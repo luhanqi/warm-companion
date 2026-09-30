@@ -8,7 +8,14 @@
 - 可重新创建的 Python 运行环境和下载缓存（`runtime/`）
 - API 密钥、生产环境变量、数据库、用户照片、录音、日志和 PID
 
-最终 LoRA 适配器位于 `train/outputs/sft-1.5b/adapter/`，最大单文件约 71 MB，低于 GitHub 的 100 MB 普通文件限制。
+最终 LoRA 适配器位于 `train/outputs/sft-1.5b/adapter/`。LoRA 和演示音频使用 Git LFS 管理，避免较大的二进制文件导致普通 Git 推送超时。
+
+克隆后请执行：
+
+```powershell
+git lfs install
+git lfs pull
+```
 
 ## 为什么不能把全部权重直接放进 GitHub
 
@@ -16,7 +23,7 @@
 
 推荐发布方式：
 
-1. GitHub：源代码、文档、最终 LoRA 适配器。
+1. GitHub：源代码、文档、最终 LoRA 适配器和演示音频；二进制文件使用 Git LFS。
 2. Hugging Face 或 ModelScope：允许再分发的模型权重及 LoRA。
 3. 对象存储：完整比赛离线包，生成带有效期的下载链接。
 4. 在 GitHub Release 或 README 中只提供下载链接、目录结构与 SHA-256，不提交权重本体。

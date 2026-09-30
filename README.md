@@ -1,6 +1,6 @@
 # 暖伴（Warm Companion）比赛提交包
 
-暖伴是一套面向老年人与家属的认知陪伴系统。本提交包包含前端、后端、训练代码、最终 LoRA 适配器、离线模型和部署说明；不包含真实账号、数据库、用户照片、录音、日志或 API 密钥。
+暖伴是一套面向老年人与家属的认知陪伴系统。本仓库包含前端、后端、训练代码、最终 LoRA 适配器、演示音频和部署说明；不包含约 55 GB 的基础模型、可重建的 Python 环境、真实账号、数据库、用户照片、录音、日志或 API 密钥。
 
 ## 三项核心创新
 
@@ -16,8 +16,7 @@
 | `web/` | 老人端与家人端全部网页、脚本、样式、图片和音频资源 |
 | `model-services/` | 语音识别、语义检索、重排、照片理解及模型启停服务 |
 | `train/` | 数据准备、SFT/DPO 训练、评估、推理服务和最终 LoRA 适配器 |
-| `models/` | 已下载的本地基础模型与多模态模型 |
-| `runtime/` | 已建立的后端、通用模型、CosyVoice Python 环境及 CosyVoice 官方推理代码 |
+| `models/` | 基础模型的目录结构、下载与放置说明；实际大模型权重需按文档另行下载 |
 | `tools/` | 提交包校验工具；FFmpeg 可执行程序需按下文单独安装 |
 | `docs/` | 架构、模型清单、原始模型配置说明、文件清单和整理日志 |
 | `.env.example` | 不含密钥的环境变量模板 |
@@ -81,7 +80,20 @@
 
 ## 快速运行（基础演示）
 
-要求 Windows 10/11。当前文件夹已经包含本机可用的 Python 环境；重新安装时需要 Python 3.10/3.11，前端开发构建另需 Node.js 18+。
+要求 Windows 10/11、Git LFS 和 Python 3.10/3.11，前端开发构建另需 Node.js 18+。首次从 GitHub 获取项目时执行：
+
+```powershell
+git lfs install
+git clone https://github.com/luhanqi/warm-companion.git
+cd warm-companion
+git lfs pull
+
+py -3.11 -m venv runtime\backend-env
+runtime\backend-env\Scripts\python -m pip install --upgrade pip
+runtime\backend-env\Scripts\python -m pip install -r backend\requirements.txt
+```
+
+`git lfs pull` 会下载仓库中的最终 LoRA 适配器和演示音频。约 55 GB 的基础模型不在 GitHub 中，完整本地模型运行前还需按 `docs/MODEL_MANIFEST.md` 和 `models/README.md` 放入对应目录。
 
 涉及音视频转码时还需要安装 FFmpeg，并确保终端执行 `ffmpeg -version` 能正常返回。本提交包中的 `tools/ffmpeg/` 是预留目录，不包含第三方可执行程序。
 
@@ -174,6 +186,6 @@ runtime\model-env\Scripts\python -m pip install -r model-services\requirements-s
 
 ## GitHub 与模型发布
 
-GitHub 仓库用于保存源代码、网页、训练脚本、部署文件、文档和最终 LoRA 适配器。约 55 GB 的基础模型与第三方模型不会直接提交到 GitHub：当前有 9 个权重文件超过 2 GB，最大文件约 10.58 GB，超过 GitHub/Git LFS 的实际发布限制。
+GitHub 仓库用于保存源代码、网页、训练脚本、部署文件、文档、最终 LoRA 适配器和演示音频。LoRA 与音频通过 Git LFS 管理，克隆后需执行 `git lfs pull`。约 55 GB 的基础模型与第三方模型不会直接提交到 GitHub：当前有 9 个权重文件超过 2 GB，最大文件约 10.58 GB，超过 GitHub/Git LFS 的实际发布限制。
 
 模型权重请发布到 Hugging Face、ModelScope 或对象存储，并保持 `models/` 下的目录名不变。代码仓库已保留 `models/README.md`、`docs/MODEL_MANIFEST.md` 和逐文件 SHA-256，下载模型后可以恢复完整离线项目。详细方案见 `docs/GITHUB_AND_MODEL_PUBLISHING.md`。
