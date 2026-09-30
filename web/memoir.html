@@ -1,0 +1,387 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>回忆录 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- 回忆录页增强样式：仅作用于本页，不修改 css/style.css -->
+    <style>
+      /* 卡片统一圆角 */
+      .greeting,
+      .book-sheet,
+      .remember-box,
+      .panel {
+        border-radius: 16px;
+      }
+      .book-sheet {
+        overflow: hidden;
+      }
+      /* 老照片装饰条（本地图片放 images/memoir.jpg） */
+      .memoir-strip {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        margin: 18px 0 4px;
+        padding: 12px;
+        background: var(--sheet);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+      .memoir-strip img {
+        width: 112px;
+        height: 112px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid var(--line-deep);
+        flex-shrink: 0;
+        filter: sepia(0.22) contrast(0.96);
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+      }
+      .memoir-strip:hover img {
+        transform: scale(1.05) rotate(-1deg);
+        box-shadow: 0 10px 24px rgba(80, 40, 16, 0.18);
+      }
+      .memoir-strip-text h2 {
+        font-family: var(--font);
+        font-size: 22px;
+        letter-spacing: 0.08em;
+      }
+      .memoir-strip-text p {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+      .memoir-strip.no-photo {
+        border-style: dashed;
+        border-color: var(--line-deep);
+        background: var(--cream);
+      }
+      .memoir-strip.no-photo img {
+        display: none;
+      }
+      /* 左侧章节索引：圆角卡片 + 悬停动效 */
+      .book-index button {
+        position: relative;
+        border-radius: 14px;
+        border-left: 0;
+        margin-bottom: 6px;
+        padding: 14px 16px;
+        transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .book-index button:hover {
+        background: var(--cream);
+        transform: translateX(4px);
+        box-shadow: 0 8px 20px rgba(80, 40, 16, 0.1);
+      }
+      .book-index button.on {
+        background: var(--sheet);
+        box-shadow: inset 0 0 0 1px var(--vermilion), 0 8px 20px rgba(178, 69, 42, 0.12);
+      }
+      .book-index button.on::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 12px;
+        bottom: 12px;
+        width: 4px;
+        border-radius: 0 4px 4px 0;
+        background: var(--vermilion);
+      }
+      /* 悬停预览浮层：显示该章节的本地图片（images/ch1.jpg ~ ch5.jpg） */
+      .book-preview {
+        position: absolute;
+        left: calc(100% + 10px);
+        top: 50%;
+        width: 240px;
+        max-width: 42vw;
+        padding: 8px;
+        background: #fffaf2;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 14px 30px rgba(62, 32, 12, 0.16);
+        z-index: 30;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-50%) translateX(-6px);
+        transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+        pointer-events: none;
+      }
+      .book-preview img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 8px;
+        background: var(--paper-deep);
+      }
+      .book-preview small {
+        display: block;
+        margin-top: 6px;
+        padding: 0 2px 2px;
+        font-family: var(--ui);
+        font-style: normal;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+      .book-preview.no-photo img {
+        display: none;
+      }
+      .book-preview.no-photo {
+        padding: 12px 14px;
+      }
+      .book-index button:hover .book-preview,
+      .book-index button:focus-visible .book-preview {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+      }
+      /* 书页切换淡入 */
+      @keyframes page-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .book-body.fade-in {
+        animation: page-in 0.4s ease;
+      }
+      /* 进度条与按钮动效 */
+      .book-progress span {
+        transition: background 0.3s ease;
+      }
+      .book-actions button {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+      .book-actions button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(80, 40, 16, 0.12);
+      }
+      @media (max-width: 760px) {
+        .book-preview {
+          left: 50%;
+          top: calc(100% + 8px);
+          width: min(300px, 76vw);
+          transform: translateX(-50%) translateY(-6px);
+        }
+        .book-index button:hover .book-preview,
+        .book-index button:focus-visible .book-preview {
+          transform: translateX(-50%) translateY(0);
+        }
+        .memoir-strip img {
+          width: 84px;
+          height: 84px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <div class="book-page">
+          <section class="greeting greeting-compact">
+            <p class="eyebrow">五章 · 说得进书里</p>
+            <h1>我的回忆录</h1>
+            <p id="summary">已写下 0 / 5 章。空着的页，您说一句，我就写上去。</p>
+            <div class="book-progress" id="progress"></div>
+          </section>
+          <!-- 老照片装饰条：图片放 book.html 同目录的 images/memoir.jpg -->
+          <div class="memoir-strip">
+            <img
+              id="memoir-photo"
+              src="images/memoir.jpg"
+              alt="我的老照片"
+              onerror="this.closest('.memoir-strip').classList.add('no-photo')"
+            />
+            <div class="memoir-strip-text">
+              <h2>这一生的老照片</h2>
+              <p>每一张都是日子。放一张您最喜欢的在这里，进门就能看见。</p>
+            </div>
+          </div>
+          <div class="book-layout">
+            <aside class="book-index" id="index"></aside>
+            <article class="book-sheet">
+              <header>
+                <span id="meta"></span>
+                <h2 id="chapter-title"></h2>
+              </header>
+              <div class="book-body" id="body"></div>
+              <div class="book-actions">
+                <button type="button" class="ghost-btn" id="prev">上一章</button>
+                <button type="button" class="solid-btn" id="listen">听这一段</button>
+                <button type="button" class="ghost-btn" id="clear">重写这一章</button>
+                <button type="button" class="ghost-btn" id="next">下一章</button>
+              </div>
+            </article>
+          </div>
+          <section class="panel remember-box">
+            <h2 id="say-title">把这一章说完整</h2>
+            <p id="prompt"></p>
+            <div id="dock"></div>
+          </section>
+        </div>
+      </main>
+      <footer class="site-colophon">暖伴 </footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var EMPTY = [
+        {
+          chapter_key: "childhood",
+          title: "童年",
+          body: "小时候住在乡下的小院里，院墙不高，院角长着一棵老槐树。每到夏天，树上开满一串串白花，风一吹，花瓣就轻轻往下落。\n\n傍晚搬个小板凳坐在门口，听长辈讲故事，天上的星星慢慢亮起来。没有很多玩具，但是泥土、蜻蜓、路边的野花，都能陪我玩上一整天。日子过得慢，心里简简单单，那些温暖细碎的片段，到现在想起来都觉得安心。",
+          audio_note: "小时候住在乡下的小院里，院墙不高，院角长着一棵老槐树。每到夏天，树上开满一串串白花，风一吹，花瓣就轻轻往下落。傍晚搬个小板凳坐在门口，听长辈讲故事，天上的星星慢慢亮起来。没有很多玩具，但是泥土、蜻蜓、路边的野花，都能陪我玩上一整天。日子过得慢，心里简简单单，那些温暖细碎的片段，到现在想起来都觉得安心。"
+        },
+        { chapter_key: "youth", title: "青年", body: "", audio_note: "" },
+        { chapter_key: "work", title: "工作", body: "", audio_note: "" },
+        { chapter_key: "family", title: "家庭", body: "", audio_note: "" },
+        { chapter_key: "retire", title: "现在", body: "", audio_note: "" },
+      ];
+      var META = [
+        { key: "childhood", title: "童年", prompt: "您小时候在哪里长大？院子里有什么？" },
+        { key: "youth", title: "青年", prompt: "年轻时您做过什么？最记得哪一首歌？" },
+        { key: "work", title: "工作", prompt: "在厂里或单位里，您最记得谁？" },
+        { key: "family", title: "家庭", prompt: "家里人都好着吗？第一次成家是什么时候？" },
+        { key: "retire", title: "现在", prompt: "退休以后，一天愿意怎么过？" },
+      ];
+      var chapters;
+      var meta = META.slice();
+      var index = 0;
+      var busy = false;
+      var rate = 0.82;
+      var notice = "";
+      var clearing = false;
+
+      // 先显示页面骨架，登录后会用后端的个人回忆录覆盖。
+      chapters = JSON.parse(JSON.stringify(EMPTY));
+
+      function persist(next) {
+        chapters = next;
+      }
+      function current() { return chapters[index]; }
+      function promptOf() {
+        var item = meta.find(function (row) { return row.key === current().chapter_key; });
+        return (item && item.prompt) || "跟我说说这一段。";
+      }
+      function render() {
+        var filled = chapters.filter(function (item) { return item.body && item.body.trim(); }).length;
+        var totalWords = chapters.reduce(function (sum, item) { return sum + (item.body || "").replace(/\s/g, "").length; }, 0);
+        document.getElementById("summary").textContent = "已写下 " + filled + " / " + chapters.length + " 章 · 共 " + totalWords + " 字。空着的页，您说一句，我就写上去。";
+        document.getElementById("progress").innerHTML = chapters.map(function (chapter) {
+          return '<span class="' + (chapter.body && chapter.body.trim() ? "filled" : "") + '"></span>';
+        }).join("");
+        document.getElementById("index").innerHTML = chapters.map(function (chapter, i) {
+          return '<button type="button" class="' + (i === index ? "on" : "") + '" data-i="' + i + '"><small>' +
+            String(i + 1).padStart(2, "0") + "</small>" + NBLayout.esc(chapter.title) + "<em>" + (chapter.body ? "已有文字" : "还空着") + "</em>" +
+            '<span class="book-preview"><img src="images/ch' + (i + 1) + (i === 0 ? '.png' : '.jpg') + '" alt="第 ' + (i + 1) + ' 章' + NBLayout.esc(chapter.title) + '" onerror="this.parentNode.classList.add(\'no-photo\')" /><small>第 ' + (i + 1) + ' 章 · ' + NBLayout.esc(chapter.title) + '</small></span></button>';
+        }).join("");
+        var cur = current();
+        var words = (cur.body || "").replace(/\s/g, "").length;
+        document.getElementById("meta").textContent = (index + 1) + " / " + chapters.length + (words ? " · " + words + " 字" : "");
+        document.getElementById("chapter-title").textContent = cur.title;
+        var bodyEl = document.getElementById("body");
+        bodyEl.innerHTML = cur.body
+          ? cur.body.split("\n").map(function (line) { return "<p>" + NBLayout.esc(line || "\u00a0") + "</p>"; }).join("")
+          : '<p class="empty-note">' + NBLayout.esc(promptOf()) + "</p>";
+        bodyEl.classList.remove("fade-in");
+        void bodyEl.offsetWidth;
+        bodyEl.classList.add("fade-in");
+        document.getElementById("prev").disabled = index === 0;
+        document.getElementById("next").disabled = index === chapters.length - 1;
+        document.getElementById("listen").disabled = !cur.body && !cur.audio_note;
+        document.getElementById("clear").disabled = !cur.body;
+        document.getElementById("clear").textContent = clearing ? "再点一次确认清空" : "重写这一章";
+        document.getElementById("say-title").textContent = "把「" + cur.title + "」说完整";
+        document.getElementById("prompt").textContent = notice || promptOf();
+      }
+      function save(text) {
+        var cur = current();
+        busy = true;
+        var nextBody = cur.body ? cur.body + "\n\n" + text : text;
+        persist(chapters.map(function (item) {
+          return item.chapter_key === cur.chapter_key ? Object.assign({}, item, { body: nextBody, audio_note: text }) : item;
+        }));
+        render();
+        NB.rememberStory({ text: text, chapter_key: cur.chapter_key }).then(function (result) {
+          notice = result.speak;
+          NBSpeech.speak(result.speak, rate);
+          return NB.fetchSession();
+        }).then(function (data) {
+          if (data && data.chapters && data.chapters.length) {
+            chapters = data.chapters;
+          }
+        }).catch(function () {
+          notice = "这一段已经写在这一页上了。下次打开还在。";
+          NBSpeech.speak("我记下了。打开这一页还能再听。", rate);
+        }).finally(function () {
+          busy = false;
+          render();
+        });
+      }
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        NBTalk.renderDock(document.getElementById("dock"), save, {
+          busy: function () { return busy; },
+          placeholder: "说一段，我整理进这一章",
+        });
+        document.getElementById("index").onclick = function (event) {
+          var btn = event.target.closest("[data-i]");
+          if (!btn) return;
+          index = Number(btn.getAttribute("data-i"));
+          clearing = false;
+          render();
+        };
+        document.getElementById("prev").onclick = function () { if (index > 0) { index -= 1; clearing = false; render(); } };
+        document.getElementById("next").onclick = function () { if (index < chapters.length - 1) { index += 1; clearing = false; render(); } };
+        document.getElementById("listen").onclick = function () {
+          var cur = current();
+          NBSpeech.speak(cur.audio_note || cur.body, rate);
+        };
+        document.getElementById("clear").onclick = function () {
+          if (!clearing) {
+            clearing = true;
+            notice = "再点一次「重写这一章」，这一页才会空出来。";
+            render();
+            return;
+          }
+          var chapterKey = current().chapter_key;
+          NB.clearChapter(chapterKey).then(function () {
+            persist(chapters.map(function (item) {
+              return item.chapter_key === chapterKey ? Object.assign({}, item, { body: "", audio_note: "" }) : item;
+            }));
+            notice = "这一页又空出来了。您可以重新说。";
+          }).catch(function () {
+            notice = "这一页暂时没有清空，请稍后再试。";
+          }).finally(function () {
+            clearing = false;
+            render();
+          });
+        };
+        NB.fetchSession().then(function (data) {
+          if (data.chapter_meta && data.chapter_meta.length) meta = data.chapter_meta;
+          if (data.chapters && data.chapters.length) chapters = data.chapters;
+          rate = (data.profile && data.profile.speech_rate) || 0.82;
+          render();
+        }).catch(function () { render(); });
+      });
+    </script>
+    
+  </body>
+</html>

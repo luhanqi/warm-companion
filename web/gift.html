@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>寄画 · 暖伴</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <style>
+      .gift-page {
+        --bg: #fbf7f2;
+        --surface: #fffdf9;
+        --surface-soft: #fff8f0;
+        --ink: #332c26;
+        --ink-2: #5c5148;
+        --muted: #9c9188;
+        --line: #efe6dc;
+        --line-2: #e4d8cb;
+
+        --brand: #c9714b;
+        --brand-dark: #b35c3e;
+        --brand-2: #e09b72;
+        --brand-soft: #fbede4;
+
+        --pink: #d9897c;
+        --pink-soft: #fae9e5;
+
+        --sage: #7c9782;
+        --sage-dark: #5f7d66;
+        --sage-soft: #edf3ee;
+
+        --amber: #d69b4a;
+        --amber-soft: #fdf2e1;
+
+        --shadow: 0 16px 38px rgba(83, 50, 30, 0.08);
+        --shadow-small: 0 8px 20px rgba(83, 50, 30, 0.06);
+
+        --r-lg: 26px;
+        --r-md: 18px;
+        --r-sm: 14px;
+      }
+
+      /* 公共说话组件保持项目原有配色，不继承本页设计变量。 */
+      .gift-page #dock {
+        --ink: #2a1810;
+        --muted: #6e5340;
+        --line: #d9c3a4;
+        --shadow: 0 18px 50px rgba(62, 32, 12, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .gift-page {
+        width: min(1160px, calc(100% - 30px));
+        margin: 0 auto;
+        padding: 28px 0 70px;
+      }
+
+      /* =========================
+         顶部介绍
+      ========================= */
+
+      .gift-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 38px 42px 34px;
+        border: 1px solid rgba(201, 113, 75, 0.18);
+        border-radius: var(--r-lg);
+        background:
+          linear-gradient(
+            125deg,
+            rgba(252, 232, 219, 0.92),
+            rgba(255, 253, 249, 0.96) 54%,
+            rgba(237, 243, 238, 0.85)
+          );
+        box-shadow: var(--shadow);
+      }
+
+      .gift-hero::before {
+        content: "画";
+        position: absolute;
+        right: 54px;
+        top: -25px;
+        font-family: "Noto Serif SC", serif;
+        font-size: 180px;
+        line-height: 1;
+        color: rgba(201, 113, 75, 0.07);
+      }
+
+      .gift-hero::after {
+        content: "";
+        position: absolute;
+        right: 70px;
+        bottom: 28px;
+        width: 180px;
+        height: 40px;
+        border-top: 1px solid rgba(201, 113, 75, 0.32);
+        border-radius: 50%;
+        transform: rotate(-7deg);
+      }
+
+      .gift-eyebrow {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--brand);
+        font-size: 14px;
+        letter-spacing: 0.14em;
+      }
+
+      .gift-eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 5px rgba(214, 155, 74, 0.15);
+      }
+
+      .gift-hero h1 {
+        position: relative;
+        z-index: 1;
+        margin: 16px 0 0;
+        font-family: "Noto Serif SC", serif;
+        font-size: clamp(32px, 5vw, 54px);
+        font-weight: 600;
+        line-height: 1.35;
+        letter-spacing: 0.08em;
+      }
+
+      .gift-hero p {
+        position: relative;
+        z-index: 1;
+        max-width: 680px;
+        margin: 15px 0 0;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.9;
+      }
+
+      .gift-privacy {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        margin-top: 20px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 253, 249, 0.78);
+        color: var(--sage-dark);
+        font-size: 13px;
+      }
+
+      .gift-status {
+        margin: 16px 0 0;
+        padding: 13px 17px;
+        border: 1px solid rgba(201, 113, 75, 0.2);
+        border-radius: 14px;
+        background: #fff7ef;
+        color: var(--brand);
+        font-size: 14px;
+      }
+
+      .gift-status[hidden] {
+        display: none;
+      }
+
+      /* =========================
+         主体工作区
+      ========================= */
+
+      .gift-studio {
+        display: grid;
+        grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .gift-panel {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        background: rgba(255, 253, 249, 0.94);
+        box-shadow: var(--shadow);
+      }
+
+      .gift-panel-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .gift-index {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        border-radius: 50%;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-family: "Noto Serif SC", serif;
+        font-size: 18px;
+      }
+
+      .gift-index.sage {
+        background: var(--sage-soft);
+        color: var(--sage-dark);
+      }
+
+      .gift-index.amber {
+        background: var(--amber-soft);
+        color: #b67b2c;
+      }
+
+      .gift-panel-head h2 {
+        margin: 0;
+        font-family: "Noto Serif SC", serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .gift-panel-head p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .gift-desk {
+        padding: 28px;
+      }
+
+      .gift-field {
+        display: block;
+        color: var(--ink-2);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.7;
+      }
+
+      .gift-field textarea,
+      .gift-field input {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        padding: 13px 14px;
+        border: 1px solid var(--line-2);
+        border-radius: var(--r-sm);
+        outline: none;
+        background: #fffdfb;
+        color: var(--ink);
+        font-size: 15px;
+        line-height: 1.7;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s ease;
+      }
+
+      .gift-field textarea {
+        min-height: 112px;
+        resize: vertical;
+      }
+
+      .gift-field textarea:focus,
+      .gift-field input:focus {
+        border-color: var(--brand-2);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(201, 113, 75, 0.11);
+      }
+
+      .gift-label {
+        margin: 24px 0 10px;
+        color: var(--muted);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+      }
+
+      .quick-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .quick-chip {
+        padding: 8px 12px;
+        border: 1px solid var(--line-2);
+        border-radius: 999px;
+        background: #fffdfb;
+        color: var(--ink-2);
+        font-size: 13px;
+        transition:
+          transform 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease,
+          background 0.2s ease;
+      }
+
+      .quick-chip:hover {
+        transform: translateY(-2px);
+        border-color: var(--brand-2);
+        background: var(--brand-soft);
+        color: var(--brand);
+      }
+
+      .gift-divider {
+        height: 1px;
+        margin: 24px 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--line-2),
+          transparent
+        );
+      }
+
+      .style-title {
+        margin: 24px 0 12px;
+        color: var(--ink-2);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .style-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .style-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 72px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fffdfb;
+        color: var(--ink-2);
+        text-align: left;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .style-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--brand-2);
+        box-shadow: var(--shadow-small);
+      }
+
+      .style-btn.active {
+        border-color: var(--brand-2);
+        background:
+          linear-gradient(
+            135deg,
+            #fff1e7,
+            #fffdf9
+          );
+        box-shadow: 0 8px 18px rgba(201, 113, 75, 0.1);
+      }
+
+      .style-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border-radius: 50%;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-family: "Noto Serif SC", serif;
+      }
+
+      .style-btn strong {
+        display: block;
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .style-btn span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .gift-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .gift-primary {
+        flex: 1;
+        min-height: 50px;
+        border: 0;
+        border-radius: 999px;
+        background:
+          linear-gradient(
+            100deg,
+            var(--brand),
+            var(--brand-2)
+          );
+        color: #fffaf4;
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 10px 22px rgba(201, 113, 75, 0.22);
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .gift-primary:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.04);
+        box-shadow: 0 14px 24px rgba(201, 113, 75, 0.27);
+      }
+
+      .gift-primary:disabled {
+        cursor: wait;
+        opacity: 0.62;
+        transform: none;
+      }
+
+      /* =========================
+         画布预览
+      ========================= */
+
+      .gift-stage {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 680px;
+        padding: 28px;
+        background:
+          linear-gradient(
+            145deg,
+            rgba(255, 252, 247, 0.95),
+            rgba(244, 239, 229, 0.95)
+          );
+      }
+
+      .gift-stage::before {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: rgba(217, 137, 124, 0.1);
+      }
+
+      .gift-stage::after {
+        content: "";
+        position: absolute;
+        left: -70px;
+        bottom: -90px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(124, 151, 130, 0.12);
+      }
+
+      .stage-head {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .stage-title {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .stage-title h2 {
+        margin: 0;
+        font-family: "Noto Serif SC", serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .style-seal {
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--sage-soft);
+        color: var(--sage-dark);
+        font-size: 13px;
+      }
+
+      .paint-mount {
+        position: relative;
+        z-index: 1;
+        flex: 1 1 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 30px;
+        border-radius: 20px;
+        background:
+          linear-gradient(
+            135deg,
+            rgba(214, 155, 74, 0.13),
+            transparent 40%
+          ),
+          rgba(255, 253, 249, 0.72);
+        border: 1px solid rgba(229, 216, 203, 0.8);
+      }
+
+      .paint-frame {
+        position: relative;
+        display: grid;
+        place-items: stretch;
+        flex: 1 1 0;
+        width: 100%;
+        min-height: 0;
+        overflow: hidden;
+        border: 12px solid #ead7c4;
+        border-radius: 10px;
+        background:
+          linear-gradient(135deg, #f9efe2, #fffdf8);
+        box-shadow:
+          0 16px 28px rgba(83, 50, 30, 0.16),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+      }
+
+      .paint-frame.has-art {
+        border-color: #e4cdb5;
+      }
+
+      .paint-frame img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .paint-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .paint-empty span {
+        display: grid;
+        place-items: center;
+        width: 72px;
+        height: 72px;
+        margin-bottom: 15px;
+        border-radius: 50%;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-family: "Noto Serif SC", serif;
+        font-size: 32px;
+      }
+
+      .paint-empty p {
+        max-width: 250px;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .paint-caption {
+        position: relative;
+        z-index: 1;
+        min-height: 50px;
+        margin: 17px 0 0;
+        color: var(--ink-2);
+        font-family: "Noto Serif SC", serif;
+        font-size: 16px;
+        line-height: 1.7;
+        text-align: center;
+      }
+
+      .paint-veil {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(255, 249, 240, 0.82);
+        backdrop-filter: blur(3px);
+      }
+
+      .paint-veil i {
+        display: block;
+        width: 58px;
+        height: 58px;
+        border: 3px solid rgba(201, 113, 75, 0.2);
+        border-top-color: var(--brand);
+        border-right-color: var(--amber);
+        border-radius: 50%;
+        animation: spin 1.1s linear infinite;
+      }
+
+      .paint-veil b {
+        color: var(--brand);
+        font-family: "Noto Serif SC", serif;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* =========================
+         家人寄出的画（独立画集）
+      ========================= */
+
+      .gift-album {
+        margin-top: 20px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        background: rgba(255, 253, 249, 0.94);
+        box-shadow: var(--shadow);
+      }
+
+      .album-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .album-title {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .album-title h2 {
+        margin: 0;
+        font-family: "Noto Serif SC", serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .album-count {
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--pink-soft);
+        color: #b86d62;
+        font-size: 13px;
+      }
+
+      .album-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .summary-chip {
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: var(--surface-soft);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .gallery-card {
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fffdfb;
+        text-align: left;
+        transition:
+          transform 0.22s ease,
+          border-color 0.22s ease,
+          box-shadow 0.22s ease;
+      }
+
+      .gallery-card:hover,
+      .gallery-card.active {
+        transform: translateY(-4px);
+        border-color: var(--brand-2);
+        box-shadow: 0 12px 22px rgba(201, 113, 75, 0.13);
+      }
+
+      .gallery-card img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1.15;
+        object-fit: cover;
+        background: #f4eadf;
+      }
+
+      .gallery-card-info {
+        padding: 12px 13px 14px;
+      }
+
+      .gallery-card-info strong {
+        display: block;
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .gallery-card-info span {
+        display: block;
+        margin-top: 6px;
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .album-empty {
+        padding: 32px 18px;
+        border: 1px dashed var(--line-2);
+        border-radius: var(--r-md);
+        background: #fbf7f2;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      .album-empty strong {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--brand);
+        font-family: "Noto Serif SC", serif;
+        font-size: 18px;
+      }
+
+      /* =========================
+         底部隐私说明
+      ========================= */
+
+      .gift-bottom-note {
+        margin-top: 20px;
+        padding: 16px 18px;
+        border: 1px solid rgba(124, 151, 130, 0.25);
+        border-radius: 16px;
+        background: var(--sage-soft);
+        color: var(--sage-dark);
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      #dock {
+        margin-top: 24px;
+      }
+
+      @media (max-width: 900px) {
+        .gift-studio {
+          grid-template-columns: 1fr;
+        }
+
+        .gallery-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .gift-page {
+          width: min(100% - 20px, 1160px);
+          padding-top: 14px;
+        }
+
+        .gift-hero {
+          padding: 28px 22px 26px;
+          border-radius: 21px;
+        }
+
+        .gift-hero h1 {
+          font-size: 34px;
+        }
+
+        .gift-hero p {
+          font-size: 15px;
+        }
+
+        .gift-desk,
+        .gift-stage,
+        .gift-album {
+          padding: 20px 16px;
+          border-radius: 20px;
+        }
+
+        .paint-mount {
+          min-height: 285px;
+          padding: 16px;
+        }
+
+        .paint-frame {
+          border-width: 8px;
+        }
+
+        .gallery-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .style-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .album-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="gift-page">
+        <!-- 顶部介绍 -->
+        <section class="gift-hero">
+          <div class="gift-eyebrow">家人寄画 · 私人创作空间</div>
+
+          <h1>画一张给她看</h1>
+
+          <p>
+            选一种画法，写下您想送给她的画面。AI会把这份想念变成一幅画，保存在家人自己的寄画记录中。
+          </p>
+
+          <span class="gift-privacy">
+            家人端独立画集 · 只保存您自己寄出的画作 · 不读取老人私密信息
+          </span>
+        </section>
+
+        <div class="status-banner" id="error" hidden></div>
+
+        <!-- 创作工作区 -->
+        <section class="gift-studio">
+          <!-- 左侧创作区 -->
+          <section class="gift-panel gift-desk">
+            <header class="gift-panel-head">
+              <span class="gift-index">壹</span>
+              <div>
+                <h2>说画面</h2>
+                <p>把想说的话，变成一幅画。</p>
+              </div>
+            </header>
+
+            <label class="gift-field">
+              用一句话说给她看的画
+              <textarea
+                id="prompt"
+                rows="4"
+                maxlength="180"
+                placeholder="老家院子里的大槐树，夏天有人坐在树下乘凉。"
+              ></textarea>
+            </label>
+
+            <div class="gift-label">可以从一句现成的话开始</div>
+
+            <div class="quick-list" id="quick"></div>
+
+            <div class="gift-divider"></div>
+
+            <label class="gift-field">
+              写在画上的一句话
+              <input
+                id="dedication"
+                maxlength="40"
+                placeholder="妈，想您了。"
+              />
+            </label>
+
+            <div class="style-title">选择画法</div>
+
+            <div class="style-grid" id="styles"></div>
+
+            <div class="gift-actions">
+              <button type="button" class="gift-primary" id="paint-btn">
+                寄给她
+              </button>
+            </div>
+          </section>
+
+          <!-- 右侧预览区 -->
+          <section class="gift-panel gift-stage">
+            <div class="stage-head">
+              <div class="stage-title">
+                <span class="style-seal">生成中</span>
+                <h2>她的画</h2>
+              </div>
+              <div id="send-status" class="gift-status" hidden>
+                已生成
+              </div>
+            </div>
+
+            <div class="paint-mount">
+              <div class="paint-frame" id="preview-frame">
+                <div class="paint-empty">
+                  <span>🖌️</span>
+                  <p>输入画面描述，点击“寄给她”即可生成</p>
+                </div>
+                <img id="preview-img" src="" alt="预览画作" hidden />
+              </div>
+            </div>
+
+            <div class="paint-caption" id="preview-caption"></div>
+          </section>
+        </section>
+
+        <!-- 家人寄出的画（独立画集） -->
+        <section class="gift-album">
+          <div class="album-head">
+            <div class="album-title">
+              <span class="style-mark sage">📥</span>
+              <h2>我寄出的画</h2>
+            </div>
+            <div class="album-count" id="sent-count">0</div>
+          </div>
+
+          <div class="album-summary" id="summary"></div>
+
+          <div class="gallery-grid" id="gallery"></div>
+
+          <div class="album-empty" id="album-empty" hidden>
+            <strong>还没有寄出过画</strong><br />
+            输入画面描述，点击“寄给她”即可开始
+          </div>
+        </section>
+
+        <div class="gift-bottom-note">
+          家人端只负责创作和查看自己寄出的画作。
+          老人端打开画集后即可看到这幅画（无需老人端知道家人端创作过程）。
+        </div>
+
+        <div id="dock"></div>
+      </main>
+
+      <footer class="site-colophon">暖伴 · 第四阶段 · 家人寄画</footer>
+    </div>
+
+    <script src="js/api.js?v=2"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var styles = [];
+      var sentGifts = [];
+      var currentStyle = {};
+      var toastTimer = null;
+
+      /* ---------------- 轻提示 ---------------- */
+      function showError(text, kind) {
+        var el = document.getElementById("error");
+        if (!text) {
+          el.hidden = true;
+          return;
+        }
+        el.className = "status-banner" + (kind === "ok" ? " is-ok" : "");
+        el.textContent = text;
+        el.hidden = false;
+
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          el.hidden = true;
+        }, 4200);
+      }
+
+      function showSuccess(text) {
+        showError(text, "ok");
+      }
+
+      /* ---------------- 画法初始化 ---------------- */
+      function initStyles() {
+        styles = [
+          {
+            id: "water",
+            label: "水彩",
+            mark: "🌊"
+          },
+          {
+            id: "oil",
+            label: "油画",
+            mark: "🖌️"
+          },
+          {
+            id: "ink",
+            label: "国画",
+            mark: "🎨"
+          },
+          {
+            id: "story",
+            label: "数字艺术",
+            mark: "🖥️"
+          }
+        ];
+
+        var container = document.getElementById("styles");
+        styles.forEach(function (style) {
+          var btn = document.createElement("button");
+          btn.className = "style-btn";
+          btn.innerHTML = `
+            <span class="style-mark">${style.mark}</span>
+            <div>
+              <strong>${style.label}</strong>
+              <span>${style.id === "water" ? "温柔梦幻" : style.id === "oil" ? "温暖治愈" : style.id === "ink" ? "古典怀旧" : "现代明亮"}</span>
+            </div>
+          `;
+          btn.onclick = function () {
+            styles.forEach(function (s) {
+              s.btn.classList.remove("active");
+            });
+            btn.classList.add("active");
+            currentStyle = style;
+          };
+          container.appendChild(btn);
+          style.btn = btn;
+        });
+      }
+
+      /* ---------------- 快速提示词 ---------------- */
+      function initQuickList() {
+        var container = document.getElementById("quick");
+        var chips = [
+          "老家院子里的大槐树",
+          "和老伴第一次在公园相遇",
+          "年轻时在工厂上班的日子",
+          "和孩子们一起做红烧肉",
+          "退休后第一次划船",
+          "听收音机听老歌的夜晚"
+        ];
+
+        chips.forEach(function (text) {
+          var chip = document.createElement("div");
+          chip.className = "quick-chip";
+          chip.textContent = text;
+          chip.onclick = function () {
+            document.getElementById("prompt").value = text;
+            currentStyle = styles[0];
+            styles.forEach(function (s) {
+              s.btn.classList.remove("active");
+            });
+            styles[0].btn.classList.add("active");
+          };
+          container.appendChild(chip);
+        });
+      }
+
+      /* ---------------- 生成画作 ---------------- */
+      var generatedGift = null;
+
+      function generatePainting() {
+        var promptEl = document.getElementById("prompt");
+        var prompt = promptEl.value.trim();
+        if (!prompt) {
+          showError("请先写下想送给她的画面");
+          return;
+        }
+
+        var statusEl = document.getElementById("send-status");
+        var previewImg = document.getElementById("preview-img");
+        var previewCaption = document.getElementById("preview-caption");
+
+        statusEl.hidden = false;
+        statusEl.textContent = "正在生成…";
+
+        NB.paintScene(prompt, currentStyle.id, {
+          dedication: document.getElementById("dedication").value.trim() || "一份想念"
+        }).then(function (result) {
+          generatedGift = {
+            id: result.id || Date.now(),
+            prompt: prompt,
+            style: currentStyle.id,
+            style_label: currentStyle.label,
+            image_url: result.url || "",
+            dedication: result.dedication || "一份想念",
+            status: "ready"
+          };
+          previewImg.src = NB.asset(generatedGift.image_url);
+          previewImg.hidden = false;
+          previewCaption.textContent = "「" + prompt + "」 — " + currentStyle.label + "风格";
+          statusEl.hidden = true;
+          showSuccess("真实画作已经生成，可以寄给她了！");
+        }).catch(function (err) {
+          statusEl.hidden = true;
+          showError(err.message || "画作没有生成成功");
+        });
+      }
+
+      /* ---------------- 发送画作给老人 ---------------- */
+      function sendPaintingToElder() {
+        var promptEl = document.getElementById("prompt");
+        var prompt = promptEl.value.trim();
+        var dedication = document.getElementById("dedication").value.trim();
+
+        if (!prompt) {
+          showError("请先写下想送给她的画面");
+          return;
+        }
+
+        if (!generatedGift || generatedGift.prompt !== prompt || generatedGift.style !== currentStyle.id) {
+          showError("画面或画风变了，请先重新生成画作");
+          return;
+        }
+        if (!sentGifts.some(function (item) { return item.id === generatedGift.id; })) {
+          generatedGift.dedication = dedication || generatedGift.dedication || "一份想念";
+          generatedGift.status = "sent";
+          sentGifts.unshift(generatedGift);
+        }
+        renderSentGifts();
+        showSuccess("画已寄给她！");
+      }
+
+      /* ---------------- 渲染家人寄出的画 ---------------- */
+      function renderSentGifts() {
+        var gallery = document.getElementById("gallery");
+        var empty = document.getElementById("album-empty");
+        var countEl = document.getElementById("sent-count");
+        var summary = document.getElementById("summary");
+
+        if (!sentGifts.length) {
+          empty.hidden = false;
+          gallery.innerHTML = "";
+          countEl.textContent = "0";
+          return;
+        }
+
+        empty.hidden = true;
+        gallery.innerHTML = "";
+
+        sentGifts.forEach(function (gift) {
+          var card = document.createElement("div");
+          card.className = "gallery-card";
+          card.innerHTML = `
+            <img src="${gift.image_url ? NB.asset(gift.image_url) : "images/warm-scene.png"}" alt="${NBLayout.esc(gift.prompt)}">
+            <div class="gallery-card-info">
+              <strong>${NBLayout.esc(gift.prompt.substring(0, 14))}…</strong>
+              <span>${NBLayout.esc(gift.style_label)}</span>
+            </div>
+          `;
+          gallery.appendChild(card);
+        });
+
+        countEl.textContent = sentGifts.length;
+
+        // 简单摘要
+        summary.innerHTML = `
+          <div class="summary-chip">已寄出 ${sentGifts.length} 张</div>
+          <div class="summary-chip">${sentGifts[0].style_label}风格</div>
+        `;
+      }
+
+      /* ---------------- 按钮点击 ---------------- */
+      document.addEventListener("click", function (event) {
+        var btn = event.target.closest(".gift-primary");
+        if (btn) {
+          if (btn.textContent.includes("生成")) {
+            generatePainting();
+          } else {
+            sendPaintingToElder();
+          }
+        }
+      });
+
+      /* ---------------- 初始化 ---------------- */
+      function init() {
+        initStyles();
+        initQuickList();
+
+        // 加载自己寄出的画
+        NB.fetchPaintings()
+          .then(function (data) {
+            sentGifts = (data.paintings || []).map(function (item) {
+              return {
+                id: item.id,
+                prompt: item.prompt,
+                style_label: item.style_label,
+                image_url: item.url,
+                dedication: item.dedication,
+                status: "sent"
+              };
+            });
+            renderSentGifts();
+          })
+          .catch(function () {
+            // 无权限或接口不存在时显示空状态
+            showError("家人寄画页面已打开", "ok");
+          });
+
+        // 字数统计（可选）
+        var noteEl = document.getElementById("dedication");
+        if (noteEl) {
+          noteEl.addEventListener("input", function () {
+            // 可扩展字数统计
+          });
+        }
+      }
+
+      NBLayout.requireRole("family").then(function (user) {
+        if (!user) {
+          showError("家人账号登录失败");
+          return;
+        }
+        init();
+      });
+    </script>
+  </body>
+</html>

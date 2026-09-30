@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>说话 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      html, body {
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ============================================================
+         背景光晕 + 宣纸纹理 + 缓慢流动的云影
+         ============================================================ */
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        background:
+          radial-gradient(circle at 12% 8%, rgba(214,174,124,0.18) 0%, transparent 42%),
+          radial-gradient(circle at 88% 92%, rgba(177,74,58,0.10) 0%, transparent 45%),
+          linear-gradient(160deg, #fffdf8 0%, #f7efe3 100%);
+        background-attachment: fixed;
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed; inset: 0;
+        pointer-events: none; z-index: 0;
+        opacity: 0.35;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.06'/></svg>");
+      }
+      body::after {
+        content: "";
+        position: fixed; inset: -20%;
+        pointer-events: none; z-index: 0;
+        background:
+          radial-gradient(circle at 30% 40%, rgba(214,174,124,0.14) 0%, transparent 38%),
+          radial-gradient(circle at 70% 65%, rgba(177,74,58,0.08) 0%, transparent 40%);
+        animation: driftBg 40s ease-in-out infinite alternate;
+      }
+      @keyframes driftBg {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(3%, -2%) scale(1.08); }
+      }
+
+      /* ============================================================
+         整页布局
+         ============================================================ */
+      .app-shell {
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+      }
+      .topbar {
+        flex: 0 0 auto;
+        min-height: 0;
+        overflow: visible;
+        position: relative;
+        z-index: 50;
+        isolation: isolate;
+        pointer-events: auto;
+      }
+      .page {
+        flex: 1 1 auto;
+        height: calc(100vh - 84px);
+        height: calc(100dvh - 84px);
+        min-height: 560px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0 !important;
+      }
+      .home-stage {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 1rem;
+        min-height: 0;
+        position: relative;
+      }
+      .salon {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden;
+        min-height: 0 !important;
+        margin-top: 0 !important;
+      }
+
+      /* ============================================================
+         消息区
+         ============================================================ */
+      .home-messages {
+        flex: 1 1 auto !important;
+        display: block;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        padding: 1rem !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        height: auto !important;
+      }
+      .home-messages::-webkit-scrollbar {
+        width: 0 !important;
+        display: none !important;
+      }
+      .home-messages {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+      }
+
+      .prompt-row {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 12px 0 8px;
+      }
+      #dock {
+        flex: 0 0 auto;
+      }
+      .bubble {
+        max-width: 74% !important;
+      }
+
+      .bubble-row {
+        margin-bottom: 6px;
+        animation: bubbleIn 0.35s ease-out;
+      }
+      @keyframes bubbleIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .thinking-tip{
+        font-size:17px;
+        color:var(--muted);
+        text-align:center;
+        padding:6px 0;
+      }
+
+      /* ============================================================
+         ★ 横幅：双层边框 + 960px 宽
+         ============================================================ */
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+
+        width: min(960px, 100%);
+        margin: 0 auto 16px;
+        padding: 24px 44px;
+
+        border: 2px solid #d9a98f;
+        outline: 1px solid #e8dccb;
+        outline-offset: 4px;
+        border-radius: 24px;
+
+        background: linear-gradient(135deg, #fffdf8 0%, #f7efe3 100%);
+        box-shadow:
+          0 8px 24px rgba(160, 120, 70, 0.08),
+          inset 0 0 0 1px rgba(255, 253, 248, 0.6);
+        position: relative;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      .header-row::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -40px;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(214,174,124,0.22) 0%, rgba(214,174,124,0) 70%);
+        pointer-events: none;
+      }
+
+      .title-banner {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        position: relative;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .title-banner .banner-text { display: none; }
+
+      .title-banner::before {
+        content: "暖伴陪您说说话";
+        display: block;
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        font-size: 32px;
+        font-weight: 900;
+        color: #3b2e21;
+        letter-spacing: 4px;
+        line-height: 1.15;
+      }
+      .title-banner::after {
+        content: "点一首 · 说一句 · 慢慢聊";
+        display: block;
+        font-size: 15px;
+        color: #b08d60;
+        letter-spacing: 3px;
+        font-weight: 500;
+      }
+
+      .header-actions{
+        display: flex;
+        gap: 12px;
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+
+      /* ============================================================
+         ★ 茶壶 + 红框 + 小气泡动画
+         ============================================================ */
+      .bubble-deco {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 96px;
+        height: 96px;
+        flex-shrink: 0;
+        margin-left: 8px;
+      }
+      .bubble-deco .bubble-emoji {
+        position: relative;
+        z-index: 3;
+        font-size: 60px;
+        line-height: 1;
+        display: block;
+        filter: drop-shadow(0 6px 16px rgba(176, 141, 96, 0.28));
+        animation: bubbleBob 4s ease-in-out infinite;
+      }
+      @keyframes bubbleBob {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-4px) scale(1.05); }
+      }
+
+      .bubble-deco .deco-ring {
+        position: absolute;
+        inset: 6px;
+        border: 2px solid #b14a3a;
+        border-radius: 50%;
+        opacity: 0.6;
+        pointer-events: none;
+        animation: ringPulse 3s ease-in-out infinite;
+      }
+      @keyframes ringPulse {
+        0%, 100% { transform: scale(1); opacity: 0.55; }
+        50% { transform: scale(1.06); opacity: 0.85; }
+      }
+
+      .bubble-deco .deco-bubble {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle at 32% 30%, #ffe6d8 0%, #e8a48c 70%, #b14a3a 100%);
+        box-shadow: 0 2px 6px rgba(177, 74, 58, 0.22);
+        pointer-events: none;
+        opacity: 0;
+        animation: bubbleRise 4.5s ease-in-out infinite;
+      }
+      .bubble-deco .db-1 {
+        width: 14px; height: 14px;
+        bottom: 12px; right: 6px;
+        animation-delay: 0s;
+      }
+      .bubble-deco .db-2 {
+        width: 10px; height: 10px;
+        bottom: 26px; right: -2px;
+        animation-delay: 1.5s;
+      }
+      .bubble-deco .db-3 {
+        width: 8px; height: 8px;
+        bottom: 6px; right: 22px;
+        animation-delay: 3s;
+      }
+      @keyframes bubbleRise {
+        0%   { opacity: 0; transform: translate(0, 8px) scale(0.6); }
+        20%  { opacity: 0.95; transform: translate(-2px, 0) scale(1); }
+        70%  { opacity: 0.7; transform: translate(-8px, -18px) scale(0.9); }
+        100% { opacity: 0; transform: translate(-14px, -32px) scale(0.5); }
+      }
+
+      .bubble-deco .deco-dot {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ffd7c2, #b14a3a);
+        box-shadow: 0 2px 6px rgba(177, 74, 58, 0.28);
+        pointer-events: none;
+        animation: dotFloat 3.4s ease-in-out infinite;
+      }
+      .bubble-deco .dot-1 {
+        width: 12px; height: 12px;
+        top: 12px; left: 8px;
+        animation-delay: 0s;
+      }
+      .bubble-deco .dot-2 {
+        width: 8px; height: 8px;
+        top: 34px; left: 2px;
+        animation-delay: 1.2s;
+      }
+      @keyframes dotFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.55; }
+        50%      { transform: translate(-3px, -9px) scale(1.15); opacity: 1; }
+      }
+
+      .page-title{
+        font-family: var(--font);
+        font-size:26px;
+        color:var(--vermilion);
+        font-weight:600;
+        border-radius: 30px;
+      }
+      .clear-chat-btn, .speech-toggle-btn{
+        border:1px solid var(--line);
+        background:var(--cream);
+        padding:6px 14px;
+        font-size:16px;
+        white-space:nowrap;
+        border-radius: 16px !important;
+      }
+      .speech-toggle-btn.off{ opacity:0.7; }
+
+      /* ============================================================
+         ★ 两侧诗句：毛笔字 + 逐字书写 + 印章落款
+         ============================================================ */
+      .side-poem {
+        position: fixed;
+        top: 50%;
+        left: auto;
+        right: auto;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+
+        font-family: "STKaiti", "华文楷体", "Kaiti", "楷体", "KaiTi", "SimSun", serif;
+        font-size: 46px;
+        font-weight: 700;
+        letter-spacing: 20px;
+        line-height: 1.35;
+
+        color: rgba(74, 44, 26, 0.72);
+        text-shadow:
+          0 0 1px rgba(74, 44, 26, 0.28),
+          0 1px 2px rgba(74, 44, 26, 0.12);
+
+        pointer-events: none;
+        user-select: none;
+        z-index: 5;
+        white-space: nowrap;
+      }
+      .side-poem.left  { left: 70px; }
+      .side-poem.right { right: 70px; }
+
+      .side-poem span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-4px);
+        filter: blur(4px);
+        animation: inkWrite 0.7s cubic-bezier(0.22, 0.85, 0.35, 1) forwards;
+      }
+      @keyframes inkWrite {
+        0%   { opacity: 0; transform: translateY(-4px); filter: blur(4px); }
+        60%  { opacity: 0.75; filter: blur(1px); }
+        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+      }
+
+      .side-poem::after {
+        content: "暖";
+        position: absolute;
+        left: 50%;
+        bottom: -80px;
+        transform: translateX(-50%) scale(1.4);
+        width: 48px;
+        height: 48px;
+        background: #b14a3a;
+        color: #fffdf8;
+        font-size: 26px;
+        font-family: "STKaiti", serif;
+        font-weight: 700;
+        writing-mode: horizontal-tb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        box-shadow:
+          0 3px 10px rgba(177,74,58,0.30),
+          inset 0 0 0 2px rgba(255,253,248,0.35);
+        letter-spacing: 0;
+        line-height: 1;
+        opacity: 0;
+        animation: sealAppear 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      .side-poem.left::after  { animation-delay: 2.5s; }
+      .side-poem.right::after { animation-delay: 4.7s; }
+      @keyframes sealAppear {
+        0%   { opacity: 0; transform: translateX(-50%) scale(1.6); }
+        70%  { opacity: 0.95; transform: translateX(-50%) scale(0.94); }
+        100% { opacity: 0.9;  transform: translateX(-50%) scale(1); }
+      }
+
+      @media (max-width: 900px) { .side-poem { display: none; } }
+
+      /* ============================================================
+         日期分隔带
+         ============================================================ */
+      .date-divider {
+        display: flex; align-items: center; justify-content: center;
+        gap: 12px; margin: 6px 0 16px;
+        color: #b08d60; font-size: 14px; letter-spacing: 2px;
+        font-family: "Kaiti","楷体",serif;
+      }
+      .date-divider::before,
+      .date-divider::after {
+        content: ""; flex: 1; height: 1px;
+        background: linear-gradient(to right, transparent, #e3d2c3, transparent);
+      }
+      .date-divider::before { margin-left: 8px; }
+      .date-divider::after  { margin-right: 8px; }
+
+      /* ============================================================
+         底部今日小字（宽度跟随横幅 960）
+         ============================================================ */
+      .today-footnote {
+        width: min(960px, 100%);
+        margin: 10px auto 0;
+        text-align: center;
+        font-family: "Kaiti","楷体",serif;
+        font-size: 15px;
+        color: rgba(160, 120, 80, 0.75);
+        letter-spacing: 2px;
+        pointer-events: none;
+        user-select: none;
+      }
+      .today-footnote::before,
+      .today-footnote::after {
+        content: "·";
+        margin: 0 10px;
+        opacity: 0.6;
+      }
+
+      /* ============================================================
+         对话框（宽度跟随横幅 960）
+         ============================================================ */
+      body.has-talk-dock #talk-dock-host,
+      #talk-dock-host {
+        position: static !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      body.has-talk-dock .talk-shell,
+      body.talk-dock-expanded .talk-shell,
+      .talk-shell {
+        position: static !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100% !important;
+        z-index: auto !important;
+        pointer-events: auto !important;
+      }
+      body.has-talk-dock .talk-composer,
+      .talk-composer {
+        width: min(960px, 100%) !important;
+        max-width: min(960px, 100%) !important;
+        margin: 0 auto !important;
+      }
+      body.has-talk-dock .page,
+      body.has-talk-dock.talk-dock-expanded .page,
+      body.has-talk-dock .site-colophon,
+      body.has-talk-dock.talk-dock-expanded .site-colophon {
+        padding-bottom: 0 !important;
+      }
+      .talk-turn {
+        max-height: min(30vh, 220px) !important;
+      }
+
+      /* ============================================================
+         圆角
+         ============================================================ */
+      .bubble { border-radius: 22px !important; }
+      .bubble-row.user .bubble { border-radius: 22px 6px 22px 22px !important; }
+      .bubble-row.assistant .bubble { border-radius: 6px 22px 22px 22px !important; }
+      .talk-bar { border-radius: 24px !important; border: 1px solid #e3d2c3 !important; box-shadow: 0 4px 14px rgba(138, 58, 43, 0.08); }
+      .talk-input { border-radius: 18px !important; }
+      .send-btn { border-radius: 24px !important; border: none !important; background: #8a3a2b !important; color: #fff !important; }
+
+      .prompt-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 14px !important;
+        border: 1px solid #e3d2c3 !important;
+        background: #fff7ed !important;
+        padding: 10px 18px 10px 14px !important;
+        min-height: 52px !important;
+        font-size: 16px !important;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        box-shadow: 0 2px 6px rgba(138,58,43,0.04);
+      }
+      .prompt-chip::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #d9a98f, #b14a3a);
+        border-radius: 14px 0 0 14px;
+      }
+      .prompt-chip:hover {
+        transform: translateY(-2px);
+        border-color: #d9a98f !important;
+        box-shadow: 0 8px 18px rgba(138,58,43,0.12);
+      }
+      .prompt-chip .chip-icon {
+        font-size: 20px;
+        line-height: 1;
+        flex-shrink: 0;
+        margin-left: 4px;
+      }
+      .prompt-chip .chip-main {
+        color: #5a4632;
+        font-weight: 500;
+      }
+
+      .home-messages { border-radius: 30px !important; }
+      .salon { border-radius: 28px !important; overflow: hidden !important; }
+
+      @media (max-width: 720px) {
+        .bubble-deco { display: none; }
+        .header-row { padding: 16px 20px; gap: 12px; }
+        .title-banner::before { font-size: 24px; }
+        .title-banner::after { font-size: 13px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <div class="home-stage">
+          <div class="side-poem left" aria-hidden="true">且听人间絮语</div>
+          <div class="side-poem right" aria-hidden="true">静守岁月温柔</div>
+
+          <div class="status-banner" id="error" hidden></div>
+
+          <div class="header-row">
+            <div class="title-banner">
+              <!-- 主标题 / 副标题由 CSS 伪元素生成 -->
+            </div>
+            <div class="header-actions">
+              <button class="speech-toggle-btn" id="speechToggleBtn">关闭朗读</button>
+              <button class="clear-chat-btn" id="clearChatBtn">清空对话</button>
+            </div>
+            <div class="bubble-deco" aria-hidden="true">
+              <span class="deco-ring"></span>
+              <span class="deco-bubble db-1"></span>
+              <span class="deco-bubble db-2"></span>
+              <span class="deco-bubble db-3"></span>
+              <span class="deco-dot dot-1"></span>
+              <span class="deco-dot dot-2"></span>
+              <span class="bubble-emoji">🫖</span>
+            </div>
+          </div>
+
+          <div class="salon" style="max-height: none !important;">
+            <div class="messages home-messages" id="messages">
+              <div class="date-divider"><span>今天 · 慢慢聊</span></div>
+              <p class="empty-note">还没有开始聊。打字发给我，或点左边话筒按住说。</p>
+            </div>
+            <div id="thinkingTip" class="thinking-tip" hidden>暖伴正在思考……</div>
+          </div>
+
+          <div class="prompt-row" id="suggestions" style="padding-top:6px; padding-bottom:6px;"></div>
+
+          <div id="dock" style="padding-top:6px; padding-bottom:6px;"></div>
+
+          <div class="today-footnote" id="todayFootnote">今天</div>
+        </div>
+      </main>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      /* 诗句逐字拆开 + 顺序写字 */
+      (function initSidePoemWriting() {
+        var poems = document.querySelectorAll('.side-poem');
+        poems.forEach(function (el, idx) {
+          var text = (el.textContent || '').trim();
+          if (!text) return;
+          el.textContent = '';
+          var startDelay = (idx === 0) ? 0.3 : 2.4;
+          var step = 0.28;
+          text.split('').forEach(function (ch, i) {
+            var span = document.createElement('span');
+            span.textContent = ch;
+            span.style.animationDelay = (startDelay + i * step).toFixed(2) + 's';
+            el.appendChild(span);
+          });
+        });
+      })();
+
+      var SUGGESTIONS = ["我想听茉莉花", "明天要出门看老同事，天气怎么样，提醒我带降压药", "教我怎么接视频"];
+      var messages = [];
+      var traces = [];
+      var busy = false;
+      var spoken = "";
+      var rate = 0.82;
+      var speechEnabled = true;
+
+      var CHIP_ICONS = ["🎵", "🌤️", "📱"];
+      var DATE_DIVIDER_HTML = '<div class="date-divider"><span>今天 · 慢慢聊</span></div>';
+
+      function renderTodayFootnote() {
+        var el = document.getElementById("todayFootnote");
+        if (!el) return;
+        var now = new Date();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var weekdayNames = ["日", "一", "二", "三", "四", "五", "六"];
+        var weekday = "星期" + weekdayNames[now.getDay()];
+        var seasonHint = "";
+        if (month >= 3 && month <= 5) seasonHint = "春意正浓";
+        else if (month >= 6 && month <= 8) seasonHint = "天热了，多喝水";
+        else if (month >= 9 && month <= 11) seasonHint = "天凉了，记得添衣";
+        else seasonHint = "天冷了，注意保暖";
+        el.textContent = "今天是 " + month + " 月 " + day + " 日 " + weekday + " · " + seasonHint;
+      }
+      renderTodayFootnote();
+
+      document.getElementById("clearChatBtn").onclick = function(){
+        messages = [];
+        renderMessages();
+      }
+      document.getElementById("speechToggleBtn").onclick = function(){
+        speechEnabled = !speechEnabled;
+        if(!speechEnabled){
+          NBSpeech.stopSpeaking();
+          this.textContent = "开启朗读";
+          this.classList.add("off");
+        }else{
+          this.textContent = "关闭朗读";
+          this.classList.remove("off");
+        }
+      }
+      function routeName(route) {
+        return { healing: "疗愈", companion: "陪伴", memory: "记忆", guardian: "守护", life: "生活", parallel: "并行" }[route] || route;
+      }
+      function renderMessages() {
+        var box = document.getElementById("messages");
+        if (!messages.length) {
+          box.innerHTML = DATE_DIVIDER_HTML + '<p class="empty-note">还没有开始聊。打字发给我，或点左边话筒按住说。</p>';
+          return;
+        }
+        box.innerHTML = DATE_DIVIDER_HTML + messages
+          .map(function (message) {
+            var who = message.role === "assistant" ? "暖" : "我";
+            var klass = message.role === "assistant" ? "warm" : "plain";
+            return (
+              '<div class="bubble-row ' + message.role + '">' +
+              '<div class="avatar-dot ' + klass + '">' +
+              who +
+              '</div><div class="bubble ' + message.role + '" style="padding:8px 16px !important; line-height:1.35 !important;">' +
+              NBLayout.esc(message.content || "……") +
+              '</div></div>'
+            );
+          })
+          .join("");
+        box.scrollTo({ top: box.scrollHeight + 20, behavior: "smooth" });
+      }
+      function renderTraces() {
+      }
+      function speakText(text){
+        if(speechEnabled){
+          NBSpeech.speak(text, rate);
+        }
+      }
+      function sendText(text) {
+        if (!text || !text.trim() || busy) return;
+        NBSpeech.stopSpeaking();
+        busy = true;
+        document.getElementById("error").hidden = true;
+        document.getElementById("thinkingTip").hidden = false;
+        messages.push({ role: "user", content: text }, { role: "assistant", content: "" });
+        spoken = "";
+        var pending = "";
+        renderMessages();
+        NB.streamChat(text, function (event) {
+          if (event.type === "token") {
+            pending += event.text;
+            messages[messages.length - 1].content = pending;
+            renderMessages();
+            NBSpeech.splitSentences(pending.slice(spoken.length)).ready.forEach(function (sentence) {
+              spoken += sentence;
+              speakText(sentence);
+            });
+          }
+          if (event.type === "trace") traces = [event].concat(traces).slice(0, 6);
+          if (event.type === "done") {
+            var rest = pending.slice(spoken.length).trim();
+            if (rest) speakText(rest);
+            document.getElementById("thinkingTip").hidden = true;
+          }
+          if (event.type === "error") {
+            var err = document.getElementById("error");
+            err.hidden = false;
+            err.textContent = event.message;
+            document.getElementById("thinkingTip").hidden = true;
+          }
+        })
+          .catch(function (error) {
+            var err = document.getElementById("error");
+            err.hidden = false;
+            err.textContent = error.message || "这一句没有发出去";
+            document.getElementById("thinkingTip").hidden = true;
+          })
+          .finally(function () {
+            busy = false;
+          });
+      }
+
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        SUGGESTIONS.forEach(function (item, idx) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "prompt-chip";
+          btn.innerHTML = '<span class="chip-icon">' + (CHIP_ICONS[idx] || "💬") + '</span>' +
+                          '<span class="chip-main">' + NBLayout.esc(item) + '</span>';
+          btn.onclick = function () {
+            sendText(item);
+          };
+          document.getElementById("suggestions").appendChild(btn);
+        });
+
+        NBTalk.renderDock(document.getElementById("dock"), sendText, {
+          busy: function () {
+            return busy;
+          }
+        });
+
+        NB.fetchSession()
+          .then(function (data) {
+            rate = (data.profile && data.profile.speech_rate) || 0.82;
+            var chips = [];
+            if (data.profile && data.profile.hometown) chips.push(data.profile.hometown);
+            (data.people || []).slice(0, 3).forEach(function (person) {
+              chips.push(person.relation + person.name);
+            });
+            (data.facts || []).slice(0, 2).forEach(function (fact) {
+              chips.push(fact.value);
+            });
+            messages = (data.messages || []).filter(function (item) {
+              return (item.role === "user" || item.role === "assistant") && item.content !== data.greeting;
+            });
+            renderMessages();
+          })
+          .catch(function () {
+            var err = document.getElementById("error");
+            err.hidden = false;
+            err.textContent = "还没有连上暖伴服务。";
+          });
+      });
+    </script>
+  </body>
+</html>

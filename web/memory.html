@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>暖伴记得这些 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page" id="content">
+        <p class="empty-note">正在翻看暖伴记下的事……</p>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        var box = document.getElementById("content");
+        NB.fetchSession().then(function (session) {
+          var profile = session.profile || {};
+          box.innerHTML =
+            '<section class="greeting greeting-compact"><p class="eyebrow">我的一生记忆库</p><h1>暖伴记得这些</h1>' +
+            "<p>您可以核对、改正或删掉记错的内容。暖伴只会使用这里确认过的个人记忆。</p></section>" +
+            '<div class="panel-grid" style="margin-top: 22px"><section class="panel"><h2>您是谁</h2>' +
+            '<div class="memory-item"><small>称呼</small>' + NBLayout.esc(profile.courtesy || "还没有称呼") + "</div>" +
+            '<div class="memory-item"><small>姓名</small>' + NBLayout.esc(profile.display_name || "还没有填写") + "</div>" +
+            '<div class="memory-item"><small>籍贯</small>' + NBLayout.esc(profile.hometown || "还没有填写") + "</div>" +
+            '<div class="memory-item"><small>年代</small>' + NBLayout.esc(profile.birth_decade || "还没有填写") + "</div></section>" +
+            '<section class="panel"><h2>家人</h2>' +
+            ((session.people || []).length
+              ? session.people.map(function (person) {
+                  return '<div class="memory-item"><small>' + NBLayout.esc(person.relation) + "</small>" +
+                    NBLayout.esc(person.name) + (person.note ? " · " + NBLayout.esc(person.note) : "") + "</div>";
+                }).join("")
+              : '<p class="empty-note">跟暖伴说说家里人的名字，就会出现在这里。</p>') +
+            '</section></div><section class="panel" style="margin-top: 16px"><h2>记下的事</h2>' +
+            ((session.facts || []).length
+              ? session.facts.map(function (fact) {
+                  return '<div class="memory-item" data-fact-row="' + fact.id + '"><small>' + NBLayout.esc(fact.key) + "</small><span>" + NBLayout.esc(fact.value) + '</span><span style="float:right;display:flex;gap:8px"><button type="button" class="ghost-btn" data-fact-edit="' + fact.id + '">改正</button><button type="button" class="ghost-btn" data-fact-delete="' + fact.id + '">删除</button></span></div>';
+                }).join("")
+              : '<p class="empty-note">还没有长期事实。</p>') +
+            '</section><section class="panel" style="margin-top: 16px"><h2>调度记录</h2>' +
+            ((session.traces || []).length
+              ? session.traces.map(function (trace) {
+                  return '<div class="trace-item"><small>' + NBLayout.esc(trace.reason) + "</small>路由到" +
+                    (trace.route === "companion" ? "陪伴智能体" : NBLayout.esc(trace.route)) + "</div>";
+                }).join("")
+              : '<p class="empty-note">还没有对话，也就还没有调度。</p>') +
+            "</section>";
+          box.onclick = function (event) {
+            var edit = event.target.closest("[data-fact-edit]");
+            var remove = event.target.closest("[data-fact-delete]");
+            var id = Number((edit || remove || {}).dataset && (edit || remove).dataset.factEdit || (remove && remove.dataset.factDelete));
+            if (!id) return;
+            var fact = (session.facts || []).find(function (item) { return item.id === id; });
+            if (!fact) return;
+            if (edit) {
+              var value = window.prompt("请改正这条记忆", fact.value || "");
+              if (value == null || !value.trim()) return;
+              NB.updateFact(id, { key: fact.key, value: value.trim() }).then(function (saved) {
+                fact.value = saved.value;
+                var row = box.querySelector('[data-fact-row="' + id + '"] span');
+                if (row) row.textContent = saved.value;
+              });
+              return;
+            }
+            if (remove && window.confirm("确定让暖伴忘掉这条记忆吗？")) {
+              NB.deleteFact(id).then(function () {
+                session.facts = session.facts.filter(function (item) { return item.id !== id; });
+                var row = box.querySelector('[data-fact-row="' + id + '"]');
+                if (row) row.remove();
+              });
+            }
+          };
+          NBTalk.renderDock(null, function (text, panel, cmd) {
+            var people = session.people || [];
+            var facts = session.facts || [];
+            var action = (cmd && cmd.action) || "";
+            if ((action === "ask_people" || action === "chat") && people.length && /(家人|儿子|女儿|谁)/.test(text)) {
+              panel.reply("我记得您家里有" + people.map(function (item) { return item.relation + item.name; }).join("、") + "。", { speak: true });
+              return;
+            }
+            if (action === "ask_people" && people.length) {
+              panel.reply("我记得您家里有" + people.map(function (item) { return item.relation + item.name; }).join("、") + "。", { speak: true });
+              return;
+            }
+            if (action === "ask_facts" && facts.length) {
+              panel.reply("我还记得您" + facts[0].value + "。", { speak: true });
+              return;
+            }
+            return false;
+          }, {
+            page: "memory",
+            placeholder: "问我记得谁，或记得什么",
+          });
+        }).catch(function () {
+          box.innerHTML =
+            '<section class="greeting greeting-compact"><p class="eyebrow">黑板</p><h1>暖伴记得这些</h1>' +
+            "<p>服务没连上时，先去资料页看看本机记下的称呼和家人。</p></section>" +
+            '<div class="status-banner">还没有连上暖伴服务。</div>' +
+            '<p style="margin-top: 16px"><a href="profile.html" class="text-link">去我的资料</a></p>';
+          NBTalk.renderDock(null, function () {
+            return false;
+          }, {
+            page: "memory",
+            placeholder: "问我记得谁，或记得什么",
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

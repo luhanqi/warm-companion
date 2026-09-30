@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>心情花园 · 暖伴</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link
+    href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ===== 基础与色板 ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --deep: #2E4A3C;
+      --moss: #5B7A5B;
+      --leaf: #6FBF73;
+      --blossom: #F6A9B8;
+      --blossom-deep: #E87E95;
+      --cream: #FBF6EC;
+      --ink: #3A4A3F;
+      --muted: #6e5340;
+      --serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+      --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--sans);
+      color: var(--muted);
+      background-color: var(--cream);
+      background-image: radial-gradient(rgba(111, 191, 115, 0.09) 1px, transparent 1px);
+      background-size: 26px 26px;
+      min-height: 100vh;
+    }
+    [hidden] { display: none !important; }
+    .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+    .page { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px 48px; }
+
+    /* ===== 引言卡片（含右侧治愈系动态花园） ===== */
+    .greeting {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin: 20px 0 16px;
+      padding: 14px 22px;
+      background: linear-gradient(135deg, #F4FAEF 0%, #FBF6EC 55%, #FFF1E5 100%);
+      border-radius: 22px;
+      box-shadow: 0 6px 22px rgba(46, 74, 60, 0.07);
+      border: 1px solid rgba(111, 191, 115, 0.14);
+      overflow: hidden;
+      position: relative;
+    }
+    .greeting-text { flex: 1; min-width: 0; position: relative; z-index: 2; }
+    .eyebrow { font-size: .78rem; letter-spacing: .32em; color: #6E8B74; font-weight: 600; margin-bottom: 6px; }
+    .greeting h1 { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--deep); letter-spacing: .05em; line-height: 1.2; }
+    .greeting-text > p:last-child {
+      color: #6E7F72;
+      margin-top: 6px;
+      font-size: .92rem;
+      line-height: 1.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ===== 右侧治愈系花园动态图（重绘版） ===== */
+    .greeting-deco {
+      position: relative;
+      flex: none;
+      width: 320px;
+      height: 112px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(180deg,
+        #D9ECFF 0%,
+        #EAF5FF 28%,
+        #FBF8EC 52%,
+        #EFF6D9 74%,
+        #D4E9B4 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+        0 4px 14px rgba(46, 74, 60, 0.08);
+    }
+
+    /* 远处柔光 */
+    .gd-sun-glow {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(255, 245, 210, 0.95) 0%,
+        rgba(255, 235, 190, 0.55) 35%,
+        rgba(255, 235, 190, 0) 70%);
+      animation: gdGlowPulse 6s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+    @keyframes gdGlowPulse {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    /* 太阳核心 */
+    .gd-sun-core {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 36%, #FFFDF0 0%, #FFE9A0 45%, #FFC94D 100%);
+      box-shadow:
+        0 0 18px rgba(255, 230, 140, 0.85),
+        0 0 38px rgba(255, 220, 130, 0.4);
+      animation: gdSunPulse 4.5s ease-in-out infinite;
+      z-index: 2;
+    }
+    @keyframes gdSunPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    /* 云朵（轻薄层叠） */
+    .gd-cloud {
+      position: absolute;
+      background: #FFFFFF;
+      border-radius: 20px;
+      opacity: 0.92;
+      z-index: 2;
+      filter: blur(0.2px);
+    }
+    .gd-cloud::before,
+    .gd-cloud::after {
+      content: "";
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .gd-cloud-a {
+      top: 26px;
+      left: 22px;
+      width: 44px;
+      height: 11px;
+      animation: gdCloudDrift 11s ease-in-out infinite;
+    }
+    .gd-cloud-a::before { top: -8px; left: 8px; width: 20px; height: 20px; }
+    .gd-cloud-a::after  { top: -5px; right: 7px; width: 14px; height: 14px; }
+
+    .gd-cloud-b {
+      top: 14px;
+      left: 122px;
+      width: 34px;
+      height: 9px;
+      opacity: 0.7;
+      animation: gdCloudDrift 14s ease-in-out infinite reverse;
+    }
+    .gd-cloud-b::before { top: -6px; left: 6px; width: 15px; height: 15px; }
+    .gd-cloud-b::after  { top: -4px; right: 5px; width: 10px; height: 10px; }
+
+    @keyframes gdCloudDrift {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(14px); }
+    }
+
+    /* 远处山丘 */
+    .gd-hill {
+      position: absolute;
+      z-index: 3;
+    }
+    .gd-hill-far {
+      left: -12%;
+      right: 25%;
+      bottom: 26px;
+      height: 48px;
+      background: linear-gradient(180deg, #C0E0AA 0%, #9CCB82 100%);
+      border-radius: 55% 45% 0 0;
+    }
+    .gd-hill-near {
+      left: 12%;
+      right: -12%;
+      bottom: 16px;
+      height: 56px;
+      background: linear-gradient(180deg, #A2D289 0%, #78B461 100%);
+      border-radius: 45% 55% 0 0;
+    }
+
+    /* 近处地面（细腻草地） */
+    .gd-ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 22px;
+      background: linear-gradient(180deg, #8CC470 0%, #6BA654 100%);
+      z-index: 4;
+    }
+    .gd-ground::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent);
+      border-radius: 50%;
+    }
+
+    /* 花朵（CSS 绘制） */
+    .gd-flower {
+      position: absolute;
+      bottom: 13px;
+      width: 3px;
+      height: 28px;
+      background: linear-gradient(180deg, #7CBE62, #589C44);
+      border-radius: 2px;
+      z-index: 5;
+      transform-origin: bottom center;
+      animation: gdSway 3.6s ease-in-out infinite;
+      animation-delay: var(--gd-delay, 0s);
+    }
+    .gd-flower::before {
+      content: "";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(circle at 50% 50%, #FFD34D 22%, transparent 28%),
+        radial-gradient(circle at 50% 18%, var(--fc, #F5A8B8) 26%, transparent 32%),
+        radial-gradient(circle at 82% 50%, var(--fc, #F5A8B8) 26%, transparent 32%),
+        radial-gradient(circle at 50% 82%, var(--fc, #F5A8B8) 26%, transparent 32%),
+        radial-gradient(circle at 18% 50%, var(--fc, #F5A8B8) 26%, transparent 32%);
+      filter: drop-shadow(0 1px 2px rgba(180, 120, 100, 0.15));
+    }
+    .gd-flower::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 2px;
+      width: 9px;
+      height: 6px;
+      background: linear-gradient(135deg, #8CD074, #5BA845);
+      border-radius: 50% 0 50% 0;
+      transform: rotate(-32deg);
+      transform-origin: 0 100%;
+    }
+    .gd-flower-a { left: 16%; --fc: #F5A8B8; --gd-delay: 0s; height: 26px; }
+    .gd-flower-b { left: 44%; --fc: #FFD080; --gd-delay: 0.9s; height: 22px; }
+    .gd-flower-c { left: 74%; --fc: #C5AAEE; --gd-delay: 0.4s; height: 30px; }
+
+    @keyframes gdSway {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(4deg); }
+    }
+
+    /* ===== 两栏布局：左右齐平 ===== */
+    .garden-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .garden-left,
+    .garden-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .garden-left { height: 100%; }
+    .garden-left .garden-scene { flex: 1; min-height: 520px; }
+    .garden-right .panel { flex: none; }
+
+    /* ===== 花园主场景 ===== */
+    .garden-scene {
+      position: relative; border-radius: 30px; overflow: hidden;
+      box-shadow: 0 20px 48px rgba(46, 74, 60, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      transition: background 1.2s cubic-bezier(.4, 0, .2, 1), box-shadow .6s ease;
+    }
+    .garden-scene:hover { box-shadow: 0 24px 56px rgba(46, 74, 60, 0.24); }
+    .garden-scene.scene-rain    { background: linear-gradient(180deg, #4A6070, #6E8090 45%, #8A9AA0); }
+    .garden-scene.scene-cloudy  { background: linear-gradient(180deg, #A8BAA8, #C8D6C4 50%, #E0E8D8); }
+    .garden-scene.scene-sunny   { background: linear-gradient(180deg, #5FC4E8, #9FDCF0 50%, #E8F5D8); }
+    .garden-scene.scene-paradise{ background: linear-gradient(180deg, #4AB0DD, #8ED6EC 42%, #FCF2C4); }
+
+    .scene-glow {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255, 240, 180, .3), transparent 65%);
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    .scene-sunny .scene-glow,
+    .scene-paradise .scene-glow { opacity: 1; }
+
+    .weather-layer { position: absolute; inset: 0; z-index: 6; pointer-events: none; transition: opacity .65s ease; }
+    .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 44%; z-index: 3; pointer-events: none; }
+    .hill { position: absolute; border-radius: 50% 50% 0 0; }
+    .hill.back { left: -6%; right: -6%; bottom: -32%; height: 86%; background: linear-gradient(180deg, #93C88A, #6DA560); opacity: .92; transition: filter 1s ease; }
+    .hill.front { left: -3%; right: -3%; bottom: -24%; height: 72%; background: linear-gradient(180deg, #82C074, #5D9A50); transition: filter 1s ease; }
+    .scene-rain .hill.back { filter: saturate(.35) brightness(.8); }
+    .scene-rain .hill.front { filter: saturate(.4) brightness(.8); }
+    .scene-cloudy .hill.back { filter: saturate(.65) brightness(.94); }
+    .scene-cloudy .hill.front { filter: saturate(.7) brightness(.94); }
+
+    .flower-bed {
+      position: absolute; left: 0; right: 0; bottom: 16px; z-index: 5;
+      display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end;
+      gap: 4px 8px; padding: 0 12px;
+    }
+    .scene-status { position: absolute; top: 16px; left: 16px; right: 16px; z-index: 8; display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; pointer-events: none; }
+    .scene-chip, .flower-count {
+      background: rgba(255, 255, 255, .9); border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 40px; padding: 9px 16px; font-size: .86rem; font-weight: 600;
+      color: var(--deep); box-shadow: 0 6px 16px rgba(46, 74, 60, .14);
+      display: inline-flex; align-items: center; gap: 6px;
+      backdrop-filter: blur(6px);
+    }
+    .flower-count .num { display: inline-block; min-width: 2.2em; text-align: center; }
+    .chip-pop { animation: chipPop .45s cubic-bezier(.34, 1.56, .64, 1); }
+    @keyframes chipPop { 0% { transform: scale(1); } 45% { transform: scale(1.16); } 100% { transform: scale(1); } }
+    .garden-hint {
+      position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; z-index: 8;
+      font-size: .84rem; letter-spacing: .08em; color: rgba(255, 255, 255, .95);
+      text-shadow: 0 1px 4px rgba(30, 50, 40, .4); pointer-events: none; transition: opacity .8s;
+    }
+    .garden-hint.hide { opacity: 0; }
+
+    /* ===== 花朵 ===== */
+    .flower {
+      position: relative; width: 64px; height: 138px;
+      border: 0; background: none; padding: 0; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      transform-origin: 50% 100%;
+      animation: sway 4.4s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+      transition: filter .3s ease, transform .3s ease;
+    }
+    .flower:hover {
+      filter: drop-shadow(0 6px 16px rgba(255, 210, 100, .6));
+      transform: translateY(-5px) scale(1.06);
+    }
+    .theme-a { --petal: #F6A9B8; --petal2: #E87E95; --core: #FFB03A; }
+    .theme-b { --petal: #FFCE8D; --petal2: #F5A95F; --core: #E8634E; }
+    .theme-c { --petal: #C7B0F2; --petal2: #A98BE6; --core: #F7C94B; }
+    .theme-d { --petal: #FFF1DC; --petal2: #F7D9A8; --core: #F194A8; }
+    .flower.off {
+      --petal: #A8B3AA; --petal2: #96A39A; --core: #B8C2B6;
+      animation: swayOff 5.4s ease-in-out infinite;
+    }
+    .flower.pop { animation: pop .5s cubic-bezier(.34, 1.56, .64, 1); }
+    .flower .stem { position: absolute; left: 50%; top: 48px; width: 4px; height: 74px; margin-left: -2px; background: linear-gradient(180deg, #8CC07C, #5D9C4E); border-radius: 3px; z-index: 1; }
+    .flower .leaf { position: absolute; z-index: 1; width: 24px; height: 12px; background: linear-gradient(135deg, #8CC07C, #5D9C4E); border-radius: 50% 0 50% 0; }
+    .flower .leaf-l { left: 16px; top: 92px; transform: rotate(-30deg); }
+    .flower .leaf-r { right: 16px; top: 106px; transform: rotate(150deg); }
+    .flower .glow {
+      position: absolute; left: 50%; top: -20px; width: 120px; height: 120px; margin-left: -60px;
+      border-radius: 50%; z-index: 0; opacity: 0; transition: opacity .6s ease;
+      background: radial-gradient(circle, rgba(255, 213, 120, .7), rgba(255, 213, 120, 0) 68%);
+    }
+    .flower.on .glow { opacity: 1; animation: glowPulse 3.2s ease-in-out infinite; }
+    .flower .bloom { position: absolute; left: 50%; top: 0; width: 62px; height: 62px; margin-left: -31px; z-index: 2; transition: transform .5s cubic-bezier(.34, 1.56, .64, 1); }
+    .flower.off .bloom { transform: scale(.7) rotate(-9deg); }
+    .flower.on .bloom { transform: scale(1.04); }
+    .flower .bloom .petal {
+      position: absolute; left: 50%; top: 2px; width: 23px; height: 29px; margin-left: -11.5px;
+      transform-origin: 50% 100%; transform: rotate(calc(var(--i) * 60deg)) translateY(-13px);
+      border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+      background: linear-gradient(180deg, var(--petal), var(--petal2));
+      box-shadow: inset 0 -4px 6px rgba(80, 60, 30, .08);
+      transition: background .4s ease;
+    }
+    .flower .bloom .core {
+      position: absolute; left: 50%; top: 50%; width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px;
+      border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFF3C4, var(--core));
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+      transition: background .4s ease;
+    }
+    @keyframes sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+    @keyframes swayOff { 0%, 100% { transform: rotate(-11deg); } 50% { transform: rotate(-5deg); } }
+    @keyframes glowPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    @keyframes pop { 0% { transform: scale(1); } 42% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+    /* ===== 天气元素 ===== */
+    .sun { position: absolute; top: 34px; right: 60px; width: 96px; height: 96px; z-index: 4; animation: sunBreathe 5s ease-in-out infinite; }
+    .sun::before {
+      content: ""; position: absolute; inset: -8px; border-radius: 50%;
+      background: repeating-conic-gradient(rgba(255, 216, 96, .55) 0deg 12deg, transparent 12deg 30deg);
+      animation: spin 28s linear infinite;
+    }
+    .sun::after {
+      content: ""; position: absolute; inset: 16px; border-radius: 50%;
+      background: radial-gradient(circle at 36% 32%, #FFF6C4, #FFD166 55%, #FFB300);
+      box-shadow: 0 0 36px rgba(255, 201, 60, .8), 0 0 80px rgba(255, 201, 60, .35);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes sunBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+
+    .cloud {
+      position: absolute; z-index: 3; width: 118px; height: 36px; border-radius: 44px;
+      background: linear-gradient(180deg, #FFFFFF, #E8F2F5);
+      animation: drift var(--dur, 9s) ease-in-out infinite; opacity: .94;
+      transition: background .8s ease, opacity .8s ease;
+    }
+    .cloud::before { content: ""; position: absolute; left: 16px; top: -17px; width: 46px; height: 46px; background: inherit; border-radius: 50%; }
+    .cloud::after { content: ""; position: absolute; right: 12px; top: -11px; width: 34px; height: 34px; background: inherit; border-radius: 50%; }
+    .cloud.dark { background: linear-gradient(180deg, #B7C4C2, #93A5A2); opacity: .9; }
+    .cloud.rainy { background: linear-gradient(180deg, #96A6AE, #74858E); opacity: .92; }
+    @keyframes drift { 0%, 100% { transform: translateX(0) translateY(0); } 50% { transform: translateX(26px) translateY(-14px); } }
+
+    .raindrop {
+      position: absolute; top: -24px; width: 2px; height: 17px; border-radius: 2px;
+      background: linear-gradient(180deg, rgba(220, 235, 245, .15), rgba(205, 225, 240, .85));
+      animation: rainFall linear infinite;
+    }
+    @keyframes rainFall { 0% { transform: translateY(-20px); opacity: 1; } 100% { transform: translateY(560px); opacity: .1; } }
+
+    /* ===== 动态彩虹（重绘版：悬于天上，柔光透亮） ===== */
+    .rainbow-v2 {
+      position: absolute;
+      bottom: 38%;          /* 位于天上，从山丘上方升起 */
+      right: 6%;
+      width: 260px;
+      height: 130px;
+      z-index: 2;           /* 低于山丘(3)，让彩虹从山后升起 */
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.45));
+    }
+    .scene-paradise .rainbow-v2 { opacity: 1; }
+
+    .rainbow-v2 .arc {
+      position: absolute;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      border-style: solid;
+      border-bottom: none;
+      box-sizing: border-box;
+    }
+    /* 红 → 橙 → 黄 → 绿 → 蓝 → 紫（由外向内） */
+    .rainbow-v2 .arc:nth-child(1) {
+      inset: 0;
+      border-width: 7px;
+      border-color: rgba(255, 130, 130, 0.92);
+    }
+    .rainbow-v2 .arc:nth-child(2) {
+      inset: 7px 7px 0 7px;
+      border-width: 7px;
+      border-color: rgba(255, 182, 100, 0.92);
+    }
+    .rainbow-v2 .arc:nth-child(3) {
+      inset: 14px 14px 0 14px;
+      border-width: 7px;
+      border-color: rgba(255, 230, 110, 0.92);
+    }
+    .rainbow-v2 .arc:nth-child(4) {
+      inset: 21px 21px 0 21px;
+      border-width: 7px;
+      border-color: rgba(130, 220, 160, 0.92);
+    }
+    .rainbow-v2 .arc:nth-child(5) {
+      inset: 28px 28px 0 28px;
+      border-width: 7px;
+      border-color: rgba(130, 185, 235, 0.92);
+    }
+    .rainbow-v2 .arc:nth-child(6) {
+      inset: 35px 35px 0 35px;
+      border-width: 7px;
+      border-color: rgba(180, 155, 225, 0.92);
+    }
+
+    /* 彩虹的光晕呼吸 */
+    .rainbow-v2::before {
+      content: "";
+      position: absolute;
+      inset: -30px;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      background: radial-gradient(ellipse at 50% 80%,
+        rgba(255, 245, 210, 0.35) 0%,
+        rgba(255, 245, 210, 0) 65%);
+      animation: rainbowGlow 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes rainbowGlow {
+      0%, 100% { opacity: 0.55; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+
+    .critter { position: absolute; z-index: 5; font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 3px rgba(20, 40, 30, .2)); animation: flit var(--dur, 7s) ease-in-out infinite; pointer-events: none; }
+    @keyframes flit {
+      0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+      30% { transform: translate(var(--dx, 14px), -16px) rotate(7deg); }
+      60% { transform: translate(calc(var(--dx, 14px) * .4), 8px) rotate(-4deg); }
+      80% { transform: translate(-6px, -8px) rotate(5deg); }
+    }
+    .bird { position: absolute; z-index: 5; font-size: 22px; line-height: 1; animation: fly var(--dur, 14s) linear infinite; pointer-events: none; }
+    @keyframes fly { 0% { left: -8%; transform: translateY(0); } 50% { transform: translateY(-22px); } 100% { left: 106%; transform: translateY(4px); } }
+    .sparkle { position: absolute; z-index: 5; font-size: 15px; animation: twinkle var(--dur, 2.6s) ease-in-out infinite; opacity: 0; pointer-events: none; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.1); } }
+
+    /* ===== 面板 ===== */
+    .panel {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(46, 74, 60, .08);
+      border-radius: 26px; padding: 26px 28px; margin-bottom: 0;
+      box-shadow: 0 10px 30px rgba(46, 74, 60, .08);
+      transition: box-shadow .3s ease, transform .3s ease;
+    }
+    .panel:hover {
+      box-shadow: 0 16px 40px rgba(46, 74, 60, .12);
+    }
+    .panel-title { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--deep); margin-bottom: 6px; }
+    .panel-title svg { width: 22px; height: 22px; flex: none; color: var(--moss); }
+    .panel-sub { color: #7A8B7E; font-size: .88rem; line-height: 1.7; margin-bottom: 16px; }
+
+    /* 心情按钮 */
+    .mood-picks { display: flex; gap: 12px; }
+    .mood-btn {
+      flex: 1; border: 2px solid #E3EADF; background: #FDFDFB; border-radius: 20px;
+      padding: 14px 8px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+      font-family: inherit;
+      position: relative;
+    }
+    .mood-btn::before { font-size: 1.5rem; line-height: 1; }
+    .mood-btn.sunny::before { content: "☀️"; }
+    .mood-btn.calm::before { content: "🌤️"; }
+    .mood-btn.low::before { content: "☁️"; }
+    .mood-btn strong { font-size: 1.08rem; color: var(--deep); }
+    .mood-btn span { font-size: .8rem; color: var(--muted); }
+    .mood-btn:hover { transform: translateY(-2px); border-color: #CFDCCB; box-shadow: 0 8px 18px rgba(46, 74, 60, .10); }
+    .mood-btn.sunny { --mood-line: #E8A83B; --mood-bg: #FFF5DE; }
+    .mood-btn.calm { --mood-line: #6FBF73; --mood-bg: #EFF8EC; }
+    .mood-btn.low { --mood-line: #8FA3A8; --mood-bg: #F0F5F4; }
+    .mood-btn.on { border-color: var(--mood-line); background: var(--mood-bg); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46, 74, 60, .12); }
+    .mood-btn.on::after {
+      content: "✓"; position: absolute; top: 6px; right: 10px; font-size: .8rem;
+      color: var(--mood-line); font-weight: 700;
+      animation: checkPop .35s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    @keyframes checkPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .mood-btn.pulse { animation: moodPulse .5s cubic-bezier(.34, 1.56, .64, 1); }
+    @keyframes moodPulse { 0% { transform: scale(1); } 45% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+    /* 周视图 */
+    .week-head { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 2px 4px; }
+    .week-head h3 { font-family: var(--serif); font-size: 1.02rem; color: var(--deep); }
+    .week-head span { font-size: .8rem; color: var(--muted); }
+    .week-pots { display: flex; gap: 6px; padding-top: 8px; }
+    .garden-pot { flex: 1; text-align: center; min-width: 0; }
+    .garden-pot .plant { width: 36px; height: 48px; margin: 0 auto; position: relative; }
+    .garden-pot .plant::after {
+      content: ""; position: absolute; left: 50%; bottom: 2px; width: 3px; height: 30px; margin-left: -1.5px;
+      background: linear-gradient(180deg, #7FB96F, #5D9A50); border-radius: 2px;
+    }
+    .garden-pot .plant::before {
+      content: ""; position: absolute; left: 50%; bottom: 30px; width: 20px; height: 20px; margin-left: -10px;
+      border-radius: 50%; transition: all .4s ease;
+    }
+    .garden-pot.sunny .plant::before { background: radial-gradient(circle at 35% 30%, #FFF0BF, #F7B53E 55%, #EE9B2E); box-shadow: 0 0 14px rgba(247, 181, 62, .75); }
+    .garden-pot.calm .plant::before { background: #8FD08A; width: 17px; height: 17px; margin-left: -8.5px; border-radius: 50% 50% 60% 0; transform: rotate(45deg); box-shadow: inset -2px -2px 4px rgba(0, 0, 0, .08); }
+    .garden-pot.low .plant::before { background: #AEB9B1; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50% 0 50% 0; transform: rotate(45deg); }
+    .garden-pot.empty .plant::before { background: transparent; box-shadow: none; }
+    .garden-pot.empty .plant::after { height: 6px; opacity: .45; }
+    .garden-pot small { display: block; margin-top: 7px; color: #93A49A; font-size: .76rem; }
+
+    /* 给家人 */
+    .sub-head { font-family: var(--serif); font-size: 1.02rem; color: var(--deep); margin-bottom: 10px; }
+    .letter-box { background: #FAF7EC; border: 1px dashed rgba(111, 191, 115, .5); border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; }
+    #letter { font-family: var(--serif); color: #55665A; line-height: 2; font-size: 1rem; min-height: 40px; }
+    .solid-btn {
+      background: linear-gradient(135deg, #7BC47E, #4E9E5A); color: #fff; border: none;
+      padding: 12px 26px; border-radius: 40px; font-weight: 600; font-size: .94rem; cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+      box-shadow: 0 8px 18px rgba(78, 158, 90, .28); font-family: inherit;
+    }
+    .solid-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(78, 158, 90, .36); }
+    .solid-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, #E2E9DD, transparent); margin: 22px 0; }
+    .pill-row { display: flex; gap: 10px; }
+    .pill {
+      padding: 10px 20px; border-radius: 40px; border: 2px solid #DDE6D9; background: #fff;
+      color: #5B6B5F; font-weight: 600; font-size: .9rem; cursor: pointer;
+      transition: all .25s ease; font-family: inherit;
+    }
+    .pill:hover { border-color: #C4D5BE; }
+    .pill.on { background: var(--deep); color: #FDFBF4; border-color: var(--deep); }
+    .digest-preview { margin-top: 14px; background: #F4F8F0; border-radius: 16px; padding: 14px 18px; font-size: .86rem; color: #5B6B5F; line-height: 1.8; }
+    .digest-preview small { display: block; color: #8CA08F; font-size: .76rem; margin-bottom: 4px; }
+    .digest-preview p { margin: 0; }
+    .status-banner { background: #FFF3D6; border: 1px solid #F0DFA8; color: #8A6D1A; border-radius: 16px; padding: 12px 18px; font-size: .9rem; line-height: 1.7; margin-bottom: 0; }
+    .site-colophon { text-align: center; color: #9AA79C; font-size: .82rem; padding: 10px 0 6px; letter-spacing: .1em; }
+    button:focus-visible, .flower:focus-visible { outline: 2px solid var(--blossom-deep); outline-offset: 3px; }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 960px) {
+      .greeting-deco { width: 260px; height: 100px; }
+    }
+    @media (max-width: 860px) {
+      .garden-layout { grid-template-columns: 1fr; gap: 20px; }
+      .garden-left .garden-scene { min-height: 440px; }
+    }
+    @media (max-width: 720px) {
+      .greeting { flex-direction: column; align-items: stretch; gap: 14px; }
+      .greeting-deco { width: 100%; height: 100px; }
+      .greeting-text > p:last-child { white-space: normal; }
+    }
+    @media (max-width: 640px) {
+      .page { padding: 0 14px 36px; }
+      .greeting { margin: 16px 0 14px; padding: 14px 16px; border-radius: 20px; }
+      .greeting h1 { font-size: 1.7rem; }
+      .greeting-deco { height: 92px; border-radius: 14px; }
+      .gd-sun-core { width: 28px; height: 28px; top: 8px; right: 12px; }
+      .gd-sun-glow { width: 120px; height: 120px; }
+      .garden-scene { min-height: 400px; border-radius: 24px; }
+      .flower { width: 50px; height: 118px; }
+      .flower .bloom { width: 50px; height: 50px; margin-left: -25px; }
+      .flower .bloom .petal { width: 18px; height: 23px; margin-left: -9px; }
+      .flower .stem { top: 40px; height: 62px; }
+      .flower .glow { width: 90px; height: 90px; margin-left: -45px; }
+      .flower-bed { bottom: 10px; gap: 2px 5px; }
+      .scene-chip, .flower-count { font-size: .82rem; padding: 7px 12px; }
+      .scene-status { top: 12px; left: 12px; right: 12px; }
+      .panel { padding: 20px 16px; border-radius: 22px; }
+      .mood-picks { gap: 8px; }
+      .mood-btn { padding: 12px 4px 10px; }
+      .mood-btn::before { font-size: 1.25rem; }
+      .mood-btn span { font-size: .84rem; }
+      .week-pots { gap: 3px; }
+      .rainbow-v2 {
+        right: 4%;
+        width: 180px;
+        height: 90px;
+      }
+      .rainbow-v2 .arc:nth-child(1) { border-width: 5px; }
+      .rainbow-v2 .arc:nth-child(2) { inset: 5px 5px 0 5px; border-width: 5px; }
+      .rainbow-v2 .arc:nth-child(3) { inset: 10px 10px 0 10px; border-width: 5px; }
+      .rainbow-v2 .arc:nth-child(4) { inset: 15px 15px 0 15px; border-width: 5px; }
+      .rainbow-v2 .arc:nth-child(5) { inset: 20px 20px 0 20px; border-width: 5px; }
+      .rainbow-v2 .arc:nth-child(6) { inset: 25px 25px 0 25px; border-width: 5px; }
+      .sun { top: 26px; right: 30px; width: 80px; height: 80px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar" id="topbar"></header>
+    <main class="page">
+      <!-- 页面标题卡片：左侧文字 + 右侧治愈系动态花园 -->
+      <section class="greeting greeting-compact">
+        <div class="greeting-text">
+          <p class="eyebrow">守护记账 · 不做诊断</p>
+          <h1>心情花园</h1>
+          <p>每天点一次晴、平、阴。花会跟着长。阴天只表示有点闷，不是病。</p>
+        </div>
+        <div class="greeting-deco" aria-hidden="true">
+          <div class="gd-sun-glow"></div>
+          <div class="gd-sun-core"></div>
+          <div class="gd-cloud gd-cloud-a"></div>
+          <div class="gd-cloud gd-cloud-b"></div>
+          <div class="gd-hill gd-hill-far"></div>
+          <div class="gd-hill gd-hill-near"></div>
+          <div class="gd-ground"></div>
+          <div class="gd-flower gd-flower-a"></div>
+          <div class="gd-flower gd-flower-b"></div>
+          <div class="gd-flower gd-flower-c"></div>
+        </div>
+      </section>
+
+      <div class="garden-layout">
+        <!-- 左侧：花园区域 -->
+        <div class="garden-left">
+          <div class="garden-scene scene-rain" id="gardenScene">
+            <div class="scene-glow"></div>
+            <div class="weather-layer" id="weatherLayer"></div>
+            <div class="hills">
+              <div class="hill back"></div>
+              <div class="hill front"></div>
+            </div>
+            <div class="scene-status">
+              <span class="scene-chip" id="sceneChip" aria-live="polite">☔ 花园在下雨，云有点厚</span>
+              <span class="flower-count"><span class="num" id="flowerNum">0 / 10</span> 朵花点亮</span>
+            </div>
+            <div class="flower-bed" id="flowerBed"></div>
+            <p class="garden-hint" id="gardenHint">点一点花朵，把花园点亮 ✨</p>
+          </div>
+        </div>
+
+        <!-- 右侧：所有功能面板 -->
+        <div class="garden-right">
+          <section class="panel">
+            <h2 class="panel-title">今天的心情
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+            </h2>
+            <p class="panel-sub">点一下晴、平或阴，今天的花就记下来了。</p>
+            <div class="mood-picks" id="moods"></div>
+            <div class="week-head">
+              <h3>这一周的花</h3>
+              <span>每天记一笔，花慢慢长</span>
+            </div>
+            <div class="week-pots" id="pots"></div>
+          </section>
+          <section class="panel">
+            <h2 class="panel-title">给家人的陪伴
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9.2-9A5.2 5.2 0 0 1 12 6.6 5.2 5.2 0 0 1 21.2 11C19 15.4 12 20 12 20z"/></svg>
+            </h2>
+            <h3 class="sub-head">给家人的短信</h3>
+            <div class="letter-box">
+              <p id="letter">点过心情以后，我可以念一封短信。里面没有您说过的原话。</p>
+            </div>
+            <button type="button" class="solid-btn" id="speak-letter" disabled>念给家里人听</button>
+            <div class="divider"></div>
+            <h3 class="sub-head">本周摘要给不给家人看</h3>
+            <p class="panel-sub" style="margin-bottom:12px">默认不给。打开以后，家人也看不到聊天原文，只能看到天数、晴阴、写下的章节。</p>
+            <div class="pill-row">
+              <button type="button" class="pill" id="allow">允许看周报</button>
+              <button type="button" class="pill on" id="deny">先不给</button>
+            </div>
+            <div class="digest-preview" id="preview" hidden><small>家人将会看到</small><p></p></div>
+          </section>
+          <div class="status-banner" id="notice" hidden></div>
+        </div>
+      </div>
+    </main>
+    <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+  </div>
+  <script src="js/api.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    var LABELS = ["一", "二", "三", "四", "五", "六", "日"];
+    var MOODS = [
+      { id: "sunny", title: "晴", desc: "心里亮堂" },
+      { id: "calm", title: "平", desc: "普通一天" },
+      { id: "low", title: "阴", desc: "有点闷" },
+    ];
+    var today = "";
+    var weekStart = "";
+    var weekMoods = [];
+    var consent = false;
+    var letter = "";
+    function addDays(start, days) {
+      var date = new Date(start + "T00:00:00");
+      date.setDate(date.getDate() + days);
+      var month = String(date.getMonth() + 1).padStart(2, "0");
+      var day = String(date.getDate()).padStart(2, "0");
+      return date.getFullYear() + "-" + month + "-" + day;
+    }
+    function notice(text) {
+      var el = document.getElementById("notice");
+      if (!text) { el.hidden = true; return; }
+      el.hidden = false;
+      el.textContent = text;
+    }
+    function render() {
+      document.getElementById("moods").innerHTML = MOODS.map(function (item) {
+        return '<button type="button" class="mood-btn ' + item.id + (today === item.id ? " on" : "") + '" data-mood="' + item.id + '"><strong>' + item.title + "</strong><span>" + item.desc + "</span></button>";
+      }).join("");
+      var start = weekStart || new Date().toISOString().slice(0, 10);
+      document.getElementById("pots").innerHTML = LABELS.map(function (label, index) {
+        var day = addDays(start, index);
+        var hit = weekMoods.find(function (item) { return item.day === day; });
+        var mood = (hit && hit.mood) || "";
+        return '<div class="garden-pot ' + (mood || "empty") + '"><div class="plant"></div><small>' + label + "</small></div>";
+      }).join("");
+      document.getElementById("letter").textContent = letter || "点过心情以后，我可以念一封短信。里面没有您说过的原话。";
+      document.getElementById("speak-letter").disabled = !letter;
+      document.getElementById("allow").className = "pill" + (consent ? " on" : "");
+      document.getElementById("deny").className = "pill" + (!consent ? " on" : "");
+    }
+    // 外部设置心情（供花园点击联动）
+    window.setMoodFromGarden = function (mood) {
+      if (!mood) return;
+      NB.setMood(mood)
+        .then(function (result) {
+          today = mood;
+          weekMoods = result.week_moods;
+          notice(result.speak);
+          NBSpeech.speak(result.speak);
+          if (result.digest_preview) {
+            document.getElementById("preview").hidden = false;
+            document.querySelector("#preview p").textContent = result.digest_preview.paraphrase;
+          }
+          render();
+        })
+        .catch(function () {
+          today = mood;
+          notice("先记在这一页上了。");
+          render();
+        });
+    };
+    NBLayout.requireRole("elder").then(function (user) {
+      if (!user) return;
+      document.getElementById("moods").onclick = function (event) {
+        var btn = event.target.closest("[data-mood]");
+        if (!btn) return;
+        var mood = btn.getAttribute("data-mood");
+        window.setMoodFromGarden(mood);
+        // 右侧点击联动左侧花朵
+        if (typeof window.syncGardenFromMood === "function") {
+          window.syncGardenFromMood(mood);
+        }
+      };
+      function toggle(share) {
+        NB.setConsent(share)
+          .then(function (result) {
+            consent = result.consent;
+            notice(share ? "家人打开周报时，只能看到下面这些。" : "周报关了。家人那边是空白说明。");
+            if (result.digest_preview) {
+              document.getElementById("preview").hidden = false;
+              document.querySelector("#preview p").textContent = result.digest_preview.paraphrase;
+            }
+            render();
+          })
+          .catch(function () {
+            consent = share;
+            render();
+          });
+      }
+      document.getElementById("allow").onclick = function () { toggle(true); };
+      document.getElementById("deny").onclick = function () { toggle(false); };
+      document.getElementById("speak-letter").onclick = function () {
+        if (letter) NBSpeech.speak(letter);
+      };
+      NB.fetchGarden()
+        .then(function (data) {
+          today = data.today_mood;
+          weekStart = data.week_start;
+          weekMoods = data.week_moods || [];
+          if (typeof window.setGardenFlowers === "function") {
+            window.setGardenFlowers(data.flowers || []);
+          }
+          consent = data.consent;
+          letter = data.letter || "";
+          if (data.digest_preview) {
+            document.getElementById("preview").hidden = false;
+            document.querySelector("#preview p").textContent = data.digest_preview.paraphrase;
+          }
+          render();
+        })
+        .catch(function () {
+          notice("花园还没连上服务。您仍可以先看看这一页。");
+          render();
+        });
+    });
+  </script>
+  <script>
+    (function () {
+      "use strict";
+      var FLOWER_COUNT = 10;
+      var SCENES = [
+        { max: 2,  cls: "rain",     chip: "☔ 花园在下雨，云有点厚" },
+        { max: 6,  cls: "cloudy",   chip: "☁️ 云朵轻轻飘，很安静" },
+        { max: 8,  cls: "sunny",    chip: "🌞 阳光洒满花园，花朵在笑" },
+        { max: 10, cls: "paradise", chip: "🌈 幸福生态园，万物都开心" }
+      ];
+      var THEMES = ["theme-a", "theme-b", "theme-c", "theme-d"];
+      var MOOD_MAP = ["low", "low", "calm", "calm", "calm", "calm", "sunny", "sunny", "sunny", "sunny"];
+      var flowers = load();
+      var rainTimer = null;
+      var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      function load() {
+        var arr = [];
+        for (var i = 0; i < FLOWER_COUNT; i++) arr.push(false);
+        return arr;
+      }
+      function save() {
+        if (window.NB && NB.saveGardenState) {
+          NB.saveGardenState(flowers).catch(function () {
+            var noticeEl = document.getElementById("notice");
+            if (noticeEl) {
+              noticeEl.hidden = false;
+              noticeEl.textContent = "花园状态没有保存成功，请稍后再试。";
+            }
+          });
+        }
+      }
+      window.setGardenFlowers = function (saved) {
+        if (!Array.isArray(saved) || saved.length !== FLOWER_COUNT) return;
+        flowers = saved.map(Boolean);
+        buildBed();
+        applyScene();
+      };
+      function litCount() {
+        var n = 0;
+        flowers.forEach(function (f) { if (f) n++; });
+        return n;
+      }
+      function sceneFor(n) {
+        for (var i = 0; i < SCENES.length; i++) {
+          if (n <= SCENES[i].max) return SCENES[i];
+        }
+        return SCENES[SCENES.length - 1];
+      }
+      function makeEl(tag, cls, html) {
+        var d = document.createElement(tag);
+        if (cls) d.className = cls;
+        if (html != null) d.innerHTML = html;
+        return d;
+      }
+      function buildBed() {
+        var bed = document.getElementById("flowerBed");
+        bed.innerHTML = "";
+        for (var i = 0; i < FLOWER_COUNT; i++) {
+          (function (idx) {
+            var f = makeEl("button", "flower " + THEMES[idx % THEMES.length] + (flowers[idx] ? " on" : " off"));
+            f.type = "button";
+            f.setAttribute("data-i", idx);
+            f.setAttribute("aria-pressed", flowers[idx] ? "true" : "false");
+            f.title = (flowers[idx] ? "熄灭" : "点亮") + "第" + (idx + 1) + "朵花";
+            var bloom = makeEl("span", "bloom");
+            for (var p = 0; p < 6; p++) {
+              var petal = makeEl("span", "petal");
+              petal.style.setProperty("--i", p);
+              bloom.appendChild(petal);
+            }
+            bloom.appendChild(makeEl("span", "core"));
+            f.appendChild(makeEl("span", "glow"));
+            f.appendChild(makeEl("span", "stem"));
+            f.appendChild(makeEl("span", "leaf leaf-l"));
+            f.appendChild(makeEl("span", "leaf leaf-r"));
+            f.appendChild(bloom);
+            f.addEventListener("click", function () { toggleFlower(idx); });
+            bed.appendChild(f);
+          })(i);
+        }
+      }
+
+      function toggleFlower(i) {
+        flowers[i] = !flowers[i];
+        var btn = document.querySelector('.flower[data-i="' + i + '"]');
+        if (btn) {
+          btn.classList.toggle("on", flowers[i]);
+          btn.classList.toggle("off", !flowers[i]);
+          btn.classList.remove("pop");
+          void btn.offsetWidth;
+          btn.classList.add("pop");
+          btn.setAttribute("aria-pressed", flowers[i] ? "true" : "false");
+          btn.title = (flowers[i] ? "熄灭" : "点亮") + "第" + (i + 1) + "朵花";
+          setTimeout(function () { btn.classList.remove("pop"); }, 500);
+        }
+        var hint = document.getElementById("gardenHint");
+        if (hint) hint.classList.add("hide");
+        save();
+        applyScene();
+
+        // 联动右侧心情卡片
+        var totalLit = litCount();
+        var moodIndex = Math.min(totalLit, FLOWER_COUNT - 1);
+        var mood = MOOD_MAP[moodIndex];
+        if (typeof window.setMoodFromGarden === "function") {
+          window.setMoodFromGarden(mood);
+        }
+        var moodBtn = document.querySelector('.mood-btn[data-mood="' + mood + '"]');
+        if (moodBtn) {
+          moodBtn.classList.remove("pulse");
+          void moodBtn.offsetWidth;
+          moodBtn.classList.add("pulse");
+          setTimeout(function () { moodBtn.classList.remove("pulse"); }, 600);
+        }
+      }
+
+      // 右侧心情点击联动左侧花朵
+      window.syncGardenFromMood = function (mood) {
+        var targetLit;
+        if (mood === "sunny") targetLit = 9;
+        else if (mood === "calm") targetLit = 5;
+        else targetLit = 1;
+
+        var current = litCount();
+        if (current === targetLit) {
+          applyScene();
+          return;
+        }
+        for (var i = 0; i < FLOWER_COUNT; i++) {
+          var shouldBeOn = i < targetLit;
+          if (flowers[i] !== shouldBeOn) {
+            flowers[i] = shouldBeOn;
+            var btn = document.querySelector('.flower[data-i="' + i + '"]');
+            if (btn) {
+              btn.classList.toggle("on", shouldBeOn);
+              btn.classList.toggle("off", !shouldBeOn);
+              btn.setAttribute("aria-pressed", shouldBeOn ? "true" : "false");
+              if (shouldBeOn) {
+                btn.classList.remove("pop");
+                void btn.offsetWidth;
+                btn.classList.add("pop");
+                setTimeout((function(b){ return function(){ b.classList.remove("pop"); }; })(btn), 500);
+              }
+            }
+          }
+        }
+        save();
+        applyScene();
+      };
+
+      function applyScene() {
+        var n = litCount();
+        var sc = sceneFor(n);
+        var scene = document.getElementById("gardenScene");
+        scene.className = "garden-scene scene-" + sc.cls;
+        var chip = document.getElementById("sceneChip");
+        chip.textContent = sc.chip;
+        chip.classList.remove("chip-pop");
+        void chip.offsetWidth;
+        chip.classList.add("chip-pop");
+        document.getElementById("flowerNum").textContent = n + " / " + FLOWER_COUNT;
+        var countEl = document.querySelector(".flower-count");
+        countEl.classList.remove("chip-pop");
+        void countEl.offsetWidth;
+        countEl.classList.add("chip-pop");
+        buildWeather(sc.cls);
+      }
+      function stopRain() {
+        if (rainTimer) { clearInterval(rainTimer); rainTimer = null; }
+        var old = document.querySelectorAll("#weatherLayer .raindrop");
+        for (var i = 0; i < old.length; i++) old[i].remove();
+      }
+      function startRain() {
+        if (reduced) return;
+        var layer = document.getElementById("weatherLayer");
+        rainTimer = setInterval(function () {
+          for (var i = 0; i < 16; i++) {
+            var d = makeEl("span", "raindrop");
+            d.style.left = (Math.random() * 100) + "%";
+            d.style.animationDuration = (0.5 + Math.random() * 0.7) + "s";
+            d.style.animationDelay = (-Math.random()) + "s";
+            layer.appendChild(d);
+            (function (dd) {
+              setTimeout(function () { if (dd.parentNode) dd.remove(); }, 1500);
+            })(d);
+          }
+        }, 170);
+      }
+      function addCloud(layer, dark, rainy) {
+        var c = makeEl("div", "cloud" + (dark ? " dark" : "") + (rainy ? " rainy" : ""));
+        var pos = [
+          { top: "8%", left: "4%",  scale: .85, dur: "8s" },
+          { top: "16%", left: "30%", scale: 1.1, dur: "11s" },
+          { top: "5%", left: "58%", scale: .9,  dur: "9s" },
+          { top: "20%", left: "78%", scale: 1.05, dur: "12s" },
+          { top: "28%", left: "16%", scale: .8,  dur: "10s" }
+        ];
+        var p = pos[Math.floor(Math.random() * pos.length)];
+        c.style.top = p.top;
+        c.style.left = p.left;
+        c.style.transform = "scale(" + p.scale + ")";
+        c.style.setProperty("--dur", p.dur);
+        c.style.animationDelay = (-Math.random() * 4) + "s";
+        layer.appendChild(c);
+      }
+      function addCritters(layer, emoji, count, opts) {
+        if (reduced) return;
+        for (var i = 0; i < count; i++) {
+          var c = makeEl("span", opts.bird ? "bird" : "critter");
+          c.textContent = emoji;
+          c.style.top = (12 + Math.random() * 38) + "%";
+          c.style.left = (Math.random() * 80) + "%";
+          c.style.fontSize = opts.size || (opts.bird ? "22px" : "26px");
+          c.style.setProperty("--dur", (opts.bird ? 11 + Math.random() * 8 : 6 + Math.random() * 5) + "s");
+          if (!opts.bird) {
+            c.style.setProperty("--dx", (10 + Math.random() * 20) + "px");
+            c.style.animationDelay = (-Math.random() * 6) + "s";
+          }
+          layer.appendChild(c);
+        }
+      }
+      function addSparkles(layer, count) {
+        if (reduced) return;
+        for (var i = 0; i < count; i++) {
+          var s = makeEl("span", "sparkle");
+          s.textContent = "✨";
+          s.style.top = (8 + Math.random() * 50) + "%";
+          s.style.left = (Math.random() * 94) + "%";
+          s.style.fontSize = (10 + Math.random() * 10) + "px";
+          s.style.setProperty("--dur", (2 + Math.random() * 3) + "s");
+          s.style.animationDelay = (-Math.random() * 4) + "s";
+          layer.appendChild(s);
+        }
+      }
+      function buildWeather(cls) {
+        var layer = document.getElementById("weatherLayer");
+        stopRain();
+        layer.style.opacity = 0;
+        clearTimeout(buildWeather._t);
+        buildWeather._t = setTimeout(function () {
+          layer.innerHTML = "";
+          if (cls === "rain") {
+            addCloud(layer, true, true);
+            addCloud(layer, true, true);
+            addCloud(layer, true, false);
+            startRain();
+          } else if (cls === "cloudy") {
+            addCloud(layer, true, false);
+            addCloud(layer, true, false);
+            addCloud(layer, true, false);
+            addCloud(layer, false, false);
+          } else if (cls === "sunny") {
+            layer.appendChild(makeEl("div", "sun"));
+            addCloud(layer, false, false);
+            addCloud(layer, false, false);
+            addCritters(layer, "🦋", 2, {});
+          } else {
+            layer.appendChild(makeEl("div", "sun"));
+            // 动态彩虹 v2（悬于天上）
+            var rb = makeEl("div", "rainbow-v2");
+            for (var i = 0; i < 6; i++) rb.appendChild(makeEl("span", "arc"));
+            layer.appendChild(rb);
+            addCloud(layer, false, false);
+            addCritters(layer, "🦋", 3, {});
+            addCritters(layer, "🐦", 2, { bird: true });
+            addSparkles(layer, 8);
+          }
+          layer.style.opacity = 1;
+        }, 90);
+      }
+      function init() {
+        if (!document.getElementById("flowerBed")) return;
+        buildBed();
+        applyScene();
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

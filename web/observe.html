@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>暖伴观察台 · AI协同与家庭守护</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <style>
+      /* =========================================================
+         观察台专属样式
+         采用现有 style.css 的米白、朱红、橙色、粉色、鼠尾草绿
+      ========================================================= */
+
+      .observe-page {
+        --observe-bg: #fbf7f2;
+        --observe-card: #fffdf9;
+        --observe-cream: #fff8ee;
+        --observe-ink: #332c26;
+        --observe-muted: #948477;
+        --observe-line: #eee1d3;
+
+        --observe-brand: #c9714b;
+        --observe-red: #c23a22;
+        --observe-orange: #e39a55;
+        --observe-pink: #d9897c;
+        --observe-sage: #7c9782;
+        --observe-purple: #a17d9d;
+        --observe-gold: #c6a05b;
+
+        --observe-shadow: 0 14px 34px rgba(83, 45, 22, 0.08);
+      }
+
+      .observe-page {
+        width: min(1120px, calc(100% - 42px));
+        margin: 0 auto;
+        padding: 28px 0 42px;
+      }
+
+      .observe-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 32px 36px 30px;
+        background:
+          linear-gradient(
+            115deg,
+            rgba(201, 113, 75, 0.1),
+            transparent 48%
+          ),
+          linear-gradient(
+            305deg,
+            rgba(124, 151, 130, 0.1),
+            transparent 45%
+          ),
+          var(--observe-card);
+        border: 1px solid var(--observe-line);
+        border-radius: 24px;
+        box-shadow: var(--observe-shadow);
+      }
+
+      .observe-hero::before {
+        content: "观";
+        position: absolute;
+        right: 34px;
+        top: -24px;
+        font-family: var(--font);
+        font-size: 150px;
+        line-height: 1;
+        color: rgba(194, 58, 34, 0.06);
+        pointer-events: none;
+      }
+
+      .observe-hero::after {
+        content: "";
+        position: absolute;
+        right: 42px;
+        bottom: 26px;
+        width: 150px;
+        height: 42px;
+        border-top: 1px solid rgba(201, 113, 75, 0.28);
+        border-radius: 50%;
+        transform: rotate(-8deg);
+        pointer-events: none;
+      }
+
+      .observe-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--observe-brand);
+        font-size: 14px;
+        letter-spacing: 0.16em;
+      }
+
+      .observe-eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--observe-orange);
+        box-shadow: 0 0 0 5px rgba(227, 154, 85, 0.13);
+      }
+
+      .observe-hero h1 {
+        position: relative;
+        z-index: 1;
+        margin-top: 14px;
+        font-family: var(--font);
+        font-size: clamp(30px, 4vw, 44px);
+        font-weight: 600;
+        line-height: 1.35;
+        letter-spacing: 0.05em;
+      }
+
+      .observe-hero p {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+        margin-top: 12px;
+        color: var(--observe-muted);
+        font-size: 18px;
+        line-height: 1.8;
+      }
+
+      .observe-hero-note {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        margin-top: 18px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--observe-cream);
+        color: var(--observe-brand);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+      }
+
+      .observe-error {
+        margin-top: 16px;
+        padding: 14px 18px;
+        border: 1px solid rgba(194, 58, 34, 0.24);
+        border-radius: 14px;
+        background: #fff0e7;
+        color: var(--observe-red);
+        font-size: 16px;
+      }
+
+      /* 顶部概览卡片 */
+
+      .observe-overview {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .overview-card {
+        position: relative;
+        min-height: 126px;
+        overflow: hidden;
+        padding: 20px 20px 18px;
+        border: 1px solid var(--observe-line);
+        border-radius: 20px;
+        background: var(--observe-card);
+        box-shadow: var(--observe-shadow);
+      }
+
+      .overview-card::after {
+        content: "";
+        position: absolute;
+        right: -18px;
+        bottom: -26px;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: var(--card-tint, rgba(201, 113, 75, 0.12));
+      }
+
+      .overview-card:nth-child(1) {
+        --card-tint: rgba(201, 113, 75, 0.14);
+      }
+
+      .overview-card:nth-child(2) {
+        --card-tint: rgba(124, 151, 130, 0.16);
+      }
+
+      .overview-card:nth-child(3) {
+        --card-tint: rgba(217, 137, 124, 0.16);
+      }
+
+      .overview-card:nth-child(4) {
+        --card-tint: rgba(227, 154, 85, 0.17);
+      }
+
+      .overview-card small {
+        display: block;
+        color: var(--observe-muted);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+      }
+
+      .overview-card strong {
+        display: block;
+        margin-top: 10px;
+        font-family: var(--font);
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--observe-ink);
+      }
+
+      .overview-card span {
+        display: block;
+        margin-top: 6px;
+        color: var(--observe-muted);
+        font-size: 13px;
+      }
+
+      .overview-card .overview-icon {
+        position: absolute;
+        right: 18px;
+        top: 16px;
+        z-index: 1;
+        color: var(--observe-brand);
+        font-family: var(--font);
+        font-size: 24px;
+      }
+
+      /* 区块标题 */
+
+      .observe-section {
+        margin-top: 24px;
+      }
+
+      .observe-section-title {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+
+      .observe-section-title h2 {
+        font-family: var(--font);
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .observe-section-title p {
+        color: var(--observe-muted);
+        font-size: 14px;
+      }
+
+      /* 主体中部布局 */
+
+      .observe-main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.32fr) minmax(330px, 0.68fr);
+        gap: 18px;
+      }
+
+      .observe-panel {
+        min-width: 0;
+        padding: 24px;
+        border: 1px solid var(--observe-line);
+        border-radius: 20px;
+        background: var(--observe-card);
+        box-shadow: var(--observe-shadow);
+      }
+
+      .observe-panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .observe-panel-head h3 {
+        font-family: var(--font);
+        font-size: 23px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+      }
+
+      .observe-panel-head p {
+        margin-top: 5px;
+        color: var(--observe-muted);
+        font-size: 14px;
+      }
+
+      .observe-badge {
+        flex-shrink: 0;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--observe-cream);
+        color: var(--observe-brand);
+        font-size: 13px;
+        letter-spacing: 0.06em;
+      }
+
+      /* 协同流程 */
+
+      .flow-source {
+        position: relative;
+        padding: 16px 18px;
+        border: 1px solid rgba(201, 113, 75, 0.22);
+        border-radius: 16px;
+        background:
+          linear-gradient(
+            110deg,
+            rgba(253, 237, 226, 0.9),
+            rgba(255, 250, 242, 0.86)
+          );
+      }
+
+      .flow-source small,
+      .flow-output small {
+        display: block;
+        color: var(--observe-brand);
+        font-size: 13px;
+        letter-spacing: 0.12em;
+      }
+
+      .flow-source p,
+      .flow-output p {
+        margin-top: 8px;
+        color: var(--observe-ink);
+        font-family: var(--font);
+        font-size: 19px;
+        line-height: 1.65;
+      }
+
+      .flow-arrow-down {
+        width: 1px;
+        height: 28px;
+        margin: 0 auto;
+        background: linear-gradient(
+          180deg,
+          var(--observe-brand),
+          rgba(201, 113, 75, 0.1)
+        );
+        position: relative;
+      }
+
+      .flow-arrow-down::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        bottom: -1px;
+        width: 8px;
+        height: 8px;
+        border-right: 1px solid var(--observe-brand);
+        border-bottom: 1px solid var(--observe-brand);
+        transform: rotate(45deg);
+      }
+
+      .flow-router {
+        padding: 13px 16px;
+        border: 1px dashed var(--observe-line);
+        border-radius: 14px;
+        background: #fffaf4;
+        text-align: center;
+        color: var(--observe-muted);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+      }
+
+      .agent-flow {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .agent-flow::before {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        top: 50%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(201, 113, 75, 0.2),
+          rgba(201, 113, 75, 0.7),
+          rgba(201, 113, 75, 0.2)
+        );
+        z-index: 0;
+      }
+
+      .agent-node {
+        position: relative;
+        z-index: 1;
+        min-height: 104px;
+        padding: 14px 10px;
+        border: 1px solid var(--node-line, var(--observe-line));
+        border-radius: 16px;
+        background: var(--node-bg, var(--observe-card));
+        text-align: center;
+      }
+
+      .agent-node .agent-symbol {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin: 0 auto 8px;
+        border-radius: 50%;
+        background: var(--node-color, var(--observe-brand));
+        color: white;
+        font-family: var(--font);
+        font-size: 16px;
+      }
+
+      .agent-node strong {
+        display: block;
+        font-family: var(--font);
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .agent-node span {
+        display: block;
+        margin-top: 4px;
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .agent-companion {
+        --node-color: var(--observe-pink);
+        --node-bg: #fff5f1;
+        --node-line: #f0d4cd;
+      }
+
+      .agent-life {
+        --node-color: var(--observe-orange);
+        --node-bg: #fff7ed;
+        --node-line: #f2dbc0;
+      }
+
+      .agent-guardian {
+        --node-color: var(--observe-sage);
+        --node-bg: #f3f8f3;
+        --node-line: #d8e6d8;
+      }
+
+      .flow-tools {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 14px;
+      }
+
+      .flow-tool {
+        padding: 6px 9px;
+        border: 1px solid var(--observe-line);
+        border-radius: 999px;
+        background: var(--observe-cream);
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .flow-output {
+        padding: 16px 18px;
+        border: 1px solid rgba(124, 151, 130, 0.34);
+        border-radius: 16px;
+        background:
+          linear-gradient(
+            110deg,
+            rgba(237, 243, 238, 0.92),
+            rgba(255, 253, 249, 0.94)
+          );
+      }
+
+      .flow-output small {
+        color: var(--observe-sage);
+      }
+
+      .flow-output p {
+        color: #405746;
+      }
+
+      .flow-empty {
+        padding: 42px 18px;
+        border: 1px dashed var(--observe-line);
+        border-radius: 16px;
+        color: var(--observe-muted);
+        text-align: center;
+        line-height: 1.8;
+      }
+
+      /* 右侧图表 */
+
+      .distribution-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .distribution-row {
+        display: grid;
+        grid-template-columns: 78px 1fr 34px;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .distribution-row label {
+        color: var(--observe-ink);
+        font-size: 14px;
+      }
+
+      .distribution-track {
+        height: 11px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #f0e6d9;
+      }
+
+      .distribution-bar {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--bar-color, var(--observe-brand));
+        transition: width 0.7s ease;
+      }
+
+      .distribution-count {
+        color: var(--observe-muted);
+        font-size: 13px;
+        text-align: right;
+      }
+
+      .chart-empty {
+        padding: 26px 12px;
+        border: 1px dashed var(--observe-line);
+        border-radius: 14px;
+        color: var(--observe-muted);
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      .agent-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+      }
+
+      .agent-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .agent-legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--legend-color, var(--observe-brand));
+      }
+
+      /* 单派/并行圆环 */
+
+      .mode-chart {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 20px;
+        align-items: center;
+        margin-top: 24px;
+      }
+
+      .donut {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--observe-pink) var(--parallel-angle, 0deg),
+          #f2e7dc 0deg
+        );
+      }
+
+      .donut::after {
+        content: "";
+        position: absolute;
+        inset: 24px;
+        border-radius: 50%;
+        background: var(--observe-card);
+      }
+
+      .donut-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .donut-content strong {
+        display: block;
+        font-family: var(--font);
+        font-size: 27px;
+        font-weight: 600;
+      }
+
+      .donut-content span {
+        display: block;
+        margin-top: 3px;
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .mode-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+
+      .mode-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--observe-muted);
+        font-size: 14px;
+      }
+
+      .mode-item-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mode-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--dot-color, var(--observe-pink));
+      }
+
+      .mode-item strong {
+        color: var(--observe-ink);
+        font-family: var(--font);
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      /* 记忆与工具摘要 */
+
+      .mini-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .mini-stat {
+        padding: 12px 13px;
+        border: 1px solid var(--observe-line);
+        border-radius: 14px;
+        background: var(--observe-cream);
+      }
+
+      .mini-stat small {
+        display: block;
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .mini-stat strong {
+        display: block;
+        margin-top: 5px;
+        font-family: var(--font);
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      /* 时间线 */
+
+      .timeline {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 8px 0 4px 5px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 16px;
+        bottom: 16px;
+        width: 1px;
+        background: linear-gradient(
+          180deg,
+          var(--observe-brand),
+          rgba(201, 113, 75, 0.12)
+        );
+      }
+
+      .timeline-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 14px;
+        padding: 0 0 18px;
+      }
+
+      .timeline-dot {
+        position: relative;
+        z-index: 1;
+        width: 11px;
+        height: 11px;
+        margin-top: 5px;
+        border: 3px solid var(--observe-card);
+        border-radius: 50%;
+        background: var(--timeline-color, var(--observe-brand));
+        box-shadow: 0 0 0 1px var(--timeline-color, var(--observe-brand));
+      }
+
+      .timeline-content {
+        padding: 12px 14px;
+        border: 1px solid var(--observe-line);
+        border-radius: 14px;
+        background: var(--observe-cream);
+      }
+
+      .timeline-content small {
+        display: block;
+        color: var(--observe-brand);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+      }
+
+      .timeline-content strong {
+        display: block;
+        margin-top: 5px;
+        color: var(--observe-ink);
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .timeline-content p {
+        margin-top: 4px;
+        color: var(--observe-muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      /* 评测区 */
+
+      .eval-panel {
+        margin-top: 24px;
+      }
+
+      .eval-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .eval-header h2 {
+        margin: 0;
+        font-family: var(--font);
+        font-size: 25px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .eval-header p {
+        margin-top: 5px;
+        color: var(--observe-muted);
+        font-size: 14px;
+      }
+
+      .observe-eval-btn {
+        min-height: 48px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 999px;
+        background:
+          linear-gradient(
+            100deg,
+            var(--observe-brand),
+            var(--observe-red)
+          );
+        color: #fffaf2;
+        font-size: 16px;
+        box-shadow: 0 8px 18px rgba(194, 58, 34, 0.18);
+      }
+
+      .observe-eval-btn:hover {
+        filter: brightness(1.04);
+      }
+
+      .observe-eval-btn:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .eval-stats-new {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .eval-stat {
+        position: relative;
+        min-height: 98px;
+        padding: 15px 16px;
+        border: 1px solid var(--observe-line);
+        border-radius: 16px;
+        background: var(--observe-cream);
+      }
+
+      .eval-stat small {
+        display: block;
+        color: var(--observe-muted);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+      }
+
+      .eval-stat strong {
+        display: block;
+        margin-top: 9px;
+        font-family: var(--font);
+        font-size: 25px;
+        font-weight: 600;
+      }
+
+      .eval-stat.success strong {
+        color: var(--observe-sage);
+      }
+
+      .eval-stat.warn strong {
+        color: var(--observe-orange);
+      }
+
+      .eval-stat .eval-mark {
+        position: absolute;
+        right: 15px;
+        top: 14px;
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--observe-sage);
+        color: white;
+        font-size: 14px;
+      }
+
+      .eval-case-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .eval-case {
+        padding: 14px 16px;
+        border: 1px solid var(--observe-line);
+        border-radius: 14px;
+        background: var(--observe-card);
+      }
+
+      .eval-case.fail {
+        border-color: rgba(194, 58, 34, 0.4);
+        background: #fff5ee;
+      }
+
+      .eval-case-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .eval-case-status {
+        color: var(--observe-sage);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .eval-case.fail .eval-case-status {
+        color: var(--observe-red);
+      }
+
+      .eval-case-expect {
+        color: var(--observe-muted);
+        font-size: 13px;
+      }
+
+      .eval-case p {
+        margin-top: 7px;
+        color: var(--observe-ink);
+        line-height: 1.65;
+      }
+
+      .eval-case p:last-child {
+        color: var(--observe-muted);
+        font-size: 14px;
+      }
+
+      /* 详细协同记录 */
+
+      .records-panel {
+        margin-top: 24px;
+      }
+
+      .records-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .record-card {
+        padding: 17px 18px;
+        border: 1px solid var(--observe-line);
+        border-radius: 16px;
+        background: var(--observe-card);
+      }
+
+      .record-card.parallel {
+        border-left: 4px solid var(--observe-pink);
+      }
+
+      .record-card.single {
+        border-left: 4px solid var(--observe-orange);
+      }
+
+      .record-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .record-mode {
+        color: var(--observe-brand);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+      }
+
+      .record-agents {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .record-agent {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--observe-cream);
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      .record-line {
+        margin-top: 10px;
+        color: var(--observe-ink);
+        line-height: 1.7;
+      }
+
+      .record-line b {
+        color: var(--observe-brand);
+        font-weight: 600;
+      }
+
+      .record-line.output {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f1f7f1;
+        color: #405746;
+      }
+
+      .record-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .record-tool {
+        padding: 4px 8px;
+        border: 1px solid var(--observe-line);
+        border-radius: 999px;
+        color: var(--observe-muted);
+        font-size: 12px;
+      }
+
+      /* 底部 */
+
+      .observe-footer-note {
+        margin-top: 24px;
+        padding: 18px 20px;
+        border: 1px solid rgba(201, 113, 75, 0.2);
+        border-radius: 18px;
+        background:
+          linear-gradient(
+            110deg,
+            rgba(253, 237, 226, 0.85),
+            rgba(237, 243, 238, 0.72)
+          );
+        color: var(--observe-muted);
+        font-family: var(--font);
+        font-size: 18px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      .observe-footer-note strong {
+        color: var(--observe-brand);
+        font-weight: 600;
+      }
+
+      @media (max-width: 900px) {
+        .observe-main-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .observe-overview {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .observe-page {
+          width: min(100% - 20px, 1120px);
+          padding-top: 16px;
+        }
+
+        .observe-hero {
+          padding: 25px 21px 24px;
+          border-radius: 18px;
+        }
+
+        .observe-hero p {
+          font-size: 16px;
+        }
+
+        .observe-overview {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .overview-card {
+          min-height: 108px;
+          padding: 15px 14px;
+        }
+
+        .overview-card strong {
+          font-size: 26px;
+        }
+
+        .overview-card small {
+          font-size: 12px;
+        }
+
+        .observe-panel {
+          padding: 18px 16px;
+          border-radius: 18px;
+        }
+
+        .observe-section-title {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .agent-flow {
+          grid-template-columns: 1fr;
+        }
+
+        .agent-flow::before {
+          top: 10%;
+          bottom: 10%;
+          left: 50%;
+          right: auto;
+          width: 1px;
+          height: auto;
+        }
+
+        .mode-chart {
+          grid-template-columns: 1fr;
+          justify-items: center;
+        }
+
+        .mode-legend {
+          width: 100%;
+        }
+
+        .eval-stats-new {
+          grid-template-columns: 1fr;
+        }
+
+        .distribution-row {
+          grid-template-columns: 70px 1fr 28px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="observe-page">
+        <!-- 页面引导 -->
+        <section class="observe-hero">
+          <div class="observe-eyebrow">家人观察台 · 不直接暴露完整对话</div>
+
+          <h1>看见AI如何理解、协同与回应</h1>
+
+          <p>
+            老人听到的始终是暖伴的一句话。家人看到的，是AI如何判断情绪、调用能力、检索记忆，并在必要时提供温和的关怀提醒。
+          </p>
+
+          <span class="observe-hero-note">
+            多个智能体并行工作 · 一个统一出口
+          </span>
+        </section>
+
+        <div class="observe-error" id="error" hidden></div>
+
+        <!-- 顶部概览 -->
+        <section class="observe-overview" aria-label="观察台运行概览">
+          <article class="overview-card">
+            <span class="overview-icon">陪</span>
+            <small>当前陪伴记录</small>
+            <strong id="overview-total">—</strong>
+            <span>已加载的真实协同记录</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">协</span>
+            <small>Agent能力调用</small>
+            <strong id="overview-agents">—</strong>
+            <span>来自当前记录的能力调用</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">合</span>
+            <small>并行协同</small>
+            <strong id="overview-parallel">—</strong>
+            <span id="overview-parallel-note">当前记录统计</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">评</span>
+            <small>路由评测</small>
+            <strong id="overview-eval">未评测</strong>
+            <span>运行评测后显示真实结果</span>
+          </article>
+        </section>
+
+        <!-- 核心协同与图表 -->
+        <section class="observe-section">
+          <div class="observe-section-title">
+            <div>
+              <h2>一句话背后的协同过程</h2>
+              <p>让家人看懂复杂的AI调用，而不是直接查看老人全部隐私。</p>
+            </div>
+          </div>
+
+          <div class="observe-main-grid">
+            <!-- 左侧：动态协同流程 -->
+            <section class="observe-panel">
+              <div class="observe-panel-head">
+                <div>
+                  <h3>知岁AI智能体中枢</h3>
+                  <p>老人一句话，如何变成一句有温度的回应</p>
+                </div>
+                <span class="observe-badge" id="flow-mode-badge">
+                  等待记录
+                </span>
+              </div>
+
+              <div id="flow-empty" class="flow-empty">
+                观察台正在等待新的陪伴记录。<br />
+                当老人说出一句话后，系统会在这里展示AI协同过程。
+              </div>
+
+              <div id="flow-content" hidden>
+                <div class="flow-source">
+                  <small>老人原话</small>
+                  <p id="flow-input">—</p>
+                </div>
+
+                <div class="flow-arrow-down"></div>
+
+                <div class="flow-router">
+                  情绪与意图理解 · 记忆检索 · 任务路由
+                </div>
+
+                <div class="flow-arrow-down"></div>
+
+                <div class="agent-flow">
+                  <article class="agent-node agent-companion">
+                    <span class="agent-symbol">伴</span>
+                    <strong>陪伴Agent</strong>
+                    <span id="flow-companion-status">情绪支持</span>
+                  </article>
+
+                  <article class="agent-node agent-life">
+                    <span class="agent-symbol">生</span>
+                    <strong>生活Agent</strong>
+                    <span id="flow-life-status">生活帮助</span>
+                  </article>
+
+                  <article class="agent-node agent-guardian">
+                    <span class="agent-symbol">护</span>
+                    <strong>守护Agent</strong>
+                    <span id="flow-guardian-status">状态关注</span>
+                  </article>
+                </div>
+
+                <div class="flow-tools" id="flow-tools"></div>
+
+                <div class="flow-arrow-down"></div>
+
+                <div class="flow-output">
+                  <small>暖伴统一出口</small>
+                  <p id="flow-output">—</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- 右侧：Agent分布 -->
+            <section class="observe-panel">
+              <div class="observe-panel-head">
+                <div>
+                  <h3>能力调用分布</h3>
+                  <p>当前真实协同记录中的Agent调用情况</p>
+                </div>
+              </div>
+
+              <div class="distribution-list" id="agent-distribution">
+                <div class="chart-empty">
+                  暂无Agent调用数据
+                </div>
+              </div>
+
+              <div class="agent-legend">
+                <span>
+                  <i style="--legend-color: #d9897c"></i>
+                  陪伴
+                </span>
+                <span>
+                  <i style="--legend-color: #e39a55"></i>
+                  生活
+                </span>
+                <span>
+                  <i style="--legend-color: #7c9782"></i>
+                  守护
+                </span>
+                <span>
+                  <i style="--legend-color: #a17d9d"></i>
+                  记忆/疗愈
+                </span>
+              </div>
+
+              <div class="mode-chart">
+                <div class="donut" id="mode-donut">
+                  <div class="donut-content">
+                    <strong id="mode-percent">—</strong>
+                    <span>并行协同</span>
+                  </div>
+                </div>
+
+                <div class="mode-legend">
+                  <div class="mode-item">
+                    <span class="mode-item-left">
+                      <i class="mode-dot" style="--dot-color: #d9897c"></i>
+                      并行协同
+                    </span>
+                    <strong id="parallel-count">0</strong>
+                  </div>
+
+                  <div class="mode-item">
+                    <span class="mode-item-left">
+                      <i class="mode-dot" style="--dot-color: #e39a55"></i>
+                      单Agent派遣
+                    </span>
+                    <strong id="single-count">0</strong>
+                  </div>
+
+                  <div class="mode-item">
+                    <span class="mode-item-left">
+                      <i class="mode-dot" style="--dot-color: #7c9782"></i>
+                      当前记录
+                    </span>
+                    <strong id="mode-total">0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mini-stat-grid">
+                <article class="mini-stat">
+                  <small>工具调用</small>
+                  <strong id="tool-total">0</strong>
+                </article>
+
+                <article class="mini-stat">
+                  <small>参与Agent种类</small>
+                  <strong id="agent-kinds">0</strong>
+                </article>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- 路由时间线 -->
+        <section class="observe-section">
+          <div class="observe-section-title">
+            <div>
+              <h2>AI调度时间线</h2>
+              <p>记录每一次能力接手与调度原因。</p>
+            </div>
+          </div>
+
+          <section class="observe-panel">
+            <div class="timeline" id="trace-timeline">
+              <div class="flow-empty">
+                还没有交接记录。
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- 评测区 -->
+        <section class="observe-section eval-panel">
+          <section class="observe-panel">
+            <div class="eval-header">
+              <div>
+                <h2>系统可靠性评测</h2>
+                <p>
+                  通过路由命中、记忆一致和统一人格三个维度观察AI能力是否稳定。
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="observe-eval-btn"
+                id="eval-btn"
+              >
+                跑一遍路由评测
+              </button>
+            </div>
+
+            <div class="eval-stats-new" id="stats" hidden></div>
+
+            <div class="eval-case-list" id="cases"></div>
+          </section>
+        </section>
+
+        <!-- 详细协同记录 -->
+        <section class="observe-section records-panel">
+          <div class="observe-section-title">
+            <div>
+              <h2>详细协同记录</h2>
+              <p>
+                这里只展示系统调用摘要，完整对话仍遵循老人授权和隐私边界。
+              </p>
+            </div>
+          </div>
+
+          <section class="observe-panel">
+            <div class="records-list" id="obs">
+              <div class="flow-empty">
+                说完一句带天气和带药的话，这里会出现对应的智能体协同记录。
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <div class="observe-footer-note">
+          <strong>暖伴</strong>
+          不替代亲情，也不替代专业诊疗；它只是把复杂的AI协同，整理成家人能够理解的安心摘要。
+        </div>
+
+        <div id="dock"></div>
+      </main>
+
+      <footer class="site-colophon">
+        暖伴 · 第四阶段 · 查询与提醒
+      </footer>
+    </div>
+
+    <script src="js/api.js?v=2"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+      /* =========================================================
+         数据与工具函数
+      ========================================================= */
+
+      var latestObserveData = {
+        observations: [],
+        traces: [],
+      };
+
+      var latestEvaluation = null;
+
+      var AGENT_LABELS = {
+        healing: "疗愈",
+        companion: "陪伴",
+        memory: "记忆",
+        guardian: "守护",
+        life: "生活",
+        parallel: "并行",
+      };
+
+      var AGENT_COLORS = {
+        companion: "#d9897c",
+        life: "#e39a55",
+        guardian: "#7c9782",
+        memory: "#a17d9d",
+        healing: "#c6a05b",
+        parallel: "#c9714b",
+      };
+
+      function agentName(route) {
+        return AGENT_LABELS[route] || route || "未知";
+      }
+
+      function safe(value) {
+        return NBLayout.esc(value == null ? "" : String(value));
+      }
+
+      function showError(text) {
+        var el = document.getElementById("error");
+
+        if (!text) {
+          el.hidden = true;
+          el.textContent = "";
+          return;
+        }
+
+        el.hidden = false;
+        el.textContent = text;
+      }
+
+      function normalizeAgentKey(value) {
+        var text = String(value || "").toLowerCase();
+
+        if (
+          text.indexOf("companion") >= 0 ||
+          text.indexOf("陪伴") >= 0
+        ) {
+          return "companion";
+        }
+
+        if (
+          text.indexOf("life") >= 0 ||
+          text.indexOf("生活") >= 0
+        ) {
+          return "life";
+        }
+
+        if (
+          text.indexOf("guardian") >= 0 ||
+          text.indexOf("守护") >= 0
+        ) {
+          return "guardian";
+        }
+
+        if (
+          text.indexOf("memory") >= 0 ||
+          text.indexOf("记忆") >= 0
+        ) {
+          return "memory";
+        }
+
+        if (
+          text.indexOf("healing") >= 0 ||
+          text.indexOf("疗愈") >= 0
+        ) {
+          return "healing";
+        }
+
+        return text || "unknown";
+      }
+
+      function uniqueArray(list) {
+        var result = [];
+
+        (list || []).forEach(function (item) {
+          if (result.indexOf(item) < 0) {
+            result.push(item);
+          }
+        });
+
+        return result;
+      }
+
+      function getLatestObservation(observations) {
+        if (!observations || !observations.length) return null;
+        return observations[ 0 ];
+      }
+
+      /* =========================================================
+         概览卡片
+      ========================================================= */
+
+      function renderOverview(observations, traces) {
+        var total = observations.length;
+
+        var totalAgentCalls = 0;
+        var agentKinds = {};
+
+        observations.forEach(function (item) {
+          var agents = item.agents || [];
+
+          agents.forEach(function (agent) {
+            var key = normalizeAgentKey(agent);
+            totalAgentCalls += 1;
+            agentKinds[key] = (agentKinds[key] || 0) + 1;
+          });
+        });
+
+        var parallelCount = observations.filter(function (item) {
+          return item.mode === "parallel";
+        }).length;
+
+        var parallelRate = total
+          ? Math.round((parallelCount / total) * 100)
+          : 0;
+
+        var toolTotal = 0;
+
+        observations.forEach(function (item) {
+          toolTotal += (item.tools || []).length;
+        });
+
+        document.getElementById("overview-total").textContent =
+          total ? total + " 条" : "0 条";
+
+        document.getElementById("overview-agents").textContent =
+          totalAgentCalls + " 次";
+
+        document.getElementById("overview-parallel").textContent =
+          total ? parallelRate + "%" : "—";
+
+        document.getElementById("overview-parallel-note").textContent =
+          total
+            ? "并行 " + parallelCount + " 条 · 单派 " + (total - parallelCount) + " 条"
+            : "当前暂无协同记录";
+
+        document.getElementById("tool-total").textContent = toolTotal;
+        document.getElementById("agent-kinds").textContent =
+          Object.keys(agentKinds).length;
+
+        if (latestEvaluation) {
+          document.getElementById("overview-eval").textContent =
+            latestEvaluation.routing_acc + "%";
+        } else {
+          document.getElementById("overview-eval").textContent = "未评测";
+        }
+      }
+
+      /* =========================================================
+         Agent调用分布图
+      ========================================================= */
+
+      function renderAgentDistribution(observations) {
+        var box = document.getElementById("agent-distribution");
+        var counts = {};
+        var total = 0;
+
+        observations.forEach(function (item) {
+          (item.agents || []).forEach(function (agent) {
+            var key = normalizeAgentKey(agent);
+            counts[key] = (counts[key] || 0) + 1;
+            total += 1;
+          });
+        });
+
+        var order = [
+          "companion",
+          "life",
+          "guardian",
+          "memory",
+          "healing",
+        ];
+
+        var exists = order.filter(function (key) {
+          return counts[key];
+        });
+
+        Object.keys(counts).forEach(function (key) {
+          if (exists.indexOf(key) < 0) {
+            exists.push(key);
+          }
+        });
+
+        if (!exists.length) {
+          box.innerHTML =
+            '<div class="chart-empty">当前还没有Agent调用数据。<br />等待新的陪伴记录进入。</div>';
+          return;
+        }
+
+        var max = Math.max.apply(
+          null,
+          exists.map(function (key) {
+            return counts[key];
+          })
+        );
+
+        box.innerHTML = exists
+          .map(function (key) {
+            var label = AGENT_LABELS[key] || key;
+            var count = counts[key];
+            var width = max ? Math.max(7, (count / max) * 100) : 0;
+            var color = AGENT_COLORS[key] || "#c9714b";
+
+            return (
+              '<div class="distribution-row">' +
+              "<label>" +
+              safe(label) +
+              "</label>" +
+              '<div class="distribution-track">' +
+              '<div class="distribution-bar" style="--bar-color:' +
+              color +
+              ";width:" +
+              width +
+              '%"></div>' +
+              "</div>" +
+              '<span class="distribution-count">' +
+              count +
+              "</span>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      /* =========================================================
+         单派 / 并行圆环图
+      ========================================================= */
+
+      function renderModeChart(observations) {
+        var total = observations.length;
+
+        var parallel = observations.filter(function (item) {
+          return item.mode === "parallel";
+        }).length;
+
+        var single = total - parallel;
+        var rate = total ? Math.round((parallel / total) * 100) : 0;
+        var angle = total ? (parallel / total) * 360 : 0;
+
+        document
+          .getElementById("mode-donut")
+          .style.setProperty("--parallel-angle", angle + "deg");
+
+        document.getElementById("mode-percent").textContent =
+          total ? rate + "%" : "—";
+
+        document.getElementById("parallel-count").textContent = parallel;
+        document.getElementById("single-count").textContent = single;
+        document.getElementById("mode-total").textContent = total;
+      }
+
+      /* =========================================================
+         中央协同流程
+      ========================================================= */
+
+      function renderFlow(observations) {
+        var empty = document.getElementById("flow-empty");
+        var content = document.getElementById("flow-content");
+        var item = getLatestObservation(observations);
+
+        if (!item) {
+          empty.hidden = false;
+          content.hidden = true;
+          document.getElementById("flow-mode-badge").textContent = "等待记录";
+          return;
+        }
+
+        empty.hidden = true;
+        content.hidden = false;
+
+        var isParallel = item.mode === "parallel";
+
+        document.getElementById("flow-mode-badge").textContent = isParallel
+          ? "并行协同"
+          : "单Agent派遣";
+
+        document.getElementById("flow-input").textContent =
+          item.user_text || "老人发来了一句问候。";
+
+        document.getElementById("flow-output").textContent =
+          item.final_text || "暖伴正在整理回应。";
+
+        var agents = (item.agents || []).map(normalizeAgentKey);
+
+        document.getElementById("flow-companion-status").textContent =
+          agents.indexOf("companion") >= 0
+            ? "已参与回应"
+            : "未参与本轮";
+
+        document.getElementById("flow-life-status").textContent =
+          agents.indexOf("life") >= 0
+            ? "已参与回应"
+            : "未参与本轮";
+
+        document.getElementById("flow-guardian-status").textContent =
+          agents.indexOf("guardian") >= 0
+            ? "已参与回应"
+            : "未参与本轮";
+
+        var tools = uniqueArray(item.tools || []);
+        var toolsBox = document.getElementById("flow-tools");
+
+        if (!tools.length) {
+          toolsBox.innerHTML =
+            '<span class="flow-tool">本轮未调用额外工具</span>';
+        } else {
+          toolsBox.innerHTML = tools
+            .map(function (tool) {
+              return '<span class="flow-tool">' + safe(tool) + "</span>";
+            })
+            .join("");
+        }
+      }
+
+      /* =========================================================
+         路由时间线
+      ========================================================= */
+
+      function renderTraces(traces) {
+        var box = document.getElementById("trace-timeline");
+
+        if (!traces || !traces.length) {
+          box.innerHTML =
+            '<div class="flow-empty">还没有交接记录。<br />AI调度发生后，时间线会出现在这里。</div>';
+          return;
+        }
+
+        box.innerHTML = traces
+          .map(function (trace, index) {
+            var key = normalizeAgentKey(trace.route);
+            var color = AGENT_COLORS[key] || "#c9714b";
+
+            return (
+              '<div class="timeline-item" style="--timeline-color:' +
+              color +
+              '">' +
+              '<span class="timeline-dot"></span>' +
+              '<div class="timeline-content">' +
+              "<small>调度 " +
+              String(index + 1).padStart(2, "0") +
+              " · " +
+              safe(agentName(trace.route)) +
+              "</small>" +
+              "<strong>" +
+              safe(trace.reason || "系统完成一次能力调度") +
+              "</strong>" +
+              "<p>该能力已进入本轮陪伴流程，并将结果交给暖伴统一整理。</p>" +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      /* =========================================================
+         详细协同记录
+      ========================================================= */
+
+      function renderObservationRecords(observations) {
+        var box = document.getElementById("obs");
+
+        if (!observations || !observations.length) {
+          box.innerHTML =
+            '<div class="flow-empty">说完一句带天气和带药的话，这里会出现对应的智能体协同记录。</div>';
+          return;
+        }
+
+        box.innerHTML = observations
+          .map(function (item) {
+            var isParallel = item.mode === "parallel";
+            var agents = item.agents || [];
+            var tools = item.tools || [];
+
+            var agentHtml = agents.length
+              ? agents
+                  .map(function (agent) {
+                    return (
+                      '<span class="record-agent">' +
+                      safe(agentName(agent)) +
+                      "</span>"
+                    );
+                  })
+                  .join("")
+              : '<span class="record-agent">未记录Agent</span>';
+
+            var toolsHtml = tools.length
+              ? tools
+                  .map(function (tool) {
+                    return (
+                      '<span class="record-tool">' + safe(tool) + "</span>"
+                    );
+                  })
+                  .join("")
+              : '<span class="record-tool">无额外工具</span>';
+
+            return (
+              '<article class="record-card ' +
+              (isParallel ? "parallel" : "single") +
+              '">' +
+              '<div class="record-meta">' +
+              '<span class="record-mode">' +
+              (isParallel ? "并行协同" : "单Agent派遣") +
+              "</span>" +
+              '<div class="record-agents">' +
+              agentHtml +
+              "</div>" +
+              "</div>" +
+              '<p class="record-line"><b>老人原话：</b>' +
+              safe(item.user_text || "") +
+              "</p>" +
+              '<div class="record-tools"><b style="font-size:13px;color:#c9714b;">工具调用：</b>' +
+              toolsHtml +
+              "</div>" +
+              '<p class="record-line output"><b>暖伴出口：</b>' +
+              safe(item.final_text || "") +
+              "</p>" +
+              "</article>"
+            );
+          })
+          .join("");
+      }
+
+      /* =========================================================
+         总体渲染
+      ========================================================= */
+
+      function renderObserve(data) {
+        latestObserveData = data || {};
+
+        var observations = latestObserveData.observations || [];
+        var traces = latestObserveData.traces || [];
+
+        renderOverview(observations, traces);
+        renderAgentDistribution(observations);
+        renderModeChart(observations);
+        renderFlow(observations);
+        renderTraces(traces);
+        renderObservationRecords(observations);
+      }
+
+      var observeRefreshTimer = null;
+
+      function startObserveAutoRefresh() {
+        if (observeRefreshTimer) {
+          clearInterval(observeRefreshTimer);
+        }
+
+        observeRefreshTimer = setInterval(function () {
+          load().catch(function (err) {
+            console.warn("观察台自动刷新失败：", err.message);
+          });
+        }, 30000);
+      }
+
+      function load() {
+        return NB.fetchObserve().then(function (data) {
+          renderObserve(data);
+          showError("");
+          return data;
+        });
+      }
+
+      /* =========================================================
+         评测结果
+      ========================================================= */
+
+      function renderEvaluation(result) {
+        latestEvaluation = result || {};
+
+        var stats = document.getElementById("stats");
+        var cases = document.getElementById("cases");
+
+        var routingHit = Number(result.routing_hit || 0);
+        var total = Number(result.total || 0);
+        var routingAcc =
+          result.routing_acc != null
+            ? Number(result.routing_acc)
+            : total
+            ? Math.round((routingHit / total) * 100)
+            : 0;
+
+        var memoryOk = !!result.memory_consistent;
+        var personaOk = !!result.persona_one_voice;
+
+        stats.hidden = false;
+
+        stats.innerHTML =
+          '<article class="eval-stat ' +
+          (routingAcc >= 80 ? "success" : "warn") +
+          '">' +
+          '<small>路由命中率</small>' +
+          "<strong>" +
+          routingHit +
+          "/" +
+          total +
+          " · " +
+          routingAcc +
+          "%</strong>" +
+          "</article>" +
+          '<article class="eval-stat ' +
+          (memoryOk ? "success" : "warn") +
+          '">' +
+          '<small>长期记忆一致</small>' +
+          "<strong>" +
+          (memoryOk ? "通过" : "未命中") +
+          "</strong>" +
+          (memoryOk ? '<span class="eval-mark">✓</span>' : "") +
+          "</article>" +
+          '<article class="eval-stat ' +
+          (personaOk ? "success" : "warn") +
+          '">' +
+          '<small>统一人格回应</small>' +
+          "<strong>" +
+          (personaOk ? "通过" : "未通过") +
+          "</strong>" +
+          (personaOk ? '<span class="eval-mark">✓</span>' : "") +
+          "</article>";
+
+        cases.innerHTML = (result.cases || [])
+          .map(function (item) {
+            return (
+              '<article class="eval-case ' +
+              (item.ok ? "" : "fail") +
+              '">' +
+              '<div class="eval-case-top">' +
+              '<span class="eval-case-status">' +
+              (item.ok ? "✓ 命中" : "× 未命中") +
+              "</span>" +
+              '<span class="eval-case-expect">期望：' +
+              safe(item.expect || "") +
+              " · 得到：" +
+              safe(item.got || "") +
+              "</span>" +
+              "</div>" +
+              "<p>" +
+              safe(item.text || "") +
+              "</p>" +
+              "<p>" +
+              safe(item.reason || "") +
+              "</p>" +
+              "</article>"
+            );
+          })
+          .join("");
+
+        document.getElementById("overview-eval").textContent =
+          routingAcc + "%";
+      }
+
+      /* =========================================================
+         页面初始化与原有语音功能
+      ========================================================= */
+
+      NBLayout.requireRole("family").then(function (user) {
+        if (!user) return;
+
+        load().catch(function (err) {
+          showError(err.message || "观察台还没有打开");
+        });
+
+        startObserveAutoRefresh();
+
+        document.getElementById("eval-btn").onclick = function () {
+          var btn = document.getElementById("eval-btn");
+
+          btn.disabled = true;
+          btn.textContent = "正在评测…";
+          showError("");
+
+          NB.runObserveEval()
+            .then(function (result) {
+              renderEvaluation(result);
+              return load();
+            })
+            .catch(function (err) {
+              showError(err.message || "评测没有跑完");
+            })
+            .finally(function () {
+              btn.disabled = false;
+              btn.textContent = "跑一遍路由评测";
+            });
+        };
+
+        NBTalk.renderDock(
+          document.getElementById("dock"),
+          function (text, panel, cmd) {
+            var action = (cmd && cmd.action) || "";
+            var line = (cmd && cmd.reply) || "";
+
+            if (action === "run_eval") {
+              document.getElementById("eval-btn").click();
+
+              panel.reply(
+                line || "正在跑路由评测。跑完以后，评测结果会显示在观察台上。",
+                { speak: true }
+              );
+
+              return;
+            }
+
+            if (action === "refresh") {
+              load()
+                .then(function () {
+                  panel.reply(line || "观察台已经刷新了。", {
+                    speak: true,
+                  });
+                })
+                .catch(function (err) {
+                  panel.reply(err.message || "观察台还没有打开", {
+                    speak: true,
+                  });
+                });
+
+              return;
+            }
+
+            return false;
+          },
+          {
+            page: "observe",
+            placeholder: "说：跑一遍评测，或刷新观察台",
+          }
+        );
+      });
+    </script>
+  </body>
+</html>

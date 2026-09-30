@@ -1,0 +1,6 @@
+{
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "smoke": false,
+  "epochs": 3.0,
+  "continue_from": ""
+}

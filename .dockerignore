@@ -1,0 +1,16 @@
+backend/.venv
+backend/.env
+backend/.env.*
+backend/data
+node_modules
+dist
+models
+tools/ffmpeg
+persistent-data
+model-services
+train/*
+!train/fetch_paint.py
+**/__pycache__
+*.log
+*.pid
+.git

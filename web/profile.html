@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的资料 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* ========== 页面整体氛围 ========== */
+      body {
+        /* 深棕色背景 */
+        
+        font-size: 18px;
+      }
+      .page {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 30px 28px 40px;
+      }
+
+      /* ========== 顶部问候区 ========== */
+      .greeting.greeting-compact {
+        position: relative; overflow: hidden;
+        background: linear-gradient(135deg, #fffdf8 0%, #f7efe3 100%);
+        border: 1px solid #e8dccb;
+        border-radius: 22px;
+        padding: 40px 48px 36px;
+        margin-bottom: 26px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+      .greeting .eyebrow {
+        font-size: 16px; color: #b08d60;
+        letter-spacing: 5px; margin: 0 0 14px; font-weight: 500;
+      }
+      .greeting h1 {
+        font-size: 42px; font-weight: 900; color: #3b2e21;
+        margin: 0 0 14px;
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        letter-spacing: 4px;
+      }
+      .greeting p {
+        font-size: 19px; color: #6b5b4b; line-height: 1.8; margin: 0;
+      }
+      .text-link {
+        color: #b14a3a; text-decoration: none;
+        border-bottom: 1px dashed #b14a3a;
+        padding-bottom: 1px;
+      }
+      .text-link:hover { color: #8f2f23; }
+
+      /* ========== 顶部装饰：相册 + 笔 + 心 ========== */
+      .greeting-deco {
+        position: absolute; top: -60px; right: -40px;
+        width: 220px; height: 220px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(214, 174, 124, 0.22) 0%, rgba(214, 174, 124, 0) 70%);
+        pointer-events: none;
+      }
+      .title-deco {
+        position: absolute;
+        top: 50%;
+        right: 60px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        user-select: none;
+        display: inline-block;
+      }
+      .title-deco .deco-main {
+        display: block;
+        font-size: 96px;
+        line-height: 1;
+        opacity: 0.9;
+        filter: drop-shadow(0 6px 16px rgba(176, 141, 96, 0.25));
+        animation: mainFloat 4s ease-in-out infinite;
+      }
+      @keyframes mainFloat {
+        0%, 100% { transform: translateY(0) rotate(-3deg); }
+        50% { transform: translateY(-8px) rotate(3deg); }
+      }
+      .title-deco .deco-sub {
+        position: absolute;
+        pointer-events: none;
+        animation: subFloat 3.6s ease-in-out infinite;
+      }
+      .title-deco .deco-pen {
+        font-size: 34px;
+        top: -6px;
+        left: -30px;
+        animation-delay: 0.4s;
+      }
+      .title-deco .deco-heart {
+        font-size: 30px;
+        top: -24px;
+        left: 18px;
+        color: #b14a3a;
+        animation-delay: 1s;
+        opacity: 0.85;
+      }
+      @keyframes subFloat {
+        0% { transform: translate(0, 0) rotate(-6deg); opacity: 0.7; }
+        50% { transform: translate(-4px, -8px) rotate(6deg); opacity: 0.95; }
+        100% { transform: translate(0, 0) rotate(-6deg); opacity: 0.7; }
+      }
+
+      /* ========== 卡片 ========== */
+      .panel {
+        position: relative;
+        background: #fffdf8;
+        border: 1px solid #e8dccb;
+        border-radius: 22px;
+        padding: 36px 42px 40px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+        margin-top: 24px;
+      }
+      .panel h2 {
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        font-size: 28px; font-weight: 900;
+        color: #3b2e21;
+        letter-spacing: 4px;
+        margin: 0 0 28px;
+        padding-left: 18px;
+        position: relative;
+      }
+      .panel h2::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 50%;
+        transform: translateY(-50%);
+        width: 5px; height: 28px;
+        background: #b14a3a;
+        border-radius: 3px;
+      }
+
+      /* ========== 表单字段 ========== */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px 30px;
+      }
+      .form-grid .full { grid-column: 1 / -1; }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 18px;
+        color: #6b5b4b;
+        letter-spacing: 1px;
+        font-weight: 500;
+      }
+      /* ★ 表单标签里的表情图标 */
+      .field .field-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .field .field-icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+
+      /* 输入框：下划线式，字大 */
+      .field input[type="text"],
+      .field input:not([type]) {
+        width: 100%;
+        padding: 16px 4px 14px;
+        font-size: 22px;
+        font-family: inherit;
+        color: #3b2e21;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid #e8dccb;
+        border-radius: 0;
+        transition: border-color 0.2s ease, background 0.2s ease;
+        outline: none;
+        font-weight: 500;
+      }
+      .field input:focus {
+        border-bottom-color: #b14a3a;
+        background: rgba(177, 74, 58, 0.03);
+      }
+      .field input::placeholder {
+        color: #c9b89a;
+        font-size: 19px;
+        font-weight: 400;
+      }
+
+      /* ========== 胶囊按钮 ========== */
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .pill {
+        padding: 12px 24px;
+        border-radius: 999px;
+        border: 1px solid #e7dccb;
+        background: #fffdf8;
+        color: #6b5b4b;
+        font-size: 17px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        letter-spacing: 1px;
+      }
+      .pill:hover:not(.on) {
+        background: #f5efe3;
+        border-color: #b08d60;
+      }
+      .pill.on {
+        background: #b14a3a;
+        color: #fffdf8;
+        border-color: #b14a3a;
+        box-shadow: 0 4px 10px rgba(177, 74, 58, 0.25);
+      }
+
+      /* ========== 语速滑块 ========== */
+      .rate-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 10px;
+      }
+      .rate-row > span {
+        font-size: 17px;
+        color: #a89279;
+        letter-spacing: 1px;
+      }
+      .rate-row input[type="range"] {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(to right, #e8dccb, #b14a3a);
+        outline: none;
+        cursor: pointer;
+      }
+      .rate-row input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: #fffdf8;
+        border: 4px solid #b14a3a;
+        box-shadow: 0 2px 8px rgba(177, 74, 58, 0.3);
+        cursor: pointer;
+      }
+      .rate-row input[type="range"]::-moz-range-thumb {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: #fffdf8;
+        border: 4px solid #b14a3a;
+        box-shadow: 0 2px 8px rgba(177, 74, 58, 0.3);
+        cursor: pointer;
+      }
+      #rate-label {
+        color: #b14a3a;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      /* ========== 主按钮（带图标） ========== */
+      .solid-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #b14a3a;
+        color: #fffdf8;
+        border: none;
+        padding: 18px 52px;
+        border-radius: 999px;
+        font-size: 20px;
+        font-family: inherit;
+        letter-spacing: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 16px rgba(177, 74, 58, 0.28);
+        font-weight: 500;
+      }
+      .solid-btn .btn-icon {
+        font-size: 24px;
+        line-height: 1;
+      }
+      .solid-btn:hover {
+        background: #96382a;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(177, 74, 58, 0.38);
+      }
+      .solid-btn:active { transform: translateY(0); }
+
+      /* ========== 头像上传区 ========== */
+      .avatar-uploader {
+        width: 140px; height: 140px;
+        border-radius: 50%;
+        background: #f7efe3;
+        border: 2px dashed #c9b89a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #a89279;
+        font-size: 15px;
+        letter-spacing: 1px;
+        overflow: hidden;
+        position: relative;
+        flex-shrink: 0;
+      }
+      .avatar-uploader:hover {
+        border-color: #b14a3a;
+        background: #fff8ec;
+        color: #b14a3a;
+      }
+      .avatar-uploader .avatar-icon {
+        font-size: 38px;
+        margin-bottom: 6px;
+      }
+      .avatar-uploader img {
+        position: absolute;
+        inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      .avatar-uploader .avatar-hint {
+        position: relative;
+        z-index: 2;
+      }
+      .avatar-uploader.has-photo .avatar-hint,
+      .avatar-uploader.has-photo .avatar-icon { display: none; }
+
+      /* 基本信息：左头像 + 右表单 */
+      .profile-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 34px;
+        align-items: start;
+      }
+      .profile-row .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .consent-list { display: grid; gap: 12px; }
+      .consent-item { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px 18px; border: 1px solid rgba(145, 105, 72, 0.2); border-radius: 16px; background: rgba(255,255,255,0.45); }
+      .consent-item strong { display: block; margin-bottom: 4px; }
+      .consent-item small { color: #6f6257; line-height: 1.5; }
+      @media (max-width: 720px) {
+        .profile-row { grid-template-columns: 1fr; justify-items: center; }
+        .profile-row .form-grid { grid-template-columns: 1fr; width: 100%; }
+      }
+
+      /* 家里人：左头像 + 右表单 */
+      .person-form-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 34px;
+        align-items: start;
+        margin-top: 28px;
+      }
+      .person-form-row .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      @media (max-width: 720px) {
+        .person-form-row { grid-template-columns: 1fr; justify-items: center; }
+        .person-form-row .form-grid { grid-template-columns: 1fr; width: 100%; }
+      }
+
+      /* ========== 家人列表（带头像） ========== */
+      .people-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 8px;
+      }
+      .person-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f7efe3;
+        border: 1px solid #e8dccb;
+        border-radius: 16px;
+        padding: 16px 22px;
+        font-size: 20px;
+        color: #3b2e21;
+        letter-spacing: 1px;
+      }
+      .person-row .person-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .person-row .person-avatar {
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: #e8dccb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 3px solid #fffdf8;
+        box-shadow: 0 2px 6px rgba(92, 58, 26, 0.15);
+      }
+      .person-row .person-avatar img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+      }
+      .ghost-btn {
+        background: transparent;
+        border: 1px solid #d9cfbf;
+        color: #8a765f;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 16px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+      .ghost-btn:hover {
+        background: #fffdf8;
+        color: #b14a3a;
+        border-color: #b14a3a;
+      }
+
+      /* ========== 提示条 ========== */
+      .status-banner {
+        margin-top: 22px;
+        background: #fff8ec;
+        border: 1px solid #e8dccb;
+        border-left: 5px solid #b14a3a;
+        border-radius: 14px;
+        padding: 20px 28px;
+        font-size: 19px;
+        color: #6b5b4b;
+        line-height: 1.8;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      /* ========== 手机端 ========== */
+      @media (max-width: 720px) {
+        .page { padding: 20px 16px 30px; }
+        .title-deco { right: 20px; }
+        .title-deco .deco-main { font-size: 64px; }
+        .greeting h1 { font-size: 32px; }
+        .greeting p { font-size: 17px; }
+        .panel { padding: 26px 22px 30px; }
+        .panel h2 { font-size: 24px; }
+        .solid-btn { width: 100%; padding: 18px 20px; }
+        .form-grid { gap: 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <section class="greeting greeting-compact">
+          <div class="greeting-deco"></div>
+          <p class="eyebrow">称呼 · 家人 · 语速</p>
+          <h1>我的资料</h1>
+          <div class="title-deco">
+            <span class="deco-main">📔</span>
+            <span class="deco-sub deco-pen">✏️</span>
+            <span class="deco-sub deco-heart">❤️</span>
+          </div>
+          <p>子女或老人自己填一次即可。暖伴之后都从这里取称呼和家人。也可去看 <a href="memory.html" class="text-link">暖伴记得我</a>。</p>
+        </section>
+
+        <!-- ★★★ 基本信息：左头像 + 右信息 ★★★ -->
+        <section class="panel">
+          <h2>基本信息</h2>
+          <div class="profile-row">
+            <!-- 老人头像 -->
+            <div class="avatar-uploader" id="profile-avatar-uploader" title="点击上传照片">
+              <span class="avatar-icon">📷</span>
+              <span class="avatar-hint">加张照片</span>
+              <input type="file" accept="image/*" hidden id="profile-photo" />
+            </div>
+
+            <div class="form-grid">
+              <label class="field">
+                <span class="field-label"><span class="field-icon">👋</span>暖伴怎么叫您</span>
+                <input id="courtesy" placeholder="例如 王阿姨" />
+              </label>
+              <label class="field">
+                <span class="field-label"><span class="field-icon">📛</span>姓名</span>
+                <input id="display_name" placeholder="例如 王秀兰" />
+              </label>
+              <label class="field">
+                <span class="field-label"><span class="field-icon">📍</span>籍贯</span>
+                <input id="hometown" placeholder="例如 江苏南通" />
+              </label>
+              <div class="field">
+                <span class="field-label"><span class="field-icon">🎂</span>出生年代</span>
+                <div class="pill-row" id="decades"></div>
+              </div>
+              <label class="field full">
+                <span class="field-label"><span class="field-icon">🗣️</span>说话速度（<span id="rate-label">适中，偏慢</span>）</span>
+                <div class="rate-row">
+                  <span>慢</span>
+                  <input type="range" id="rate" min="0.6" max="1.1" step="0.02" value="0.82" />
+                  <span>快</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div style="margin-top: 30px">
+            <button class="solid-btn" type="button" id="save-profile">
+              <span class="btn-icon">💾</span>保存资料
+            </button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>家人关联码</h2>
+          <p class="empty-note">家人注册时必须同时填写您的账号和这组六位关联码。不要发给不认识的人。</p>
+          <div class="form-grid">
+            <div class="field"><span class="field-label">当前关联码</span><strong id="family-link-code">正在读取…</strong></div>
+          </div>
+          <div style="margin-top: 18px">
+            <button class="ghost-btn" type="button" id="rotate-family-link-code">换一组关联码</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>隐私与陪伴授权</h2>
+          <div class="consent-list" id="consent-list">
+            <label class="consent-item"><span><strong>日常语言趋势</strong><small>分析对话文字的流畅度、重复和连贯变化，不用于疾病诊断。</small></span><input type="checkbox" data-scope="transcript_analysis" /></label>
+            <label class="consent-item"><span><strong>向家人分享趋势</strong><small>只分享趋势摘要和数据充分度，不展示聊天原文。</small></span><input type="checkbox" data-scope="family_cognition" /></label>
+            <label class="consent-item"><span><strong>家人查看照料资料</strong><small>允许已使用关联码绑定的家人查看称呼、家乡和家人名单。</small></span><input type="checkbox" data-scope="family_care_view" /></label>
+            <label class="consent-item"><span><strong>家人修改照料资料</strong><small>允许家人修改资料和家人名单；建议只在确有照料需要时开启。</small></span><input type="checkbox" data-scope="family_care_edit" /></label>
+            <label class="consent-item"><span><strong>家人管理提醒</strong><small>允许家人查看、新增和删除服药、复诊等提醒。</small></span><input type="checkbox" data-scope="family_reminders" /></label>
+            <label class="consent-item"><span><strong>保存并分析原始录音</strong><small>用于统计语速、静音和停顿趋势；默认关闭，不用于疾病诊断。</small></span><input type="checkbox" data-scope="audio_storage" /></label>
+            <label class="consent-item"><span><strong>语音模型分析</strong><small>允许使用本地 SenseVoice 和 openSMILE 分析已保存录音；远程服务还需开启云端语音处理。</small></span><input type="checkbox" data-scope="voice_analysis" /></label>
+            <label class="consent-item"><span><strong>老照片内容理解</strong><small>允许视觉模型分析本人主动上传的老照片；远程服务还需开启云端图片处理。</small></span><input type="checkbox" data-scope="photo_analysis" /></label>
+            <label class="consent-item"><span><strong>制作记忆影像</strong><small>允许把本人选择的照片、口述和音乐组合为记忆作品。</small></span><input type="checkbox" data-scope="memory_video" /></label>
+            <label class="consent-item"><span><strong>云端语义记忆检索</strong><small>只有配置了语义向量服务时才生效；开启后，相关记忆文字会发送给该服务用于检索。</small></span><input type="checkbox" data-scope="external_memory_ai" /></label>
+            <label class="consent-item"><span><strong>云端对话处理</strong><small>仅在使用云端大模型时生效；关闭后只使用本地模型或本地规则回答。</small></span><input type="checkbox" data-scope="cloud_conversation" /></label>
+            <label class="consent-item"><span><strong>云端图片处理</strong><small>允许将本人主动选择的照片发送给已配置的远程视觉服务；作画按钮会在点击时单独确认请求。</small></span><input type="checkbox" data-scope="cloud_image_processing" /></label>
+            <label class="consent-item"><span><strong>云端语音处理</strong><small>允许使用已配置的 SenseVoice 和声学分析服务；关闭后继续使用浏览器本地指标。</small></span><input type="checkbox" data-scope="cloud_voice_processing" /></label>
+            <label class="consent-item"><span><strong>云端记忆影像</strong><small>允许把选中的照片、口述和故事发送给已配置的视频模型生成记忆短片。</small></span><input type="checkbox" data-scope="cloud_video_processing" /></label>
+            <label class="consent-item"><span><strong>研究型认知风险模型</strong><small>只发送按天汇总的语言和声学指标，不发送聊天原文；结果不是疾病诊断。</small></span><input type="checkbox" data-scope="research_cognition_model" /></label>
+            <label class="consent-item"><span><strong>个性音色</strong><small>允许使用本人已保存的录音作为 CosyVoice 音色样本；未配置服务时仍使用系统普通话声音。</small></span><input type="checkbox" data-scope="voice_personalization" /></label>
+          </div>
+        </section>
+
+        <section class="panel" id="cognition-progress">
+          <h2>我的认知基线进度</h2>
+          <p class="empty-note" id="cognition-progress-note">开启“日常语言趋势”后，暖伴会按天积累，不会把同一天的多次聊天当成很多天。</p>
+          <div class="form-grid" id="cognition-progress-stats"></div>
+          <p class="empty-note" id="speech-style-note">个人表达风格：正在从您的日常对话中慢慢学习。</p>
+        </section>
+
+        <!-- ★★★ 家里人：左头像 + 右信息 ★★★ -->
+        <section class="panel">
+          <h2>家里人</h2>
+          <div class="people-list" id="people"></div>
+
+          <div class="person-form-row">
+            <!-- 家人头像 -->
+            <div class="avatar-uploader" id="avatar-uploader" title="点击上传照片">
+              <span class="avatar-icon">📷</span>
+              <span class="avatar-hint">加张照片</span>
+              <input type="file" accept="image/*" hidden id="person-photo" />
+            </div>
+
+            <div class="form-grid">
+              <div class="field full">
+                <span class="field-label"><span class="field-icon">👨‍👩‍👧</span>关系</span>
+                <div class="pill-row" id="relations"></div>
+              </div>
+              <label class="field">
+                <span class="field-label"><span class="field-icon">✏️</span>名字</span>
+                <input id="name" placeholder="例如 小明" />
+              </label>
+              <label class="field">
+                <span class="field-label"><span class="field-icon">💬</span>补充</span>
+                <input id="note" placeholder="例如 在外地工作" />
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top: 30px">
+            <button class="solid-btn" type="button" id="save-person">
+              <span class="btn-icon">📝</span>记下这位家人
+            </button>
+          </div>
+        </section>
+      <div id="dock" hidden></div>
+        <div class="status-banner" id="message" hidden></div>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+<script src="js/speech.js"></script>
+<script src="js/holdtalk.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+      var RELATIONS = ["儿子", "女儿", "孙子", "孙女", "老伴", "儿媳", "邻居"];
+      var DECADES = ["1940年代", "1950年代", "1960年代", "1970年代"];
+      var profile = {
+        user_id: "default",
+        display_name: "王秀兰",
+        courtesy: "王阿姨",
+        hometown: "江苏南通",
+        birth_decade: "1950年代",
+        speech_rate: 0.82,
+        photo: ""
+      };
+      var people = [];
+      var relation = "儿子";
+
+      function msg(text) {
+        var el = document.getElementById("message");
+        if (!text) { el.hidden = true; return; }
+        el.hidden = false;
+        el.textContent = text;
+      }
+
+      function rateLabel(value) {
+        return value <= 0.7 ? "很慢" : value <= 0.85 ? "适中，偏慢" : "稍快";
+      }
+
+      function photoSource(item) {
+        if (!item) return "";
+        if (item.photo_url) return NB.asset(item.photo_url);
+        if (item.photo) return NB.asset("/api/avatars/" + encodeURIComponent(item.photo));
+        return "";
+      }
+
+      function paint() {
+        document.getElementById("courtesy").value = profile.courtesy || "";
+        document.getElementById("display_name").value = profile.display_name || "";
+        document.getElementById("hometown").value = profile.hometown || "";
+        document.getElementById("rate").value = profile.speech_rate || 0.82;
+        document.getElementById("rate-label").textContent = rateLabel(profile.speech_rate || 0.82);
+
+        // 老人头像回显
+        var profileUploader = document.getElementById("profile-avatar-uploader");
+        var profilePhoto = photoSource(profile);
+        if (profilePhoto) {
+          profileUploader.classList.add("has-photo");
+          var oldImg = profileUploader.querySelector("img");
+          if (oldImg) oldImg.remove();
+          var img = document.createElement("img");
+          img.src = profilePhoto;
+          profileUploader.appendChild(img);
+        } else {
+          profileUploader.classList.remove("has-photo");
+          var oldImg2 = profileUploader.querySelector("img");
+          if (oldImg2) oldImg2.remove();
+        }
+
+        document.getElementById("decades").innerHTML = DECADES.map(function (item) {
+          return '<button type="button" class="pill' + (profile.birth_decade === item ? " on" : "") + '" data-decade="' + item + '">' + item + "</button>";
+        }).join("");
+
+        document.getElementById("relations").innerHTML = RELATIONS.map(function (item) {
+          return '<button type="button" class="pill' + (relation === item ? " on" : "") + '" data-rel="' + item + '">' + item + "</button>";
+        }).join("");
+
+        document.getElementById("people").innerHTML = people.map(function (person) {
+          var personPhoto = photoSource(person);
+          var avatarHtml = personPhoto
+            ? '<div class="person-avatar"><img src="' + personPhoto + '" alt="" /></div>'
+            : '<div class="person-avatar">👤</div>';
+          return '<div class="person-row">' +
+            '<span class="person-info">' + avatarHtml + '<span>' +
+            NBLayout.esc(person.relation + person.name + (person.note ? "（" + person.note + "）" : "")) +
+            '</span></span>' +
+            '<button class="ghost-btn" type="button" data-del="' + person.id + '">去掉</button>' +
+            '</div>';
+        }).join("");
+      }
+
+      function readForm() {
+        profile.courtesy = document.getElementById("courtesy").value;
+        profile.display_name = document.getElementById("display_name").value;
+        profile.hometown = document.getElementById("hometown").value;
+        profile.speech_rate = Number(document.getElementById("rate").value);
+      }
+
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        paint();
+
+        NB.fetchFamilyLinkCode().then(function (data) {
+          document.getElementById("family-link-code").textContent = data.link_code || "尚未生成";
+        }).catch(function () {
+          document.getElementById("family-link-code").textContent = "读取失败";
+        });
+        document.getElementById("rotate-family-link-code").onclick = function () {
+          if (!confirm("更换后，旧关联码会立即失效。确定更换吗？")) return;
+          NB.rotateFamilyLinkCode().then(function (data) {
+            document.getElementById("family-link-code").textContent = data.link_code || "";
+            msg("新的家人关联码已经生成。");
+          }).catch(function (error) {
+            msg((error && error.message) || "关联码没有更新成功");
+          });
+        };
+
+        document.getElementById("rate").oninput = function () {
+          profile.speech_rate = Number(this.value);
+          document.getElementById("rate-label").textContent = rateLabel(profile.speech_rate);
+        };
+        document.getElementById("decades").onclick = function (event) {
+          var btn = event.target.closest("[data-decade]");
+          if (!btn) return;
+          profile.birth_decade = btn.getAttribute("data-decade");
+          paint();
+        };
+        document.getElementById("relations").onclick = function (event) {
+          var btn = event.target.closest("[data-rel]");
+          if (!btn) return;
+          relation = btn.getAttribute("data-rel");
+          paint();
+        };
+        document.getElementById("people").onclick = function (event) {
+          var btn = event.target.closest("[data-del]");
+          if (!btn) return;
+          var id = Number(btn.getAttribute("data-del"));
+          NB.deletePerson(id).then(function () {
+            people = people.filter(function (item) { return item.id !== id; });
+            paint();
+          }).catch(function (error) {
+            msg((error && error.message) || "这位家人没有删除成功");
+          });
+        };
+
+        // ★★★ 老人头像上传 ★★★
+        var profileUploader = document.getElementById("profile-avatar-uploader");
+        var profilePhotoInput = document.getElementById("profile-photo");
+        profileUploader.onclick = function () { profilePhotoInput.click(); };
+        profilePhotoInput.onchange = function (event) {
+          var file = event.target.files && event.target.files[0];
+          event.target.value = "";
+          if (!file) return;
+          NB.uploadProfilePhoto(file).then(function (saved) {
+            profile = Object.assign(profile, saved);
+            paint();
+            msg("头像已经保存到暖伴服务。");
+          }).catch(function (error) {
+            msg((error && error.message) || "头像没有保存成功");
+          });
+        };
+
+        // ★★★ 保存资料 ★★★
+        document.getElementById("save-profile").onclick = function () {
+          readForm();
+          NB.updateProfile(profile).then(function (saved) {
+            profile = saved;
+            msg("资料已经记下。下次打开，暖伴会用这个称呼叫您。");
+            paint();
+          }).catch(function (error) {
+            msg((error && error.message) || "资料没有保存成功，请稍后再试。");
+          });
+        };
+
+        // ★★★ 家人照片上传 ★★★
+        var currentPersonPhoto = null;
+        var uploader = document.getElementById("avatar-uploader");
+        var photoInput = document.getElementById("person-photo");
+
+        uploader.onclick = function () { photoInput.click(); };
+
+        photoInput.onchange = function (event) {
+          var file = event.target.files && event.target.files[0];
+          event.target.value = "";
+          if (!file) return;
+          currentPersonPhoto = file;
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            uploader.classList.add("has-photo");
+            var existingImg = uploader.querySelector("img");
+            if (existingImg) existingImg.remove();
+            var img = document.createElement("img");
+            img.src = e.target.result;
+            uploader.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        };
+
+        var resetAvatarUploader = function () {
+          currentPersonPhoto = null;
+          uploader.classList.remove("has-photo");
+          var existingImg = uploader.querySelector("img");
+          if (existingImg) existingImg.remove();
+        };
+
+        // ★★★ 保存家人 ★★★
+        document.getElementById("save-person").onclick = function () {
+          var name = document.getElementById("name").value.trim();
+          if (!name) { msg("请写下家人的名字"); return; }
+          var payload = {
+            relation: relation,
+            name: name,
+            note: document.getElementById("note").value.trim(),
+          };
+          NB.addPerson(payload).then(function (person) {
+            if (!currentPersonPhoto) return person;
+            return NB.uploadPersonPhoto(person.id, currentPersonPhoto);
+          }).then(function (person) {
+            if (!people.some(function (item) { return item.id === person.id; })) people.push(person);
+            document.getElementById("name").value = "";
+            document.getElementById("note").value = "";
+            resetAvatarUploader();
+            msg("家人已经写进黑板。");
+            paint();
+          }).catch(function (error) {
+            msg((error && error.message) || "家人资料没有保存成功");
+          });
+        };
+
+        NB.fetchSession().then(function (data) {
+          profile = data.profile;
+          people = data.people || [];
+          var scopes = data.consent_scopes || {};
+          NB.setConsentScopes(scopes);
+          document.querySelectorAll("[data-scope]").forEach(function (input) {
+            input.checked = !!scopes[input.getAttribute("data-scope")];
+          });
+          var speechStyle = data.speech_style || {};
+          document.getElementById("speech-style-note").textContent = speechStyle.status === "available"
+            ? "个人表达风格：已根据 " + speechStyle.sample_count + " 段本人对话形成文字节奏偏好（不会冒充本人，也不是音色克隆）。"
+            : "个人表达风格：已积累 " + (speechStyle.sample_count || 0) + "/5 段本人对话，满 5 段后开始用于调整回复节奏。";
+          paint();
+        }).catch(function () {
+          msg("还没有连上暖伴服务，请连接后再保存资料。");
+        });
+        NB.fetchCognitionTrend().then(function (data) {
+          var trend = data.trend || {};
+          var voice = trend.voice || {};
+          document.getElementById("cognition-progress-stats").innerHTML =
+            '<div class="field"><span class="field-label">已积累天数</span><strong>' + (trend.day_count || 0) + ' 天</strong></div>' +
+            '<div class="field"><span class="field-label">有效对话</span><strong>' + (trend.sample_count || 0) + ' 次</strong></div>' +
+            '<div class="field"><span class="field-label">录音样本</span><strong>' + (voice.sample_count || 0) + ' 次</strong></div>' +
+            '<div class="field"><span class="field-label">当前状态</span><strong>' + NBLayout.esc(trend.label || "正在建立个人基线") + '</strong></div>';
+          document.getElementById("cognition-progress-note").textContent = trend.disclaimer || "仅用于长期趋势观察，不用于疾病诊断。";
+        }).catch(function () {});
+        document.getElementById("consent-list").onchange = function (event) {
+          var input = event.target.closest("[data-scope]");
+          if (!input) return;
+          input.disabled = true;
+          NB.setConsentScope(input.getAttribute("data-scope"), input.checked).then(function () {
+            return NB.fetchConsentScopes();
+          }).then(function (data) {
+            NB.setConsentScopes(data.scopes || {});
+            msg("授权设置已保存。");
+          }).catch(function (error) {
+            input.checked = !input.checked;
+            msg((error && error.message) || "授权设置没有保存成功");
+          }).finally(function () { input.disabled = false; });
+        };
+        NBTalk.renderDock(document.getElementById("dock"), function (text, panel, cmd) {
+  // 资料页不需要特殊指令，返回 false 让 holdtalk.js 走默认聊天
+  return false;
+}, {
+  page: "profile",
+  placeholder: "说：叫我王阿姨，或儿子叫小明",
+});
+      });
+    </script>
+  </body>
+</html>

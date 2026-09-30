@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>照料 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <style>
+      /* ===================== 设计变量 ===================== */
+      .page {
+        --bg: #fbf7f2;
+        --surface: #ffffff;
+        --ink: #332c26;
+        --ink-2: #5c5148;
+        --muted: #9c9188;
+        --line: #efe6dc;
+        --line-2: #e4d8cb;
+
+        --brand: #c9714b;
+        --brand-2: #e09b72;
+        --brand-soft: #fbede4;
+
+        --sage: #7c9782;
+        --sage-soft: #edf3ee;
+
+        --amber: #d69b4a;
+        --amber-soft: #fdf2e1;
+
+        --r-lg: 26px;
+        --r-md: 18px;
+        --r-sm: 14px;
+
+        --shadow-1: 0 1px 2px rgba(70, 45, 25, 0.04),
+          0 6px 18px -12px rgba(70, 45, 25, 0.18);
+        --shadow-2: 0 20px 44px -26px rgba(90, 55, 30, 0.5),
+          0 2px 8px rgba(90, 55, 30, 0.05);
+        --ease: cubic-bezier(0.22, 0.85, 0.3, 1);
+      }
+
+      /* 公共说话组件保持项目原有配色，不继承本页设计变量。 */
+      .page #dock {
+        --ink: #2a1810;
+        --muted: #6e5340;
+        --line: #d9c3a4;
+      }
+
+      /* ===================== 基础 ===================== */
+      html {
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+      }
+
+      /* ===================== 页面容器 ===================== */
+      .page {
+        width: min(100% - 40px, 900px);
+        margin: 0 auto;
+        padding: 26px 0 130px;
+        box-sizing: border-box;
+      }
+
+      /* ===================== 英雄区 ===================== */
+      .greeting {
+        position: relative;
+        overflow: hidden;
+        padding: 36px 38px 34px;
+        border-radius: var(--r-lg);
+        border: 1px solid #f3e2d4;
+        background: linear-gradient(
+          135deg,
+          #fff9f4 0%,
+          #fdeade 46%,
+          #f7efe6 100%
+        );
+        box-shadow: 0 26px 50px -38px rgba(120, 70, 40, 0.7),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        animation: rise 0.6s var(--ease) both;
+      }
+
+      .greeting::before,
+      .greeting::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .greeting::before {
+        width: 260px;
+        height: 260px;
+        right: -80px;
+        top: -110px;
+        background: radial-gradient(
+          circle at 35% 35%,
+          rgba(227, 154, 110, 0.42),
+          rgba(227, 154, 110, 0) 68%
+        );
+      }
+
+      .greeting::after {
+        width: 220px;
+        height: 220px;
+        left: -70px;
+        bottom: -120px;
+        background: radial-gradient(
+          circle at 35% 35%,
+          rgba(124, 151, 130, 0.34),
+          rgba(124, 151, 130, 0) 70%
+        );
+      }
+
+      .greeting > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 15px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        color: #9c6a4e;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(201, 113, 75, 0.22);
+        backdrop-filter: blur(6px);
+      }
+
+      .eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 0 0 rgba(201, 113, 75, 0.45);
+        animation: pulse 2.6s ease-out infinite;
+      }
+
+      .greeting h1 {
+        margin: 18px 0 12px;
+        font-family: "Noto Serif SC", "Songti SC", serif;
+        font-size: clamp(24px, 3.4vw, 34px);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        line-height: 1.35;
+        color: #33291f;
+      }
+
+      .greeting .lede {
+        margin: 0;
+        max-width: 44ch;
+        font-size: 14.5px;
+        line-height: 1.9;
+        color: #7c6e63;
+      }
+
+      /* ===================== 卡片 ===================== */
+      .panel {
+        position: relative;
+        margin-top: 18px;
+        padding: 26px 28px 28px;
+        border-radius: var(--r-lg);
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: var(--shadow-1);
+        animation: rise 0.62s var(--ease) both;
+        transition: box-shadow 0.4s var(--ease), border-color 0.4s var(--ease),
+          transform 0.4s var(--ease);
+      }
+
+      .panel:hover {
+        border-color: #e9dccd;
+        box-shadow: var(--shadow-2);
+      }
+
+      .panel-note {
+        background: linear-gradient(180deg, #fffdfb 0%, #fffaF4 100%);
+        border-color: #f2e6d8;
+      }
+
+      .stagger-1 {
+        animation-delay: 0.08s;
+      }
+      .stagger-2 {
+        animation-delay: 0.16s;
+      }
+      .stagger-3 {
+        animation-delay: 0.24s;
+      }
+
+      /* ===================== 卡片头部 ===================== */
+      .panel-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .panel-icon {
+        flex: none;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        color: var(--brand);
+        background: linear-gradient(140deg, #fdeee4, #f8ded0);
+        box-shadow: inset 0 0 0 1px rgba(201, 113, 75, 0.14),
+          0 6px 14px -10px rgba(201, 113, 75, 0.8);
+      }
+
+      .panel-icon.is-sage {
+        color: var(--sage);
+        background: linear-gradient(140deg, #eef5f0, #e0ebe3);
+        box-shadow: inset 0 0 0 1px rgba(124, 151, 130, 0.18),
+          0 6px 14px -10px rgba(124, 151, 130, 0.8);
+      }
+
+      .panel-icon.is-amber {
+        color: var(--amber);
+        background: linear-gradient(140deg, #fdf4e6, #fbe9cd);
+        box-shadow: inset 0 0 0 1px rgba(214, 155, 74, 0.2),
+          0 6px 14px -10px rgba(214, 155, 74, 0.8);
+      }
+
+      .panel-icon svg {
+        width: 21px;
+        height: 21px;
+        display: block;
+      }
+
+      .panel h2 {
+        margin: 2px 0 0;
+        font-family: "Noto Serif SC", "Songti SC", serif;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: #352c24;
+      }
+
+      .panel-sub {
+        margin: 6px 0 0;
+        font-size: 13px;
+        line-height: 1.75;
+        color: var(--muted);
+      }
+
+      /* ===================== 表单 ===================== */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .field {
+        display: block;
+        font-size: 13.5px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        color: var(--ink-2);
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      .field input,
+      .field textarea {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 9px;
+        padding: 12px 15px;
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink);
+        background: #fcfaf7;
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        outline: none;
+        transition: border-color 0.22s var(--ease), box-shadow 0.22s var(--ease),
+          background 0.22s var(--ease), transform 0.22s var(--ease);
+      }
+
+      .field textarea {
+        resize: vertical;
+        min-height: 92px;
+      }
+
+      .field input::placeholder,
+      .field textarea::placeholder {
+        color: #bdb3aa;
+      }
+
+      .field input:hover,
+      .field textarea:hover {
+        border-color: #e5d7c8;
+      }
+
+      .field input:focus,
+      .field textarea:focus {
+        background: #fff;
+        border-color: var(--brand-2);
+        box-shadow: 0 0 0 4px rgba(201, 113, 75, 0.13);
+        transform: translateY(-1px);
+      }
+
+      /* ===================== 语速滑块 ===================== */
+      .rate-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .rate-row > span {
+        flex: none;
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        flex: 1;
+        height: 6px;
+        border-radius: 999px;
+        outline: none;
+        background: linear-gradient(
+          90deg,
+          var(--brand) 0%,
+          var(--brand-2) var(--fill, 44%),
+          #efe6dc var(--fill, 44%),
+          #efe6dc 100%
+        );
+        transition: box-shadow 0.25s var(--ease);
+      }
+
+      input[type="range"]:focus-visible {
+        box-shadow: 0 0 0 4px rgba(201, 113, 75, 0.14);
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--brand);
+        box-shadow: 0 4px 10px -2px rgba(201, 113, 75, 0.55);
+        cursor: grab;
+        transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+      }
+
+      input[type="range"]::-webkit-slider-thumb:active {
+        cursor: grabbing;
+        transform: scale(1.2);
+        box-shadow: 0 6px 16px -2px rgba(201, 113, 75, 0.7);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--brand);
+        box-shadow: 0 4px 10px -2px rgba(201, 113, 75, 0.55);
+        cursor: grab;
+      }
+
+      input[type="range"]::-moz-range-track {
+        height: 6px;
+        border-radius: 999px;
+        background: #efe6dc;
+      }
+
+      .rate-value {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        color: #9c6a4e;
+        background: var(--brand-soft);
+        border: 1px solid rgba(201, 113, 75, 0.16);
+      }
+
+      /* ===================== 按钮 ===================== */
+      .care-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .solid-btn {
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        padding: 12px 24px;
+        font-family: inherit;
+        font-size: 14.5px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: #fff;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #c9714b 0%, #dc8a5c 100%);
+        box-shadow: 0 10px 22px -12px rgba(201, 113, 75, 0.95),
+          inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        transition: transform 0.2s var(--ease), box-shadow 0.28s var(--ease),
+          filter 0.28s var(--ease);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .solid-btn:hover {
+        transform: translateY(-2px);
+        filter: saturate(1.08) brightness(1.02);
+        box-shadow: 0 16px 30px -12px rgba(201, 113, 75, 0.85),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      .solid-btn:active {
+        transform: translateY(0) scale(0.985);
+      }
+
+      .solid-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(201, 113, 75, 0.24),
+          0 10px 22px -12px rgba(201, 113, 75, 0.9);
+      }
+
+      .ghost-btn {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        padding: 11px 22px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink-2);
+        background: #fff;
+        border: 1.5px solid var(--line-2);
+        border-radius: 999px;
+        transition: color 0.22s var(--ease), border-color 0.22s var(--ease),
+          background 0.22s var(--ease), transform 0.2s var(--ease);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .ghost-btn:hover {
+        color: var(--brand);
+        border-color: var(--brand-2);
+        background: var(--brand-soft);
+        transform: translateY(-2px);
+      }
+
+      .ghost-btn:active {
+        transform: translateY(0) scale(0.985);
+      }
+
+      .ghost-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(201, 113, 75, 0.16);
+      }
+
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: scale(0);
+        opacity: 1;
+        pointer-events: none;
+        animation: ripple 0.62s ease-out forwards;
+      }
+
+      .ghost-btn .ripple {
+        background: rgba(201, 113, 75, 0.16);
+      }
+
+      /* ===================== 家人列表 ===================== */
+      .people-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .empty-note {
+        margin: 0;
+        padding: 18px 16px;
+        border-radius: var(--r-md);
+        border: 1px dashed var(--line-2);
+        background: #fbf7f2;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      .person-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: var(--r-md);
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #fffdfb 0%, #fbf5ef 100%);
+        box-shadow: 0 1px 2px rgba(70, 45, 25, 0.03);
+        animation: popIn 0.46s var(--ease) both;
+        transition: transform 0.26s var(--ease), box-shadow 0.26s var(--ease),
+          border-color 0.26s var(--ease), opacity 0.24s var(--ease);
+      }
+
+      .person-row:hover {
+        transform: translateX(4px);
+        border-color: #efdccb;
+        box-shadow: 0 14px 26px -20px rgba(90, 55, 30, 0.85);
+      }
+
+      .person-row.leaving {
+        opacity: 0;
+        transform: translateX(24px) scale(0.96);
+      }
+
+      .avatar {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-family: "Noto Serif SC", serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #b4643f;
+        background: radial-gradient(circle at 32% 26%, #fff7f0, #fbe2d1);
+        border: 1px solid #f4dccb;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .person-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+
+      .person-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: #3a312a;
+        line-height: 1.5;
+      }
+
+      .person-meta {
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .del-btn {
+        flex: none;
+        cursor: pointer;
+        padding: 6px 13px;
+        font-family: inherit;
+        font-size: 12.5px;
+        color: #a08d80;
+        background: #fff;
+        border: 1px solid var(--line-2);
+        border-radius: 999px;
+        opacity: 0;
+        transform: translateX(6px);
+        transition: opacity 0.24s var(--ease), transform 0.24s var(--ease),
+          color 0.2s var(--ease), border-color 0.2s var(--ease),
+          background 0.2s var(--ease);
+      }
+
+      .person-row:hover .del-btn,
+      .person-row:focus-within .del-btn {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .del-btn:hover {
+        color: #c0523f;
+        border-color: #f0c7bc;
+        background: #fdf1ee;
+      }
+
+      /* ===================== 分隔线 ===================== */
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 24px 0 18px;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        color: #b5a99d;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(228, 216, 203, 0),
+          rgba(228, 216, 203, 1),
+          rgba(228, 216, 203, 0)
+        );
+      }
+
+      /* ===================== 捎话便签 ===================== */
+      .digest-line {
+        position: relative;
+        margin: 0 0 20px;
+        padding: 15px 18px 15px 46px;
+        font-size: 14px;
+        line-height: 1.75;
+        color: #5a4a3d;
+        border-radius: var(--r-md);
+        border: 1px solid #f2e2cd;
+        background: linear-gradient(135deg, #fffbf4 0%, #fdf2e6 100%);
+        box-shadow: 0 10px 22px -20px rgba(160, 110, 60, 0.9);
+        animation: popIn 0.45s var(--ease) both;
+        word-break: break-word;
+      }
+
+      .digest-line::before {
+        content: "\201C";
+        position: absolute;
+        left: 17px;
+        top: 8px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 30px;
+        line-height: 1;
+        color: #dfb18a;
+      }
+
+      .counter {
+        margin-top: 10px;
+        text-align: right;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        transition: color 0.25s var(--ease);
+      }
+
+      .counter.over {
+        color: #c0523f;
+        font-weight: 500;
+      }
+
+      /* ===================== 提示条（Toast） ===================== */
+      .status-banner {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        z-index: 90;
+        max-width: min(92vw, 540px);
+        padding: 13px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #fdf8f3;
+        background: linear-gradient(
+          135deg,
+          rgba(58, 48, 40, 0.96),
+          rgba(43, 35, 29, 0.96)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow: 0 22px 46px -20px rgba(40, 25, 15, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transform: translateX(-50%);
+        animation: toastIn 0.46s var(--ease) both;
+      }
+
+      .status-banner[hidden] {
+        display: none;
+      }
+
+      /* ===================== Dock ===================== */
+      #dock {
+        margin-top: 28px;
+      }
+
+      #dock:empty {
+        display: none;
+      }
+
+      /* ===================== 页脚 ===================== */
+      .site-colophon {
+        padding: 30px 20px 34px;
+        text-align: center;
+        font-size: 12.5px;
+        letter-spacing: 0.14em;
+        color: #b8aca1;
+      }
+
+      /* ===================== 动画 ===================== */
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -16px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0) scale(1);
+        }
+      }
+
+      @keyframes ripple {
+        to {
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(201, 113, 75, 0.5);
+        }
+        70% {
+          box-shadow: 0 0 0 9px rgba(201, 113, 75, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(201, 113, 75, 0);
+        }
+      }
+
+      /* ===================== 响应式 ===================== */
+      @media (max-width: 760px) {
+        .page {
+          width: min(100% - 26px, 900px);
+          padding: 18px 0 120px;
+        }
+
+        .greeting {
+          padding: 26px 22px 24px;
+          border-radius: 22px;
+        }
+
+        .panel {
+          padding: 22px 20px 24px;
+          border-radius: 22px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .panel-head {
+          gap: 12px;
+          margin-bottom: 18px;
+        }
+
+        .care-actions {
+          gap: 10px;
+        }
+
+        .solid-btn,
+        .ghost-btn {
+          flex: 1 1 auto;
+          text-align: center;
+        }
+
+        .status-banner {
+          top: 14px;
+          font-size: 13.5px;
+          padding: 12px 18px;
+        }
+      }
+
+      /* 触屏设备：删除按钮常显 */
+      @media (hover: none) {
+        .del-btn {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* 动效减弱 */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="page">
+        <!-- ============ 英雄区 ============ -->
+        <section class="greeting greeting-compact">
+          <span class="eyebrow"><span class="dot"></span>家人照料 · 不含原文</span>
+          <h1>帮她把日子记清楚</h1>
+          <p class="lede">
+            改称呼、记下家里人、捎一句给暖伴念。这里看不到她说的原话，也不做诊断。
+          </p>
+        </section>
+
+        <div class="status-banner" id="error" hidden></div>
+
+        <!-- ============ 称呼与语速 ============ -->
+        <section class="panel stagger-1">
+          <div class="panel-head">
+            <span class="panel-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="8" r="3.6" />
+                <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0" />
+              </svg>
+            </span>
+            <div>
+              <h2>她怎么被称呼</h2>
+              <p class="panel-sub">
+                暖伴开口前先叫对她，语速也可以调得更慢一点。
+              </p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              暖伴怎么叫她
+              <input id="courtesy" placeholder="例如 王阿姨" />
+            </label>
+
+            <label class="field">
+              籍贯
+              <input id="hometown" placeholder="例如 江苏南通" />
+            </label>
+
+            <label class="field full">
+              说话速度
+              <div class="rate-row">
+                <span>慢</span>
+                <input
+                  type="range"
+                  id="rate"
+                  min="0.6"
+                  max="1.1"
+                  step="0.02"
+                  value="0.82"
+                />
+                <span>快</span>
+              </div>
+              <span class="rate-value" id="rate-label">适中，偏慢</span>
+            </label>
+          </div>
+
+          <div class="care-actions">
+            <button class="solid-btn" type="button" id="save-profile">
+              保存资料
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ 家里人 ============ -->
+        <section class="panel stagger-2">
+          <div class="panel-head">
+            <span class="panel-icon is-sage" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="8" r="3.4" />
+                <path d="M2.8 19.4a6.4 6.4 0 0 1 12.4 0" />
+                <path d="M16.4 5.4a2.9 2.9 0 0 1 0 5.2" />
+                <path d="M18.2 19.4a5.4 5.4 0 0 0-1.6-3.8" />
+              </svg>
+            </span>
+            <div>
+              <h2>家里人</h2>
+              <p class="panel-sub">
+                写上以后，暖伴闲聊时会自然提起，不会念档案。
+              </p>
+            </div>
+          </div>
+
+          <div class="people-list" id="people"></div>
+
+          <div class="divider"><span>添加一位家人</span></div>
+
+          <div class="form-grid">
+            <label class="field">
+              关系
+              <input id="relation" placeholder="儿子" />
+            </label>
+
+            <label class="field">
+              名字
+              <input id="name" placeholder="小明" />
+            </label>
+
+            <label class="field full">
+              补充
+              <input id="person-note" placeholder="在外地工作" />
+            </label>
+          </div>
+
+          <div class="care-actions">
+            <button class="solid-btn" type="button" id="save-person">
+              记下这位家人
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ 捎一句话 ============ -->
+        <section class="panel panel-note stagger-3">
+          <div class="panel-head">
+            <span class="panel-icon is-amber" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M20.5 11.8c0 3.9-3.8 7-8.5 7a9.7 9.7 0 0 1-2.6-.35L4.6 20.4l1.2-3.5A6.7 6.7 0 0 1 3.5 11.8c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7Z"
+                />
+                <path d="M9 11.6h6" />
+                <path d="M9 14.2h3.6" />
+              </svg>
+            </span>
+            <div>
+              <h2>捎一句话</h2>
+              <p class="panel-sub">
+                她下次打开说话页，暖伴用自己的口气念这一句。请写短、写具体，不要写病情判断。
+              </p>
+            </div>
+          </div>
+
+          <p class="digest-line" id="note-now" hidden></p>
+
+          <label class="field">
+            一句话，八十个字以内
+            <textarea
+              id="note-text"
+              rows="3"
+              placeholder="妈，今晚我给您打电话。药记得早饭后带上。"
+            ></textarea>
+          </label>
+
+          <div class="counter" id="note-counter">
+            <span id="note-count">0</span> / 80
+          </div>
+
+          <div class="care-actions">
+            <button type="button" class="solid-btn" id="save-note">
+              让暖伴下次转述
+            </button>
+            <button type="button" class="ghost-btn" id="clear-note">
+              撤掉这句
+            </button>
+          </div>
+        </section>
+
+        <div id="dock"></div>
+      </main>
+
+      <footer class="site-colophon">暖伴 · 第四阶段 · 家人照料</footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var profile = {};
+      var people = [];
+      var toastTimer = null;
+      var RATE_MIN = 0.6;
+      var RATE_MAX = 1.1;
+
+      /* ---------------- 轻提示 ---------------- */
+      function showError(text, kind) {
+        var el = document.getElementById("error");
+        if (!text) {
+          el.hidden = true;
+          return;
+        }
+        el.className = "status-banner" + (kind === "ok" ? " is-ok" : "");
+        el.textContent = text;
+        el.hidden = false;
+
+        // 重置入场动画，让连续提示也有节奏感
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          el.hidden = true;
+        }, 4200);
+      }
+
+      /* ---------------- 语速 ---------------- */
+      function rateLabel(value) {
+        return value <= 0.7 ? "很慢" : value <= 0.85 ? "适中，偏慢" : "稍快";
+      }
+
+      function paintRate(value) {
+        var el = document.getElementById("rate");
+        var pct =
+          ((Number(value) - RATE_MIN) / (RATE_MAX - RATE_MIN)) * 100;
+        pct = Math.min(100, Math.max(0, pct));
+        el.style.setProperty("--fill", pct + "%");
+      }
+
+      /* ---------------- 字数统计 ---------------- */
+      function syncNoteCount() {
+        var len = document.getElementById("note-text").value.length;
+        var count = document.getElementById("note-count");
+        var box = document.getElementById("note-counter");
+        if (!count || !box) return;
+        count.textContent = len;
+        box.classList.toggle("over", len > 80);
+      }
+
+      /* ---------------- 家人列表 ---------------- */
+      function renderPeople() {
+        var box = document.getElementById("people");
+        if (!people.length) {
+          box.innerHTML =
+            '<p class="empty-note">还没有写下家里人。写一个，暖伴闲聊时就能自然提起。</p>';
+          return;
+        }
+        box.innerHTML = people
+          .map(function (item, i) {
+            var initial = String(item.name || "家").trim().charAt(0) || "家";
+            return (
+              '<div class="person-row" style="animation-delay:' +
+              i * 55 +
+              'ms">' +
+              '<span class="avatar" aria-hidden="true">' +
+              NBLayout.esc(initial) +
+              "</span>" +
+              '<span class="person-main">' +
+              '<span class="person-name">' +
+              NBLayout.esc(item.name) +
+              "</span>" +
+              '<span class="person-meta">' +
+              NBLayout.esc(item.relation || "") +
+              (item.note ? " · " + NBLayout.esc(item.note) : "") +
+              "</span>" +
+              "</span>" +
+              '<button type="button" class="del-btn" data-del="' +
+              item.id +
+              '">去掉</button>' +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      /* ---------------- 捎话展示 ---------------- */
+      function renderNote(note) {
+        var line = document.getElementById("note-now");
+        if (note && note.text) {
+          line.hidden = false;
+          line.textContent =
+            (note.pending ? "还没转述：" : "已经转述过：") + note.text;
+        } else {
+          line.hidden = true;
+          line.textContent = "";
+        }
+        syncNoteCount();
+      }
+
+      /* ---------------- 按钮水波纹 ---------------- */
+      document.addEventListener("click", function (event) {
+        var btn = event.target.closest(".solid-btn, .ghost-btn");
+        if (!btn) return;
+        var rect = btn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height) * 2;
+        var dot = document.createElement("span");
+        dot.className = "ripple";
+        dot.style.width = size + "px";
+        dot.style.height = size + "px";
+        dot.style.left = event.clientX - rect.left - size / 2 + "px";
+        dot.style.top = event.clientY - rect.top - size / 2 + "px";
+        btn.appendChild(dot);
+        setTimeout(function () {
+          dot.remove();
+        }, 640);
+      });
+
+      /* ---------------- 主流程 ---------------- */
+      NBLayout.requireRole("family").then(function (user) {
+        if (!user) return;
+
+        /* 语速 */
+        document.getElementById("rate").oninput = function () {
+          var v = Number(this.value);
+          document.getElementById("rate-label").textContent = rateLabel(v);
+          paintRate(v);
+        };
+
+        /* 字数 */
+        document
+          .getElementById("note-text")
+          .addEventListener("input", syncNoteCount);
+
+        /* 保存资料 */
+        document.getElementById("save-profile").onclick = function () {
+          NB.updateProfile({
+            courtesy: document.getElementById("courtesy").value.trim(),
+            hometown: document.getElementById("hometown").value.trim(),
+            speech_rate: Number(document.getElementById("rate").value),
+          })
+            .then(function () {
+              showError("称呼和语速已经记下。", "ok");
+            })
+            .catch(function (err) {
+              showError(err.message || "资料没有存上");
+            });
+        };
+
+        /* 删除家人 */
+        document.getElementById("people").onclick = function (event) {
+          var btn = event.target.closest("[data-del]");
+          if (!btn) return;
+          var id = Number(btn.getAttribute("data-del"));
+          var row = btn.closest(".person-row");
+          if (row) row.classList.add("leaving");
+
+          NB.deletePerson(id)
+            .then(function () {
+              people = people.filter(function (item) {
+                return item.id !== id;
+              });
+              setTimeout(renderPeople, 180);
+            })
+            .catch(function () {
+              if (row) row.classList.remove("leaving");
+              showError("这位家人没有去掉");
+            });
+        };
+
+        /* 新增家人 */
+        document.getElementById("save-person").onclick = function () {
+          var relation =
+            document.getElementById("relation").value.trim() || "儿子";
+          var name = document.getElementById("name").value.trim();
+          if (!name) {
+            showError("请写下名字");
+            return;
+          }
+          NB.addPerson({
+            relation: relation,
+            name: name,
+            note: document.getElementById("person-note").value.trim(),
+          })
+            .then(function (saved) {
+              people.push(saved);
+              document.getElementById("name").value = "";
+              document.getElementById("person-note").value = "";
+              renderPeople();
+              showError("家人已经写进黑板。", "ok");
+            })
+            .catch(function (err) {
+              showError(err.message || "家人没有记下");
+            });
+        };
+
+        /* 保存捎话 */
+        document.getElementById("save-note").onclick = function () {
+          var text = document.getElementById("note-text").value.trim();
+          if (!text) {
+            showError("请写下要捎的那一句");
+            return;
+          }
+          NB.saveFamilyNote(text)
+            .then(function (data) {
+              renderNote(data.note);
+              document.getElementById("note-text").value = "";
+              syncNoteCount();
+              showError("记下了。她下次开口，暖伴会转述。", "ok");
+            })
+            .catch(function (err) {
+              showError(err.message || "这句话没有存上");
+            });
+        };
+
+        /* 撤掉捎话 */
+        document.getElementById("clear-note").onclick = function () {
+          NB.clearFamilyNote()
+            .then(function () {
+              renderNote(null);
+              showError("捎话已经撤掉。", "ok");
+            })
+            .catch(function () {
+              showError("没有撤掉");
+            });
+        };
+
+        /* 初始化 */
+        NB.fetchFamilyCare()
+          .then(function (data) {
+            if (data.shared === false) {
+              showError(data.message || "老人尚未授权查看照料资料");
+            }
+            profile = data.profile || {};
+            people = data.people || [];
+
+            document.getElementById("courtesy").value =
+              profile.courtesy || "";
+            document.getElementById("hometown").value =
+              profile.hometown || "";
+
+            var rate = profile.speech_rate || 0.82;
+            document.getElementById("rate").value = rate;
+            document.getElementById("rate-label").textContent = rateLabel(rate);
+            paintRate(rate);
+
+            renderPeople();
+            renderNote(data.note);
+            if (!data.editable) {
+              ["courtesy", "hometown", "rate", "relation", "name", "person-note"].forEach(function (id) {
+                var input = document.getElementById(id);
+                if (input) input.disabled = true;
+              });
+              document.getElementById("save-profile").disabled = true;
+              document.getElementById("save-person").disabled = true;
+              document.querySelectorAll("[data-del]").forEach(function (button) { button.disabled = true; });
+              if (data.shared !== false) showError("老人只授权查看，目前不能修改照料资料。");
+            }
+          })
+          .catch(function (err) {
+            showError(err.message || "照料页还没有打开");
+          });
+
+        /* 语音 Dock */
+        NBTalk.renderDock(
+          document.getElementById("dock"),
+          function (text, panel, cmd) {
+            var action = (cmd && cmd.action) || "";
+            var args = (cmd && cmd.args) || {};
+            var line = (cmd && cmd.reply) || "";
+
+            if (action === "set_courtesy" && args.courtesy) {
+              document.getElementById("courtesy").value = String(
+                args.courtesy
+              ).replace(/[。！？\s]/g, "");
+              document.getElementById("save-profile").click();
+              panel.reply(
+                line ||
+                  "称呼记下了，暖伴以后叫她" +
+                    document.getElementById("courtesy").value +
+                    "。",
+                { speak: true }
+              );
+              return;
+            }
+
+            if (action === "clear_note") {
+              document.getElementById("clear-note").click();
+              panel.reply(line || "捎话已经撤掉。", { speak: true });
+              return;
+            }
+
+            if (action === "save_note" || action === "") {
+              document.getElementById("note-text").value = args.text || text;
+              syncNoteCount();
+              document.getElementById("save-note").click();
+              panel.reply(
+                line || "记下了。她下次开口，暖伴会转述这一句。",
+                { speak: true }
+              );
+              return;
+            }
+
+            return false;
+          },
+          {
+            page: "care",
+            placeholder: "说要捎的那一句，或叫她王阿姨",
+          }
+        );
+      });
+    </script>
+  </body>
+</html>

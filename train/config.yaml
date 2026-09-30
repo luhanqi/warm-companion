@@ -1,0 +1,15 @@
+# 暖伴对话模型配置。改这里即可，不必改 Python。
+# 底座必须是 1.5B。不能拿 0.5B 的 LoRA 接着训，参数对不上。
+
+base_model: Qwen/Qwen2.5-1.5B-Instruct
+
+sft_output: outputs/sft-1.5b
+dpo_output: outputs/dpo-1.5b
+merged_output: outputs/merged-1.5b
+
+epochs: 3
+learning_rate: 0.0001
+lora_r: 16
+max_len: 512
+batch: 1
+accum: 8

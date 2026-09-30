@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家人周报 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- 家人周报 · 温馨视觉增强：只作用于本页样式与展示动效，不改动任何功能逻辑 -->
+    <style>
+      :root {
+        --fy-vermilion: #c23a22;
+        --fy-sun: #e8943a;
+        --fy-sun-soft: #ffcf87;
+        --fy-line: rgba(214, 176, 128, 0.38);
+        --fy-muted: #8a7a68;
+        --fy-ease: cubic-bezier(0.22, 0.85, 0.28, 1);
+      }
+
+      /* ---------- 1. 页面底色：一层很淡的暖光 ---------- */
+      body {
+        background:
+          radial-gradient(1100px 620px at 10% -12%, rgba(255, 231, 200, 0.6), transparent 62%),
+          radial-gradient(900px 540px at 98% 2%, rgba(255, 208, 196, 0.34), transparent 60%),
+          var(--paper, #fbf6ee);
+        background-attachment: fixed;
+      }
+
+      /* ---------- 2. 卡片间距加大：页面与摘要内部都使用纵向 flex 间距 ---------- */
+      .page,
+      #digest {
+        display: flex;
+        flex-direction: column;
+        gap: 34px; /* 上下卡片间距，比原来更疏朗 */
+      }
+
+      /* ---------- 3. 卡片：统一圆角 + 柔和投影 + 悬浮上浮 + 扫光 ---------- */
+      .panel,
+      .greeting,
+      .family-alert,
+      #stats article {
+        border-radius: 20px;
+      }
+
+      .panel {
+        position: relative;
+        overflow: hidden;
+        background: var(--sheet, #fffdf9);
+        border: 1px solid var(--fy-line);
+        box-shadow:
+          0 2px 6px rgba(120, 78, 42, 0.05),
+          0 16px 34px -20px rgba(120, 78, 42, 0.3);
+        transition:
+          transform 0.4s var(--fy-ease),
+          box-shadow 0.4s ease,
+          border-color 0.4s ease;
+      }
+
+      /* 卡片顶部：悬停时亮起一道暖红细光 */
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          rgba(194, 58, 34, 0),
+          rgba(194, 58, 34, 0.72) 45%,
+          rgba(232, 148, 58, 0.65) 70%,
+          rgba(194, 58, 34, 0)
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+      }
+
+      /* 悬浮扫光：一道柔和的白光从卡片一侧滑过 */
+      .panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -120%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.55),
+          transparent
+        );
+        transform: skewX(-18deg);
+        transition: left 0.9s ease;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .panel:hover {
+        transform: translateY(-4px);
+        border-color: rgba(194, 58, 34, 0.3);
+        box-shadow:
+          0 4px 10px rgba(120, 78, 42, 0.06),
+          0 28px 50px -22px rgba(150, 80, 40, 0.38);
+      }
+      .panel:hover::after {
+        opacity: 1;
+      }
+      .panel:hover::before {
+        left: 130%;
+      }
+
+      /* 卡片标题：左侧一道圆头暖红竖条 */
+      .panel h2 {
+        position: relative;
+        padding-left: 15px;
+        letter-spacing: 0.02em;
+      }
+      .panel h2::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 5px;
+        height: 1.02em;
+        transform: translateY(-50%);
+        border-radius: 3px;
+        background: linear-gradient(180deg, #e2634a, var(--fy-vermilion));
+        box-shadow: 0 0 0 3px rgba(194, 58, 34, 0.08);
+      }
+
+      /* ---------- 4. 顶部问候区 ---------- */
+      .greeting {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--fy-line);
+        background:
+          radial-gradient(120% 140% at 6% 0%, rgba(255, 236, 214, 0.92), transparent 62%),
+          linear-gradient(135deg, #fffaf3, #fdf0e2);
+        box-shadow: 0 18px 40px -24px rgba(150, 90, 40, 0.4);
+      }
+      /* 右上角缓缓漂移的暖光斑 */
+      .greeting::after {
+        content: "";
+        position: absolute;
+        right: -70px;
+        top: -80px;
+        width: 230px;
+        height: 230px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 205, 138, 0.6), transparent 68%);
+        animation: fy-float 11s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes fy-float {
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+        50%      { transform: translate3d(-20px, 16px, 0) scale(1.12); opacity: 1; }
+      }
+      .greeting > * {
+        position: relative;
+        z-index: 1;
+      }
+      .greeting .eyebrow {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: rgba(194, 58, 34, 0.08);
+        color: var(--fy-vermilion);
+        font-size: 13px;
+        letter-spacing: 0.16em;
+      }
+      .greeting h1 {
+        font-family: var(--font-serif, "Noto Serif SC", serif);
+        letter-spacing: 0.02em;
+      }
+
+      /* ---------- 5. 卡片依次浮入 ---------- */
+      @keyframes fy-rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .page > .greeting,
+      .page > .panel,
+      .page > .family-alert,
+      .page > #note-box,
+      .page > #closed {
+        animation: fy-rise 0.6s var(--fy-ease) both;
+      }
+      .page > .family-alert { animation-delay: 0.06s; }
+      .page > #note-box,
+      .page > #closed    { animation-delay: 0.1s; }
+      .page > .panel     { animation-delay: 0.14s; }
+
+      #digest > * {
+        animation: fy-rise 0.6s var(--fy-ease) both;
+      }
+      #digest > *:nth-child(1) { animation-delay: 0.14s; }
+      #digest > *:nth-child(2) { animation-delay: 0.2s; }
+      #digest > *:nth-child(3) { animation-delay: 0.26s; }
+      #digest > *:nth-child(4) { animation-delay: 0.32s; }
+
+      /* ---------- 6. 一周开口记录：七个圆点 + 流动虚线 ---------- */
+      #week-chart {
+        background:
+          radial-gradient(120% 110% at 88% -12%, rgba(255, 224, 178, 0.6), transparent 62%),
+          linear-gradient(140deg, #fffdf8, #fbf1e4);
+      }
+      .week-track {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin: 22px 4px 16px;
+      }
+      /* 流动的虚线：从右向左缓缓滚动，像一条会呼吸的线 */
+      .week-track::before {
+        content: "";
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        top: 50%;
+        height: 3px;
+        transform: translateY(-50%);
+        border-radius: 999px;
+        background: repeating-linear-gradient(
+          90deg,
+          rgba(214, 176, 128, 0.55) 0 6px,
+          transparent 6px 12px
+        );
+        background-size: 12px 3px;
+        animation: fy-dash-flow 1.2s linear infinite;
+        z-index: 0;
+      }
+      @keyframes fy-dash-flow {
+        from { background-position: 0 0; }
+        to   { background-position: 12px 0; }
+      }
+
+      .week-dot {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 auto;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(138, 122, 104, 0.85);
+        background: #fffdf8;
+        border: 2px solid rgba(214, 176, 128, 0.5);
+        box-shadow:
+          inset 0 1px 0 #fff,
+          0 5px 12px -8px rgba(150, 90, 40, 0.45);
+        transition:
+          transform 0.35s var(--fy-ease),
+          box-shadow 0.35s ease,
+          background 0.35s ease,
+          color 0.35s ease,
+          border-color 0.35s ease;
+      }
+      .week-dot.on {
+        background: linear-gradient(160deg, var(--fy-sun-soft), #ef9f37);
+        border-color: #e08a2a;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(150, 80, 20, 0.35);
+        box-shadow:
+          0 0 0 4px rgba(240, 160, 58, 0.16),
+          0 12px 20px -12px rgba(180, 100, 30, 0.75);
+        animation: fy-dot-pop 0.6s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+      }
+      @keyframes fy-dot-pop {
+        0%   { transform: scale(0.45); opacity: 0; }
+        70%  { transform: scale(1.14); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+      /* 亮起的圆点外圈脉冲光环 */
+      .week-dot.on::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid rgba(240, 160, 58, 0.6);
+        animation: fy-dot-ring 1.8s ease-out infinite;
+        pointer-events: none;
+      }
+      @keyframes fy-dot-ring {
+        0%   { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(1.55); opacity: 0; }
+      }
+      .week-dot:hover {
+        transform: translateY(-4px) scale(1.08);
+        box-shadow:
+          0 0 0 4px rgba(240, 160, 58, 0.14),
+          0 16px 24px -14px rgba(160, 90, 30, 0.7);
+      }
+      .week-dot.on:hover {
+        transform: translateY(-4px) scale(1.1);
+      }
+
+      .week-caption {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.9;
+        color: var(--ink, #3d342b);
+      }
+      .week-caption b {
+        font-family: var(--font-serif, "Noto Serif SC", serif);
+        font-size: 22px;
+        color: var(--fy-vermilion);
+        padding: 0 2px;
+      }
+      .week-mood {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        padding: 4px 14px;
+        border-radius: 999px;
+        font-size: 14px;
+        letter-spacing: 0.06em;
+        color: #a8562f;
+        background: rgba(255, 245, 232, 0.95);
+        border: 1px solid var(--fy-line);
+        box-shadow: inset 0 1px 0 #fff;
+      }
+      .week-mood::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(160deg, var(--fy-sun-soft), var(--fy-sun));
+        box-shadow: 0 0 0 3px rgba(232, 148, 58, 0.16);
+        animation: fy-breathe 2.6s ease-in-out infinite;
+      }
+      @keyframes fy-breathe {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50%      { transform: scale(0.78); opacity: 0.7; }
+      }
+
+      /* ---------- 7. 数据小卡片：开口天数 / 心情 / 听过 / 回忆录 ---------- */
+      #stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin: 0; /* 间距交给父级 flex gap */
+      }
+      #stats article {
+        position: relative;
+        overflow: hidden;
+        padding: 20px 14px 18px;
+        text-align: center;
+        border: 1px solid var(--fy-line);
+        background:
+          radial-gradient(120% 120% at 50% -24%, rgba(255, 255, 255, 0.96), transparent 58%),
+          linear-gradient(160deg, #fffaf3, #f8ebdb);
+        box-shadow: 0 12px 26px -18px rgba(150, 90, 40, 0.45);
+        transition:
+          transform 0.4s var(--fy-ease),
+          box-shadow 0.4s ease,
+          border-color 0.4s ease;
+        animation: fy-rise 0.55s var(--fy-ease) both;
+      }
+      #stats article:nth-child(1) { animation-delay: 0.28s; }
+      #stats article:nth-child(2) { animation-delay: 0.36s; }
+      #stats article:nth-child(3) { animation-delay: 0.44s; }
+      #stats article:nth-child(4) { animation-delay: 0.52s; }
+
+      /* 底部那团暖光，只在鼠标移上去时亮起来 */
+      #stats article::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -48px;
+        width: 140px;
+        height: 96px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 176, 96, 0.5), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.45s ease;
+        pointer-events: none;
+      }
+      #stats article:hover {
+        transform: translateY(-6px) scale(1.015);
+        border-color: rgba(194, 58, 34, 0.32);
+        box-shadow: 0 26px 46px -22px rgba(160, 80, 40, 0.5);
+      }
+      #stats article:hover::before {
+        opacity: 1;
+      }
+      #stats article small {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        color: var(--fy-muted);
+      }
+      #stats article strong {
+        display: block;
+        font-family: var(--font-serif, "Noto Serif SC", serif);
+        font-size: 22px;
+        line-height: 1.35;
+        color: var(--fy-vermilion);
+        word-break: break-word;
+        animation: fy-value 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) 0.4s both;
+      }
+      @keyframes fy-value {
+        0%   { opacity: 0; transform: scale(0.8); }
+        70%  { transform: scale(1.06); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+
+      /* ---------- 8. 转述文字与短信稿 ---------- */
+      #paraphrase {
+        padding-left: 16px;
+        border-left: 3px solid rgba(232, 148, 58, 0.5);
+        border-radius: 2px;
+        transition: border-color 0.3s ease;
+      }
+      #paraphrase:hover {
+        border-left-color: var(--fy-vermilion);
+      }
+      .family-letter {
+        border-radius: 16px;
+        background: linear-gradient(160deg, #fffaf3, #fdf1e4);
+        border: 1px dashed rgba(214, 176, 128, 0.55);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .family-letter:hover {
+        border-color: rgba(194, 58, 34, 0.4);
+        box-shadow: 0 12px 26px -18px rgba(150, 90, 40, 0.55);
+      }
+
+      /* ---------- 9. 表单与列表的悬浮手感 ---------- */
+      .reminder-form input,
+      .reminder-form select {
+        border-radius: 12px;
+        transition:
+          border-color 0.28s ease,
+          box-shadow 0.28s ease,
+          background 0.28s ease;
+      }
+      .reminder-form input:hover,
+      .reminder-form select:hover {
+        border-color: rgba(194, 58, 34, 0.35);
+      }
+      .reminder-form input:focus,
+      .reminder-form select:focus {
+        outline: none;
+        border-color: rgba(194, 58, 34, 0.55);
+        box-shadow: 0 0 0 4px rgba(194, 58, 34, 0.1);
+        background: #fffdf8;
+      }
+      .person-row {
+        border-radius: 14px;
+        transition:
+          transform 0.32s var(--fy-ease),
+          box-shadow 0.32s ease,
+          background 0.32s ease;
+      }
+      .person-row:hover {
+        transform: translateX(5px);
+        background: #fffaf2;
+        box-shadow: 0 10px 22px -14px rgba(150, 90, 40, 0.55);
+      }
+
+      /* ---------- 10. 按钮：圆润一点，按下去有回弹感 ---------- */
+      .solid-btn,
+      .ghost-btn {
+        border-radius: 999px;
+        transition:
+          transform 0.28s var(--fy-ease),
+          box-shadow 0.28s ease,
+          background 0.28s ease,
+          color 0.28s ease;
+      }
+      .solid-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px -12px rgba(194, 58, 34, 0.8);
+      }
+      .ghost-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -14px rgba(150, 90, 40, 0.7);
+      }
+      .solid-btn:active,
+      .ghost-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* ---------- 11. 捎话提醒条：轻微呼吸，让人一眼注意到 ---------- */
+      .family-alert {
+        border-left: 4px solid var(--fy-vermilion);
+        border-radius: 18px;
+        background: linear-gradient(135deg, #fff7ee, #fdece2);
+        animation: fy-rise 0.6s var(--fy-ease) both,
+          fy-alert 3.4s ease-in-out 0.8s infinite;
+      }
+      @keyframes fy-alert {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(194, 58, 34, 0); }
+        50%      { box-shadow: 0 0 0 9px rgba(194, 58, 34, 0.07); }
+      }
+
+      /* ---------- 12. 窄屏适配 ---------- */
+      @media (max-width: 720px) {
+        #stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .week-dot {
+          width: 38px;
+          height: 38px;
+          font-size: 14px;
+        }
+      }
+
+      /* ---------- 13. 尊重「减少动态效果」的系统设置 ---------- */
+      @media (prefers-reduced-motion: reduce) {
+        .page *,
+        #digest *,
+        .greeting::after,
+        .family-alert,
+        .week-dot.on,
+        .week-dot.on::after,
+        .week-mood::before,
+        #stats article strong,
+        .week-track::before,
+        .panel::before {
+          animation: none !important;
+        }
+        .panel,
+        #stats article,
+        .week-dot,
+        .person-row,
+        .solid-btn,
+        .ghost-btn,
+        .family-letter {
+          transition: none !important;
+        }
+        .panel:hover::before {
+          left: -120%; /* 关闭扫光移动 */
+        }
+      }
+      .trend-bars { display: flex; align-items: end; gap: 8px; height: 120px; margin: 18px 0 30px; padding: 12px 8px 0; border-bottom: 1px solid rgba(117,86,58,.25); }
+      .trend-bar { flex: 1; min-width: 12px; max-width: 44px; border-radius: 9px 9px 2px 2px; background: linear-gradient(180deg,#f39a64,#d87347); position: relative; }
+      .trend-bar span { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #786759; white-space: nowrap; }
+      .cognition-alert { margin-top: 18px; padding: 15px 17px; border-radius: 15px; background: #fff3e7; border: 1px solid rgba(211,111,62,.25); }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <section class="greeting greeting-compact">
+          <p class="eyebrow">家人只读 · 不含原文</p>
+          <h1 id="title">老人的一周</h1>
+          <p>守护智能体写的摘要。没有对话原文，也没有诊断词。提醒、捎话和寄画在上面另外几页。</p>
+        </section>
+        <div class="status-banner" id="error" hidden></div>
+        <section class="family-alert" id="unused" hidden>
+          <strong>这几天她好像没开口</strong>
+          <p id="unused-msg"></p>
+        </section>
+        <section class="panel" id="note-box" hidden>
+          <h2>待转述的捎话</h2>
+          <p class="digest-line" id="note-text"></p>
+          <p class="empty-note">她下次打开说话页，暖伴会念这一句。原文不会出现在周报里。</p>
+        </section>
+        <section class="panel landing-privacy" id="closed" hidden>
+          <h2>周报还关着</h2>
+          <p id="closed-msg"></p>
+        </section>
+        <div id="digest" hidden>
+          <!-- 一周开口记录：七个圆点，亮起的代表那天她开口说了话 -->
+          <section class="panel week-chart" id="week-chart">
+            <h2>这一周的开口记录</h2>
+            <div class="week-track" id="week-track"></div>
+            <p class="week-caption" id="week-caption">暖伴在整理这一周…</p>
+          </section>
+          <div class="family-stats" id="stats"></div>
+          <section class="panel">
+            <h2>暖伴转述</h2>
+            <p class="digest-line" id="paraphrase"></p>
+            <p class="empty-note">本页不含聊天原文。</p>
+          </section>
+          <section class="panel" id="cognition-box">
+            <h2>日常语言趋势</h2>
+            <div class="family-stats" id="cognition-stats"></div>
+            <div class="trend-bars" id="cognition-chart" hidden></div>
+            <p class="digest-line" id="cognition-label"></p>
+            <p class="empty-note" id="cognition-note">这只是长期语言变化的辅助观察，不是疾病诊断，也不展示聊天原文。</p>
+            <p class="empty-note" id="voice-detail"></p>
+            <div id="cognition-alerts"></div>
+          </section>
+          <section class="panel" id="letter-box" hidden>
+            <h2>可发给自己的短信稿</h2>
+            <p class="family-letter" id="letter"></p>
+            <button type="button" class="ghost-btn" id="copy-letter">复制这段</button>
+          </section>
+        </div>
+        <section class="panel">
+          <h2>帮她记下提醒</h2>
+          <p class="empty-note">只是出门前提醒，不是用药指导。暖伴会按您写的原样念给她听。</p>
+          <div class="people-list" id="reminders"></div>
+          <div class="reminder-form">
+            <label class="field">种类
+              <select id="kind">
+                <option value="medicine">用药</option>
+                <option value="visit">复诊</option>
+                <option value="other">其他</option>
+              </select>
+            </label>
+            <label class="field">写下提醒 <input id="title-input" placeholder="降压药" /></label>
+            <label class="field">补充 <input id="note" placeholder="早饭后带上" /></label>
+            <button type="button" class="solid-btn" id="save">记下</button>
+          </div>
+        </section>
+        <div id="dock"></div>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var KIND = { medicine: "用药", visit: "复诊", other: "其他" };
+      var reminders = [];
+
+      function showError(text) {
+        var el = document.getElementById("error");
+        if (!text) { el.hidden = true; return; }
+        el.hidden = false;
+        el.textContent = text;
+      }
+
+      function renderReminders() {
+        var box = document.getElementById("reminders");
+        if (!reminders.length) {
+          box.innerHTML = '<p class="empty-note">还没有提醒。</p>';
+          return;
+        }
+        box.innerHTML = reminders.map(function (item) {
+          return '<div class="person-row"><span>' + NBLayout.esc((KIND[item.kind] || "其他") + " · " + item.title + (item.note ? "（" + item.note + "）" : "")) +
+            '</span><button type="button" class="ghost-btn" data-del="' + item.id + '">去掉</button></div>';
+        }).join("");
+      }
+
+      NBLayout.requireRole("family").then(function (user) {
+        if (!user) return;
+        document.getElementById("reminders").onclick = function (event) {
+          var btn = event.target.closest("[data-del]");
+          if (!btn) return;
+          var id = Number(btn.getAttribute("data-del"));
+          NB.deleteReminder(id).then(function () {
+            reminders = reminders.filter(function (item) { return item.id !== id; });
+            renderReminders();
+          }).catch(function () { showError("这条提醒没有删掉"); });
+        };
+        document.getElementById("copy-letter").onclick = function () {
+          var text = document.getElementById("letter").textContent || "";
+          if (!text) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () { showError("短信稿已复制。"); }).catch(function () {});
+          }
+        };
+        document.getElementById("save").onclick = function () {
+          var title = document.getElementById("title-input").value.trim();
+          if (!title) { showError("请写下提醒"); return; }
+          NB.addReminder({
+            kind: document.getElementById("kind").value,
+            title: title,
+            note: document.getElementById("note").value.trim(),
+          }).then(function (saved) {
+            reminders.push(saved);
+            document.getElementById("title-input").value = "";
+            document.getElementById("note").value = "";
+            showError("");
+            renderReminders();
+          }).catch(function (err) {
+            showError(err.message || "提醒没有记下");
+          });
+        };
+        NB.fetchFamilyDigest().then(function (data) {
+          var elder = data.elder_name || "老人";
+          document.getElementById("title").textContent = data.viewer ? data.viewer + "，这是" + elder + "的一周" : elder + "的一周";
+          if (data.unused_days >= 2) {
+            document.getElementById("unused").hidden = false;
+            document.getElementById("unused-msg").textContent = "已经 " + data.unused_days + " 天没有听见她说话。不是诊断，只是提醒您打个电话，或去照料页捎一句。";
+          }
+          if (data.note && data.note.pending) {
+            document.getElementById("note-box").hidden = false;
+            document.getElementById("note-text").textContent = (data.note.from_name || "您") + "： " + data.note.text;
+          }
+          if (!data.consent) {
+            document.getElementById("closed").hidden = false;
+            document.getElementById("closed-msg").textContent = data.message || elder + "还没有打开「允许看周报」。聊天原文本来就不会出现在这里。";
+            return;
+          }
+          if (data.digest) {
+            document.getElementById("digest").hidden = false;
+            document.getElementById("stats").innerHTML =
+              "<article><small>开口天数</small><strong>" + data.digest.days_talked + "</strong></article>" +
+              "<article><small>心情</small><strong>" + NBLayout.esc(data.digest.mood_weather || "") + "</strong></article>" +
+              "<article><small>听过</small><strong>" + NBLayout.esc(data.digest.song_title || "还没有") + "</strong></article>" +
+              "<article><small>回忆录</small><strong>" + NBLayout.esc((data.digest.chapters || []).length ? data.digest.chapters.join("、") : "本周未增") + "</strong></article>";
+            document.getElementById("paraphrase").textContent = data.digest.paraphrase || "";
+            if (data.cognition) {
+              document.getElementById("cognition-stats").innerHTML =
+                "<article><small>有效对话</small><strong>" + data.cognition.sample_count + " 次</strong></article>" +
+                "<article><small>基线天数</small><strong>" + (data.cognition.day_count || 0) + " 天</strong></article>" +
+                "<article><small>数据充分度</small><strong>" + data.cognition.data_sufficiency + "%</strong></article>" +
+                "<article><small>语言状态</small><strong>" + NBLayout.esc(data.cognition.label) + "</strong></article>" +
+                "<article><small>平均语速</small><strong>" + ((data.cognition.voice || {}).sample_count ? (data.cognition.voice.average_chars_per_minute + " 字/分") : "采集中") + "</strong></article>";
+              document.getElementById("cognition-label").textContent = data.cognition.level === "attention"
+                ? "近期变化值得持续关注，可以陪她多聊熟悉的人和往事；如持续担忧，请咨询专业医务人员。"
+                : data.cognition.label;
+              var voice = data.cognition.voice || {};
+              document.getElementById("voice-detail").textContent = voice.sample_count
+                ? "录音样本 " + voice.sample_count + " 次 · 平均静音 " + Math.round((voice.average_silence_ratio || 0) * 100) + "% · 平均长停顿 " + (voice.average_longest_pause_ms || 0) + " 毫秒 · 回答启动 " + (voice.average_response_latency_ms || 0) + " 毫秒"
+                : "录音声学基线仍在采集中。";
+              var series = data.cognition.series || [];
+              if (series.length) {
+                var chart = document.getElementById("cognition-chart");
+                chart.hidden = false;
+                chart.innerHTML = series.map(function (point) {
+                  return '<div class="trend-bar" style="height:' + Math.max(12, point.score) + '%" title="' + point.day + ' · ' + point.score + '分"><span>' + point.day.slice(5) + '</span></div>';
+                }).join("");
+              }
+              document.getElementById("cognition-alerts").innerHTML = (data.cognition_alerts || []).filter(function (item) {
+                return !item.acknowledged;
+              }).map(function (item) {
+                return '<div class="cognition-alert"><strong>' + NBLayout.esc(item.title) + '</strong><p>' + NBLayout.esc(item.detail) + '</p><button type="button" class="ghost-btn" data-alert-ack="' + item.id + '">我知道了</button></div>';
+              }).join("");
+            } else {
+              document.getElementById("cognition-stats").innerHTML = "";
+              document.getElementById("cognition-label").textContent = "老人尚未授权分享语言趋势。";
+            }
+            if (data.letter) {
+              document.getElementById("letter-box").hidden = false;
+              document.getElementById("letter").textContent = data.letter;
+            }
+          }
+        }).catch(function (err) {
+          showError(err.message || "周报没有打开");
+        });
+        document.getElementById("cognition-alerts").onclick = function (event) {
+          var button = event.target.closest("[data-alert-ack]");
+          if (!button) return;
+          NB.acknowledgeCognitionAlert(Number(button.getAttribute("data-alert-ack"))).then(function () {
+            var card = button.closest(".cognition-alert");
+            if (card) card.remove();
+          }).catch(function (error) { showError(error.message || "提醒暂时没有确认"); });
+        };
+        NB.fetchReminders().then(function (data) {
+          reminders = data.reminders || [];
+          renderReminders();
+        }).catch(function () {});
+        NBTalk.renderDock(document.getElementById("dock"), function (text, panel, cmd) {
+          var action = (cmd && cmd.action) || "";
+          var args = (cmd && cmd.args) || {};
+          var line = (cmd && cmd.reply) || "";
+          if (action === "copy_letter") {
+            document.getElementById("copy-letter").click();
+            var letter = document.getElementById("letter").textContent || "";
+            panel.reply(line || (letter ? "短信稿已复制。" : "这会儿还没有短信稿。"), { speak: true });
+            return;
+          }
+          if (action === "add_reminder" && args.title) {
+            document.getElementById("title-input").value = String(args.title).replace(/[。！？\s]/g, "");
+            document.getElementById("save").click();
+            panel.reply(line || ("提醒记下了：" + args.title), { speak: true });
+            return;
+          }
+          if (action === "read_digest") {
+            var paraphrase = document.getElementById("paraphrase").textContent || "";
+            panel.reply(paraphrase || line || "周报还关着，或还没有摘要。", { speak: true });
+            return;
+          }
+          return false;
+        }, {
+          page: "family",
+          placeholder: "说：记下提醒降压药，或复制短信稿",
+        });
+      });
+    </script>
+    <!-- 一周开口记录图表：读取上面四张小卡片里的数字，把「开口天数」画成七个圆点。
+         只做展示，不改动任何原有功能。 -->
+    <script>
+      (function () {
+        var track = document.getElementById("week-track");
+        var caption = document.getElementById("week-caption");
+        var stats = document.getElementById("stats");
+        if (!track || !caption || !stats) return;
+
+        var DAYS = ["一", "二", "三", "四", "五", "六", "日"];
+
+        // 先摆好七个空圆点
+        DAYS.forEach(function (label) {
+          var dot = document.createElement("span");
+          dot.className = "week-dot";
+          dot.textContent = label;
+          track.appendChild(dot);
+        });
+
+        function readStats() {
+          var map = {};
+          var items = stats.querySelectorAll("article");
+          for (var i = 0; i < items.length; i++) {
+            var key = items[i].querySelector("small");
+            var val = items[i].querySelector("strong");
+            if (key && val) map[key.textContent.trim()] = val.textContent.trim();
+          }
+          return map;
+        }
+
+        function esc(text) {
+          if (window.NBLayout && NBLayout.esc) return NBLayout.esc(text);
+          return String(text == null ? "" : text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+
+        function render() {
+          var map = readStats();
+          if (!Object.keys(map).length) {
+            caption.textContent = "暖伴在整理这一周…";
+            return;
+          }
+
+          var days = parseInt(map["开口天数"], 10);
+          if (isNaN(days)) days = 0;
+          days = Math.max(0, Math.min(7, days));
+
+          var dots = track.querySelectorAll(".week-dot");
+          for (var i = 0; i < dots.length; i++) {
+            dots[i].style.animationDelay = (i * 0.09) + "s";
+            dots[i].classList.toggle("on", i < days);
+          }
+
+          var tail =
+            days >= 7 ? "，天天都有她的声音。" :
+            days >= 4 ? "，比往常热闹一些。" :
+            days >= 1 ? "，安静的日子多一些。" :
+                        "，暖伴还在等她说第一句。";
+
+          var html = "这一周有 <b>" + days + "</b> 天听见她说话" + tail;
+
+          var mood = map["心情"];
+          if (mood) html += '<br><span class="week-mood">心情像：' + esc(mood) + "</span>";
+
+          caption.innerHTML = html;
+        }
+
+        if (window.MutationObserver) {
+          new MutationObserver(render).observe(stats, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+        }
+        render();
+      })();
+    </script>
+  </body>
+</html>

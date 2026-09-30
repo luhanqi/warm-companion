@@ -1,0 +1,58 @@
+# Logs
+logs
+*.log
+*.log.*
+*.pid
+.pytest_cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+backend/.venv
+model-services/.local-models.pids.json
+model-services/*-service.log*
+backend/data/*.db
+backend/data/paintings/
+backend/data/voice/
+backend/__pycache__/
+backend/app/__pycache__/
+.env
+train/.venv/
+# Keep only the final competition LoRA adapter in Git. Intermediate
+# checkpoints remain excluded.
+train/outputs/*
+!train/outputs/sft-1.5b/
+train/outputs/sft-1.5b/*
+!train/outputs/sft-1.5b/adapter/
+!train/outputs/sft-1.5b/adapter/**
+train/hf_cache/
+train/data/prepared/
+**/__pycache__/
+
+# The competition folder contains model weights for offline delivery, but they
+# should not be committed to a normal Git repository.
+# Base-model weights are too large for GitHub. Keep the model instructions
+# and checksums in Git; publish weights through a model host/object storage.
+models/*
+!models/README.md
+.venv-models/
+runtime/
+.env.production
+persistent-data/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

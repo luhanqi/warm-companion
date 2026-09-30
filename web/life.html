@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生活 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- 生活页布局增强：仅作用于本页，不修改 css/style.css，不改变任何功能 -->
+    <style>
+      /* 页面加宽，适配两栏 */
+      .page:has(.life-split) {
+        width: min(1040px, calc(100% - 40px));
+      }
+      /* 卡片统一圆角 */
+      .greeting,
+      .panel,
+      .person-row,
+      .lesson-card {
+        border-radius: 16px;
+      }
+      .panel h2::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 0.9em;
+        margin-right: 8px;
+        border-radius: 2px;
+        background: var(--vermilion);
+        vertical-align: -0.08em;
+      }
+      /* 两栏布局：左侧主内容，右侧天气/新闻（上下排列，底部与左侧齐平） */
+      .life-split {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .life-main {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
+      }
+      .life-side {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .life-side .panel {
+        flex: 1;
+      }
+
+      /* ===================== 天气卡片：动态天气轮播 ===================== */
+      .life-weather {
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(130% 95% at 84% -6%, rgba(255, 205, 122, 0.55), transparent 62%),
+          linear-gradient(140deg, rgba(255, 250, 243, 0.96), rgba(244, 231, 210, 0.6)),
+          var(--sheet);
+      }
+      /* 卡片顶部缓慢漂移的柔光 */
+      .life-weather::before {
+        content: "";
+        position: absolute;
+        left: -25%;
+        top: -70px;
+        width: 150%;
+        height: 200px;
+        background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), transparent 72%);
+        filter: blur(16px);
+        pointer-events: none;
+        animation: wx-aurora 9s ease-in-out infinite;
+      }
+      @keyframes wx-aurora {
+        0%, 100% { transform: translate3d(-5%, 0, 0) scale(1); opacity: 0.65; }
+        50%      { transform: translate3d(5%, 8px, 0) scale(1.08); opacity: 1; }
+      }
+      /* 保证正文内容始终盖在光晕之上 */
+      .life-weather > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .life-weather-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .life-weather-head h2 {
+        margin: 0;
+      }
+      .wx-live {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        white-space: nowrap;
+      }
+      .wx-live::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--vermilion);
+        animation: wx-blink 1.8s ease-in-out infinite;
+      }
+      @keyframes wx-blink {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%      { opacity: 0.35; transform: scale(0.8); }
+      }
+
+      /* 圆形天气舞台 */
+      .weather-icon {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 2px auto 12px;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+      }
+      .weather-icon::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 50% 42%,
+          rgba(255, 255, 255, 0.96),
+          rgba(255, 246, 230, 0.5) 62%,
+          rgba(255, 246, 230, 0) 78%
+        );
+        box-shadow: inset 0 0 0 1px rgba(214, 176, 128, 0.4),
+          0 10px 24px rgba(178, 69, 42, 0.12);
+        animation: wx-breathe 5.5s ease-in-out infinite;
+        z-index: 0;
+      }
+      @keyframes wx-breathe {
+        0%, 100% { transform: scale(1); opacity: 0.85; }
+        50%      { transform: scale(1.035); opacity: 1; }
+      }
+
+      /* 四组天气场景叠放在同一处，靠透明度 + 缩放平滑切换 */
+      .wx-scene {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        transform: scale(0.85) rotate(-5deg);
+        transition: opacity 0.85s ease,
+          transform 1.05s cubic-bezier(0.22, 0.85, 0.28, 1);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .wx-scene.active {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+      .wx-scene svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+      }
+
+      /* 晴：光芒慢转 + 光环反向旋转 + 日轮轻呼吸 */
+      .wx-rays {
+        transform-box: view-box;
+        transform-origin: 60px 60px;
+        animation: wx-spin 34s linear infinite;
+      }
+      .wx-halo {
+        transform-box: view-box;
+        transform-origin: 60px 60px;
+        animation: wx-spin-rev 70s linear infinite;
+      }
+      .wx-sun-core {
+        transform-box: view-box;
+        transform-origin: 60px 60px;
+        animation: wx-pulse 4.2s ease-in-out infinite;
+      }
+      @keyframes wx-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes wx-spin-rev {
+        to { transform: rotate(-360deg); }
+      }
+      @keyframes wx-pulse {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.06); }
+      }
+
+      /* 云：两团错位漂移，形成前后景深 */
+      .wx-cloud-a {
+        transform-box: view-box;
+        animation: wx-drift-a 9s ease-in-out infinite;
+      }
+      .wx-cloud-b {
+        transform-box: view-box;
+        animation: wx-drift-b 12.5s ease-in-out infinite;
+      }
+      @keyframes wx-drift-a {
+        0%, 100% { transform: translateX(-7px); }
+        50%      { transform: translateX(8px); }
+      }
+      @keyframes wx-drift-b {
+        0%, 100% { transform: translateX(8px) translateY(2px); }
+        50%      { transform: translateX(-9px) translateY(-2px); }
+      }
+
+      /* 雨：雨丝下落 */
+      .wx-drop {
+        animation: wx-fall 1.25s linear infinite;
+      }
+      @keyframes wx-fall {
+        0%   { transform: translateY(-8px); opacity: 0; }
+        18%  { opacity: 0.95; }
+        75%  { opacity: 0.75; }
+        100% { transform: translateY(24px); opacity: 0; }
+      }
+
+      /* 风：气流虚线流动 + 整组轻晃 */
+      .wx-wind {
+        transform-box: view-box;
+        animation: wx-gust 5.2s ease-in-out infinite;
+      }
+      @keyframes wx-gust {
+        0%, 100% { transform: translateX(-4px); }
+        50%      { transform: translateX(4px); }
+      }
+      .wx-flow {
+        stroke-dasharray: 24 12;
+        animation: wx-flow 1.7s linear infinite;
+      }
+      @keyframes wx-flow {
+        to { stroke-dashoffset: -72; }
+      }
+
+      /* 指示小圆点 */
+      .wx-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: -6px 0 12px;
+      }
+      .life-split .wx-dot {
+        width: 22px;
+        height: 4px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(178, 120, 70, 0.24);
+        cursor: pointer;
+        opacity: 0.8;
+        transition: width 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+      }
+      .life-split .wx-dot:hover:not(:disabled) {
+        transform: none;
+        box-shadow: none;
+        opacity: 1;
+      }
+      .life-split .wx-dot.active {
+        width: 34px;
+        background: var(--vermilion);
+        opacity: 1;
+      }
+
+      /* 尊重系统「减少动态效果」设置 */
+      @media (prefers-reduced-motion: reduce) {
+        .wx-rays,
+        .wx-halo,
+        .wx-sun-core,
+        .wx-cloud-a,
+        .wx-cloud-b,
+        .wx-drop,
+        .wx-wind,
+        .wx-flow,
+        .wx-live::before,
+        .life-weather::before,
+        .weather-icon::before {
+          animation: none !important;
+        }
+        .wx-scene {
+          transition: opacity 0.3s ease;
+          transform: none;
+        }
+      }
+
+      /* 卡片入场依次浮现 */
+      @keyframes panel-in {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .life-main > .panel,
+      .life-side > .panel {
+        animation: panel-in 0.5s ease both;
+      }
+      .life-side > .panel:first-child {
+        animation-delay: 0.08s;
+      }
+      .life-side > .panel:last-child {
+        animation-delay: 0.16s;
+      }
+      /* 数字小课堂：卡片底部对齐 + 内容省略，点击展开 */
+      .lesson-grid {
+        align-items: stretch;
+      }
+      .lesson-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 236px;
+      }
+      .lesson-card strong {
+        flex-shrink: 0;
+      }
+      .lesson-steps {
+        margin-top: 10px;
+        flex: 1;
+        max-height: 6.2em;
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent 100%);
+        mask-image: linear-gradient(180deg, #000 68%, transparent 100%);
+        transition: max-height 0.3s ease;
+      }
+      .lesson-card p {
+        overflow: hidden;
+        max-height: 3.4em;
+        -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+        mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+      }
+      .lesson-card .solid-btn {
+        margin-top: auto;
+        align-self: flex-start;
+      }
+      .lesson-more {
+        align-self: flex-end;
+        margin-top: 8px;
+        padding: 4px 10px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: color 0.2s ease, background 0.2s ease;
+      }
+      .lesson-more:hover {
+        color: var(--vermilion);
+        background: var(--cream);
+      }
+      .lesson-card.expanded .lesson-steps,
+      .lesson-card.expanded p {
+        max-height: none;
+        overflow: visible;
+        -webkit-mask-image: none;
+        mask-image: none;
+      }
+      /* 提醒表单：第一行 种类+写下提醒+记下按钮，第二行「补充」整行，收进卡片内 */
+      .reminder-form {
+        grid-template-columns: 1fr 1fr auto;
+        align-items: end;
+      }
+      .reminder-form .field:nth-child(3) {
+        grid-column: 1 / -1;
+      }
+      /* 本地新闻直接摊开：字体放大，不截断、不折叠，完整显示 */
+      #news.lesson-steps {
+        max-height: none;
+        overflow: visible;
+        -webkit-mask-image: none;
+        mask-image: none;
+        flex: none;
+        font-size: 20px;
+        line-height: 2.1;
+      }
+      #news.lesson-steps li {
+        margin-bottom: 10px;
+        animation: row-in 0.4s ease both;
+      }
+      #news.lesson-steps li:nth-child(2) { animation-delay: 0.08s; }
+      #news.lesson-steps li:nth-child(3) { animation-delay: 0.16s; }
+      #news.lesson-steps li:nth-child(4) { animation-delay: 0.24s; }
+      #news.lesson-steps li:nth-child(5) { animation-delay: 0.32s; }
+      /* 念三句弹出的小框：位于按钮下方，高度+透明度平滑弹出 */
+      .news-pop {
+        margin-top: 12px;
+        padding: 0 16px;
+        border-radius: 14px;
+        background: var(--cream);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--vermilion);
+        font-size: 17px;
+        line-height: 1.8;
+        color: var(--ink);
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: max-height 0.35s ease, opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease;
+      }
+      .news-pop.open {
+        max-height: 420px;
+        opacity: 1;
+        transform: translateY(0);
+        padding: 14px 16px;
+      }
+      .news-pop strong {
+        display: block;
+        margin-bottom: 6px;
+        font-family: var(--font);
+        font-size: 18px;
+        letter-spacing: 0.08em;
+        color: var(--vermilion);
+      }
+      .news-pop p {
+        line-height: 1.9;
+      }
+      /* 提醒标题右侧的胶囊小卡片：默认暗淡，点击点亮 */
+      .reminder-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .reminder-badge {
+        flex-shrink: 0;
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        opacity: 0.55;
+        transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease,
+          border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+      }
+      .reminder-badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        transition: box-shadow 0.25s ease;
+      }
+      .reminder-badge:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+      }
+      .reminder-badge.on {
+        opacity: 1;
+        background: var(--vermilion);
+        border-color: var(--vermilion);
+        color: #fff6ea;
+        box-shadow: 0 0 0 0 rgba(194, 58, 34, 0.35);
+        animation: badge-glow 1.6s ease-out infinite;
+      }
+      @keyframes badge-glow {
+        0% {
+          box-shadow: 0 0 0 0 rgba(194, 58, 34, 0.35);
+        }
+        100% {
+          box-shadow: 0 0 0 12px rgba(194, 58, 34, 0);
+        }
+      }
+      /* 提醒条目入场淡入 */
+      @keyframes row-in {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .person-row {
+        animation: row-in 0.35s ease;
+      }
+      /* 按钮悬停微动效 */
+      .life-split button {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .life-split button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(80, 40, 16, 0.1);
+      }
+      /* 窄屏：单列，天气/新闻置顶 */
+      @media (max-width: 800px) {
+        .life-split {
+          grid-template-columns: 1fr;
+        }
+        .life-side {
+          order: -1;
+          position: static;
+        }
+        .page:has(.life-split) {
+          width: min(100% - 20px, 980px);
+        }
+      }
+      @media (max-width: 600px) {
+        .reminder-form {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .reminder-form .field,
+        .reminder-form .field:nth-child(3),
+        .reminder-form .solid-btn {
+          grid-column: 1;
+          min-width: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <section class="greeting greeting-compact">
+          <p class="eyebrow">生活助手 · 查询与提醒</p>
+          <h1>出门前，先问一句</h1>
+          <p>问天气、听新闻、读自己记下的提醒。挂号只教怎么看屏幕，暖伴不会替您挂上号。</p>
+        </section>
+        <div class="status-banner" id="error" hidden></div>
+        <div class="life-split">
+          <div class="life-main">
+            <section class="panel">
+              <div class="reminder-title">
+                <h2>自己记下的提醒</h2>
+                <span class="reminder-badge" id="reminder-badge" title="今日已设置提醒">提醒 0</span>
+              </div>
+              <p class="empty-note">这不是用药指导。写上去的，暖伴只会原样念给您听。</p>
+              <div class="people-list" id="reminders"></div>
+              <div class="reminder-form">
+                <label class="field">种类
+                  <select id="kind">
+                    <option value="medicine">用药</option>
+                    <option value="visit">复诊</option>
+                    <option value="other">其他</option>
+                  </select>
+                </label>
+                <label class="field">写下提醒 <input id="title" placeholder="降压药" /></label>
+                <label class="field">补充 <input id="note" placeholder="早饭后带上" /></label>
+                <button type="button" class="solid-btn" id="save">记下</button>
+              </div>
+              <button type="button" class="ghost-btn" data-ask="念一下我的提醒">读一遍提醒</button>
+            </section>
+            <section class="panel">
+              <h2>数字小课堂</h2>
+              <div class="lesson-grid" id="lessons"></div>
+            </section>
+            <section class="panel remember-box" id="reply-box" hidden>
+              <h2>暖伴这一句</h2>
+              <p class="digest-line" id="reply"></p>
+            </section>
+            <div id="dock"></div>
+            <div class="prompt-row">
+              <button type="button" class="prompt-chip" data-ask="明天要出门看老同事，天气怎么样，提醒我带降压药。">明天要出门看老同事，天气怎么样，提醒我带降压药。</button>
+            </div>
+          </div>
+          <aside class="life-side">
+            <!-- ============ 天气卡片：四组动态天气循环播放 ============ -->
+            <section class="panel life-weather">
+              <div class="life-weather-head">
+                <h2>今天天气</h2>
+                <span class="wx-live">动态</span>
+              </div>
+
+              <div class="weather-icon" id="weather-icon" aria-hidden="true">
+                <!-- 场景 1 · 晴 -->
+                <div class="wx-scene active" data-name="晴">
+                  <svg viewBox="0 0 120 120">
+                    <defs>
+                      <radialGradient id="wxSunG" cx="46%" cy="40%" r="68%">
+                        <stop offset="0%" stop-color="#fff1c4" />
+                        <stop offset="52%" stop-color="#ffca63" />
+                        <stop offset="100%" stop-color="#ef9a2c" />
+                      </radialGradient>
+                    </defs>
+                    <circle class="wx-halo" cx="60" cy="60" r="48" fill="none"
+                      stroke="#e9a94f" stroke-width="1.4" stroke-dasharray="2.5 8" opacity="0.55" />
+                    <g class="wx-rays" stroke="#ee9a2e" stroke-width="4.6"
+                      stroke-linecap="round" opacity="0.9">
+                      <line x1="60" y1="8" x2="60" y2="20" />
+                      <line x1="96.8" y1="23.2" x2="88.3" y2="31.7" />
+                      <line x1="112" y1="60" x2="100" y2="60" />
+                      <line x1="96.8" y1="96.8" x2="88.3" y2="88.3" />
+                      <line x1="60" y1="112" x2="60" y2="100" />
+                      <line x1="23.2" y1="96.8" x2="31.7" y2="88.3" />
+                      <line x1="8" y1="60" x2="20" y2="60" />
+                      <line x1="23.2" y1="23.2" x2="31.7" y2="31.7" />
+                    </g>
+                    <circle class="wx-sun-core" cx="60" cy="60" r="27" fill="url(#wxSunG)" />
+                    <ellipse cx="51" cy="50" rx="9" ry="6" fill="#fff8e0" opacity="0.5"
+                      transform="rotate(-28 51 50)" />
+                  </svg>
+                </div>
+
+                <!-- 场景 2 · 多云 -->
+                <div class="wx-scene" data-name="多云">
+                  <svg viewBox="0 0 120 120">
+                    <defs>
+                      <radialGradient id="wxSunG2" cx="46%" cy="40%" r="68%">
+                        <stop offset="0%" stop-color="#fff1c4" />
+                        <stop offset="60%" stop-color="#ffcc70" />
+                        <stop offset="100%" stop-color="#f0a63c" />
+                      </radialGradient>
+                      <linearGradient id="wxCloudG" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="100%" stop-color="#efe0c7" />
+                      </linearGradient>
+                      <linearGradient id="wxCloudG2" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fffdf9" />
+                        <stop offset="100%" stop-color="#e4d3b8" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="76" cy="42" r="19" fill="url(#wxSunG2)" opacity="0.92" />
+                    <g class="wx-cloud-b" fill="url(#wxCloudG2)" opacity="0.72">
+                      <ellipse cx="48" cy="52" rx="24" ry="13" />
+                      <circle cx="38" cy="46" r="12" />
+                      <circle cx="58" cy="44" r="14" />
+                    </g>
+                    <g class="wx-cloud-a" fill="url(#wxCloudG)">
+                      <ellipse cx="58" cy="78" rx="30" ry="15" />
+                      <circle cx="44" cy="70" r="15" />
+                      <circle cx="66" cy="68" r="17" />
+                      <circle cx="80" cy="76" r="12" />
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- 场景 3 · 小雨 -->
+                <div class="wx-scene" data-name="小雨">
+                  <svg viewBox="0 0 120 120">
+                    <defs>
+                      <linearGradient id="wxRainCloud" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f8f4ed" />
+                        <stop offset="100%" stop-color="#cec5b6" />
+                      </linearGradient>
+                      <linearGradient id="wxDropG" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#a9cbea" />
+                        <stop offset="100%" stop-color="#5f8fc4" />
+                      </linearGradient>
+                    </defs>
+                    <g fill="url(#wxRainCloud)">
+                      <ellipse cx="60" cy="52" rx="31" ry="16" />
+                      <circle cx="44" cy="44" r="16" />
+                      <circle cx="68" cy="41" r="18" />
+                      <circle cx="82" cy="50" r="13" />
+                    </g>
+                    <g stroke="url(#wxDropG)" stroke-width="3.4" stroke-linecap="round">
+                      <line class="wx-drop" x1="40" y1="74" x2="36" y2="86" />
+                      <line class="wx-drop" x1="54" y1="74" x2="50" y2="86" style="animation-delay:.25s" />
+                      <line class="wx-drop" x1="68" y1="74" x2="64" y2="86" style="animation-delay:.5s" />
+                      <line class="wx-drop" x1="82" y1="74" x2="78" y2="86" style="animation-delay:.75s" />
+                      <line class="wx-drop" x1="47" y1="74" x2="43" y2="86" style="animation-delay:.95s" />
+                      <line class="wx-drop" x1="75" y1="74" x2="71" y2="86" style="animation-delay:1.1s" />
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- 场景 4 · 风 -->
+                <div class="wx-scene" data-name="风">
+                  <svg viewBox="0 0 120 120">
+                    <defs>
+                      <linearGradient id="wxWindG" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#e7c9a3" stop-opacity="0.15" />
+                        <stop offset="45%" stop-color="#d9a86f" />
+                        <stop offset="100%" stop-color="#c9853f" stop-opacity="0.15" />
+                      </linearGradient>
+                    </defs>
+                    <g class="wx-wind" fill="none" stroke="url(#wxWindG)"
+                      stroke-width="5" stroke-linecap="round">
+                      <path class="wx-flow" d="M16 46 H64 a9 9 0 1 0 -9 -9" />
+                      <path class="wx-flow" d="M10 66 H74 a10 10 0 1 1 -10 10"
+                        style="animation-delay:.3s" />
+                      <path class="wx-flow" d="M24 86 H58 a8 8 0 1 0 -8 -8"
+                        style="animation-delay:.6s" />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 指示小圆点（由脚本自动生成） -->
+              <div class="wx-dots" id="wx-dots"></div>
+
+              <p class="digest-line" id="weather">问一句，我念给您听。</p>
+              <button type="button" class="solid-btn" data-ask="今天天气怎么样">念天气</button>
+            </section>
+
+            <section class="panel">
+              <h2>本地新闻</h2>
+              <button type="button" class="ghost-btn" data-ask="念一段新闻">念三句</button>
+              <ol class="lesson-steps" id="news"></ol>
+              <div class="news-pop" id="news-pop"></div>
+            </section>
+          </aside>
+        </div>
+      </main>
+      <footer class="site-colophon">暖伴 </footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var KIND = { medicine: "用药", visit: "复诊", other: "其他" };
+      var busy = false;
+      var spoken = "";
+      var reminders = [];
+      var lessons = [];
+      function showError(text) {
+        var el = document.getElementById("error");
+        if (!text) { el.hidden = true; return; }
+        el.hidden = false;
+        el.textContent = text;
+      }
+      function renderReminders() {
+        var box = document.getElementById("reminders");
+        if (!reminders.length) {
+          box.innerHTML = '<p class="empty-note">还没有提醒。您或家人先写一条。</p>';
+          return;
+        }
+        box.innerHTML = reminders.map(function (item) {
+          return '<div class="person-row"><span>' + NBLayout.esc((KIND[item.kind] || "其他") + " · " + item.title + (item.note ? "（" + item.note + "）" : "")) +
+            '</span><button type="button" class="ghost-btn" data-del="' + item.id + '">去掉</button></div>';
+        }).join("");
+      }
+      function load() {
+        return NB.fetchLife().then(function (data) {
+          document.getElementById("weather").textContent = data.weather || "问一句，我念给您听。";
+          document.getElementById("news").innerHTML = (data.news || []).map(function (item) {
+            return "<li>" + NBLayout.esc(item) + "</li>";
+          }).join("");
+          reminders = data.reminders || [];
+          lessons = data.lessons || [];
+          renderReminders();
+          document.getElementById("lessons").innerHTML = lessons.map(function (lesson) {
+            var ask = lesson.id === "register" ? "帮我看看怎么挂号" : lesson.id === "weather" ? "怎么看天气" : "教我怎么接视频";
+            return '<article class="lesson-card"><strong>' + NBLayout.esc(lesson.title) + '</strong><ol class="lesson-steps">' +
+              (lesson.steps || []).map(function (step) { return "<li>" + NBLayout.esc(step) + "</li>"; }).join("") +
+              "</ol><p>" + NBLayout.esc(lesson.encourage || "") + '</p><button type="button" class="solid-btn" data-ask="' +
+              NBLayout.esc(ask) + '">教我这一课</button><button type="button" class="lesson-more">⋯ 展开</button></article>';
+          }).join("");
+        });
+      }
+      function sendText(text) {
+        if (!text.trim() || busy) return;
+        NBSpeech.stopSpeaking();
+        busy = true;
+        showError("");
+        document.getElementById("reply").textContent = "";
+        document.getElementById("reply-box").hidden = false;
+        spoken = "";
+        var pending = "";
+        NB.streamChat(text, function (event) {
+          if (event.type === "token") {
+            pending += event.text;
+            document.getElementById("reply").textContent = pending;
+            NBSpeech.splitSentences(pending.slice(spoken.length)).ready.forEach(function (sentence) {
+              spoken += sentence;
+              NBSpeech.speak(sentence, 0.82);
+            });
+          }
+          if (event.type === "done") {
+            var rest = pending.slice(spoken.length).trim();
+            if (rest) NBSpeech.speak(rest, 0.82);
+            load();
+          }
+          if (event.type === "error") showError(event.message);
+        }).catch(function (err) {
+          showError(err.message || "这一句没有发出去");
+        }).finally(function () {
+          busy = false;
+        });
+      }
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        NBTalk.renderDock(document.getElementById("dock"), sendText, { busy: function () { return busy; } });
+        document.body.addEventListener("click", function (event) {
+          var ask = event.target.closest("[data-ask]");
+          var del = event.target.closest("[data-del]");
+          if (ask) sendText(ask.getAttribute("data-ask"));
+          if (del) {
+            var id = Number(del.getAttribute("data-del"));
+            NB.deleteReminder(id).then(function () {
+              reminders = reminders.filter(function (item) { return item.id !== id; });
+              renderReminders();
+            }).catch(function () { showError("这条提醒没有删掉"); });
+          }
+        });
+        document.getElementById("save").onclick = function () {
+          var title = document.getElementById("title").value.trim();
+          if (!title) { showError("请写下提醒"); return; }
+          NB.addReminder({
+            kind: document.getElementById("kind").value,
+            title: title,
+            note: document.getElementById("note").value.trim(),
+          }).then(function (saved) {
+            reminders.push(saved);
+            document.getElementById("title").value = "";
+            document.getElementById("note").value = "";
+            showError("");
+            renderReminders();
+          }).catch(function (err) {
+            showError(err.message || "提醒没有记下");
+          });
+        };
+        load().catch(function () { showError("生活页还没有连上服务。"); });
+      });
+    </script>
+    <!-- 数字小课堂展开/收起：只新增交互，不改动原有任何功能 -->
+    <script>
+      document.addEventListener("click", function (event) {
+        var more = event.target.closest(".lesson-more");
+        if (!more) return;
+        var card = more.closest(".lesson-card");
+        if (!card) return;
+        var expanded = card.classList.toggle("expanded");
+        more.textContent = expanded ? "收起" : "⋯ 展开";
+      });
+    </script>
+    <!-- 提醒胶囊小卡片：初始 0，点击点亮变 1，再点回到 0；不改动原有任何功能 -->
+    <script>
+      (function () {
+        var badge = document.getElementById("reminder-badge");
+        badge.addEventListener("click", function () {
+          var on = badge.classList.toggle("on");
+          badge.textContent = on ? "提醒 1" : "提醒 0";
+        });
+      })();
+    </script>
+    <!-- 点「念三句」后，下方小框同步显示「暖伴这一句」的回答；再点收起；不改动原有朗读功能 -->
+    <script>
+      (function () {
+        var btn = document.querySelector('[data-ask="念一段新闻"]');
+        var pop = document.getElementById("news-pop");
+        var reply = document.getElementById("reply");
+        if (!btn || !pop || !reply) return;
+        function sync() {
+          if (pop.classList.contains("open")) {
+            pop.innerHTML = "<strong>暖伴这一句</strong><p>" + reply.textContent + "</p>";
+          }
+        }
+        btn.addEventListener("click", function () {
+          var open = pop.classList.toggle("open");
+          if (open) sync();
+          else pop.innerHTML = "";
+        });
+        if (window.MutationObserver && reply) {
+          new MutationObserver(sync).observe(reply, { characterData: true, childList: true, subtree: true });
+        }
+      })();
+    </script>
+    <!-- 前端补足示例新闻：若新闻不足 4 条，自动补几条铺满；不改动原有数据逻辑 -->
+    <script>
+      (function () {
+        var list = document.getElementById("news");
+        if (!list) return;
+        var EXTRA = [
+          "南通今日多云转晴，气温 18 到 26 度，早晚出门记得添件外衣。",
+          "市人民医院新开通了老年绿色通道，挂号窗口设了优先服务。",
+          "家门口的菜市场下周一开始整修，买菜可以先去街心花园临时点。",
+          "公园晨练提醒：今天空气良好，早上八点以后去更暖和。"
+        ];
+        function topUp() {
+          var current = list.querySelectorAll("li").length;
+          var need = Math.max(0, 4 - current);
+          for (var i = 0; i < need; i++) {
+            var li = document.createElement("li");
+            li.textContent = EXTRA[i % EXTRA.length];
+            list.appendChild(li);
+          }
+        }
+        if (window.MutationObserver) {
+          new MutationObserver(topUp).observe(list, { childList: true });
+        }
+        topUp();
+      })();
+    </script>
+    <!-- 天气动画轮播：四组动态循环播放，点小圆点可手动切换；不改动其余任何功能 -->
+    <script>
+      (function () {
+        var stage = document.querySelector(".weather-icon");
+        var dotsBox = document.getElementById("wx-dots");
+        if (!stage || !dotsBox) return;
+        var scenes = [].slice.call(stage.querySelectorAll(".wx-scene"));
+        if (!scenes.length) return;
+
+        var dots = scenes.map(function (scene, i) {
+          var dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "wx-dot" + (i === 0 ? " active" : "");
+          dot.setAttribute("aria-label", "查看" + (scene.dataset.name || "天气") + "动画");
+          dot.addEventListener("click", function () { go(i, true); });
+          dotsBox.appendChild(dot);
+          return dot;
+        });
+
+        var current = 0;
+        var timer = null;
+        var DURATION = 4500;
+
+        function go(index, byUser) {
+          if (index === current) {
+            if (byUser) restart();
+            return;
+          }
+          scenes[current].classList.remove("active");
+          dots[current].classList.remove("active");
+          current = index;
+          scenes[current].classList.add("active");
+          dots[current].classList.add("active");
+          if (byUser) restart();
+        }
+        function next() { go((current + 1) % scenes.length); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function restart() { stop(); timer = setInterval(next, DURATION); }
+
+        restart();
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) stop();
+          else restart();
+        });
+      })();
+    </script>
+  </body>
+</html>

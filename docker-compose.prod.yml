@@ -1,0 +1,23 @@
+services:
+  warm-companion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: warm-companion
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NUANBAN_HOST: 0.0.0.0
+      NUANBAN_PORT: "8002"
+      NUANBAN_AUTO_START_MODELS: "0"
+    ports:
+      - "80:8002"
+    volumes:
+      - ./persistent-data:/app/backend/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

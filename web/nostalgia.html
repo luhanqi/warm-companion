@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>怀旧时光 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      html, body { font-family: "Microsoft YaHei", PingFang SC, SimHei, sans-serif; }
+
+      #player {
+        border-radius: 14px; overflow: hidden;
+        background: #fffdf8;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        position: relative;
+      }
+
+      /* ========== 顶部横幅 ========== */
+      .greeting.greeting-compact {
+        position: relative; overflow: hidden;
+        background: linear-gradient(135deg, #fffdf8 0%, #f7efe3 100%);
+        border: 1px solid #e8dccb; border-radius: 20px;
+        padding: 36px 40px 34px; margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(160, 120, 70, 0.06);
+      }
+      .greeting-deco {
+        position: absolute; top: -60px; right: -40px;
+        width: 220px; height: 220px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(214, 174, 124, 0.22) 0%, rgba(214, 174, 124, 0) 70%);
+        pointer-events: none;
+      }
+      .greeting .eyebrow {
+        font-size: 15px; color: #b08d60;
+        letter-spacing: 3px; margin: 0 0 14px; font-weight: 500;
+      }
+      .greeting h1 {
+        font-size: 38px; font-weight: 900; color: #3b2e21;
+        margin: 0 0 12px;
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        letter-spacing: 3px;
+      }
+      .title-radio {
+        position: absolute; top: 50%; right: 60px;
+        transform: translateY(-50%);
+        pointer-events: none; user-select: none;
+        display: inline-block;
+      }
+      .title-radio .radio-icon {
+        display: block; font-size: 96px; line-height: 1;
+        opacity: 0.9;
+        filter: drop-shadow(0 6px 16px rgba(176, 141, 96, 0.25));
+      }
+      .title-radio .radio-note {
+        position: absolute; color: #b14a3a; opacity: 0.75;
+        font-family: "SimSun", "宋体", serif;
+        pointer-events: none;
+        animation: radioFloat 3.6s ease-in-out infinite;
+        text-shadow: 0 2px 6px rgba(177, 74, 58, 0.15);
+      }
+      .title-radio .note-1 { font-size: 38px; top: -18px; left: -12px; animation-delay: 0s; }
+      .title-radio .note-2 { font-size: 30px; top: 6px; left: -34px; animation-delay: 0.6s; }
+      .title-radio .note-3 { font-size: 26px; top: -34px; left: 14px; animation-delay: 1.2s; }
+      @keyframes radioFloat {
+        0% { transform: translate(0, 0) rotate(-6deg); opacity: 0.7; }
+        50% { transform: translate(-4px, -8px) rotate(6deg); opacity: 0.95; }
+        100% { transform: translate(0, 0) rotate(-6deg); opacity: 0.7; }
+      }
+
+      /* ========== 回忆卡片 ========== */
+      .remember-box h2 { font-size: 26px; }
+      .remember-box p { font-size: 19px; line-height: 1.8; color: #4a3e32; }
+      .remember-dock { margin-top: 20px; width: 100%; }
+      .memoir-btn-row { display: flex; justify-content: flex-end; margin-top: 16px; }
+      .memoir-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #fffdf8; border: 1px solid #d9cfbf;
+        color: #8a765f; padding: 12px 24px; border-radius: 30px;
+        font-size: 17px; text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      }
+      .memoir-btn:hover {
+        background: #f5efe3; color: #3b2e21; border-color: #b08d60;
+        box-shadow: 0 4px 12px rgba(160, 120, 70, 0.12);
+        transform: translateY(-1px);
+      }
+
+      /* ========== 歌曲卡片 ========== */
+      .song-card {
+        border: 2px solid transparent; border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+        will-change: transform;
+      }
+      .song-card:hover {
+        transform: translateY(-8px) scale(1.06);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+        z-index: 8;
+      }
+      .song-card.on {
+        transform: scale(1.08);
+        border: 3px solid #1a1a1a;
+        box-shadow: 0 20px 46px rgba(0, 0, 0, 0.42), 0 0 0 4px rgba(177, 74, 58, 0.18);
+        z-index: 10;
+      }
+      .song-card.on > div:first-child { background: rgba(255, 253, 248, 0.35) !important; }
+
+      /* ========== 时间轴容器 ========== */
+      .timeline-wrap { position: relative; padding-left: 100px; margin-top: 12px; }
+      .timeline-wrap::before {
+        content: ""; position: absolute;
+        left: 26px; top: 12px; bottom: 12px;
+        width: 2px; background: #b14a3a;
+        border-radius: 2px; z-index: 0;
+      }
+      .timeline-wrap::after {
+        content: ""; position: absolute;
+        left: 26px; bottom: -8px;
+        transform: translateX(-50%);
+        width: 0; height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 14px solid #b14a3a;
+        z-index: 1;
+      }
+      .era-card-wrap { position: relative; margin-bottom: 28px; }
+      .era-card-wrap::before {
+        content: ""; position: absolute;
+        left: -74px; top: -14px;
+        width: 16px; height: 2px;
+        background: #b14a3a; border-radius: 1px; z-index: 3;
+      }
+      .era-card-wrap:first-child::before { display: none; }
+      .era-marker {
+        position: absolute; left: -74px; top: 60px;
+        display: flex; align-items: center;
+        pointer-events: none; z-index: 3;
+        transition: transform 0.3s ease;
+        transform-origin: left center;
+      }
+      .era-tick { width: 40px; height: 2px; background: #b14a3a; }
+      .era-arrow {
+        width: 0; height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 16px solid #b14a3a;
+        filter: drop-shadow(0 2px 3px rgba(177, 74, 58, 0.3));
+      }
+      .era-card-wrap:hover .era-marker { transform: scale(1.2); }
+      .era-card-wrap:hover .era-tick { background: #8f2f23; }
+      .era-card-wrap:hover .era-arrow { border-left-color: #8f2f23; }
+
+      .era-card {
+        position: relative; background: #fdf6e9;
+        border: 1px solid #e8dccb; border-radius: 12px;
+        padding: 26px 30px 26px 18px;
+        overflow: hidden;
+        transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+        cursor: pointer; z-index: 2;
+      }
+      .era-card:hover {
+        transform: translateY(-6px) scale(1.03);
+        box-shadow: 0 16px 40px rgba(160, 120, 70, 0.22);
+        border-color: #b14a3a; z-index: 10;
+      }
+      .era-card.on {
+        transform: translateY(-6px) scale(1.03);
+        border: 2px solid #b14a3a;
+        box-shadow: 0 16px 40px rgba(177, 74, 58, 0.28);
+        z-index: 11;
+      }
+      .era-photo {
+        position: absolute; top: 0; right: 0;
+        width: 60%; height: 100%;
+        background-size: cover; background-position: center;
+        opacity: 0; transform: scale(1.06);
+        transition: opacity 0.9s ease, transform 0.9s ease;
+        pointer-events: none;
+        filter: sepia(0.25) brightness(1.08) contrast(0.88) saturate(0.85);
+        -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.12) 80%, transparent 100%);
+        mask-image: linear-gradient(to left, #000 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.12) 80%, transparent 100%);
+        z-index: 1;
+      }
+      .era-card:hover .era-photo, .era-card.on .era-photo { opacity: 1; transform: scale(1); }
+      .era-year, .era-content { position: relative; z-index: 3; }
+      .era-year {
+        flex: 0 0 130px; font-size: 34px; font-weight: 900;
+        color: #b14a3a;
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        letter-spacing: 1px; line-height: 1.1;
+        padding-top: 22px; margin-left: -14px;
+      }
+      .era-content {
+        display: inline-block; width: calc(100% - 160px);
+        vertical-align: top; margin-left: 28px;
+      }
+      .era-content h3 {
+        margin: 0 0 10px; font-size: 24px; font-weight: 700;
+        color: #1f1810;
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        letter-spacing: 2px; line-height: 1.3;
+      }
+      .era-content p { margin: 0 0 14px; color: #6b5b4b; font-size: 15px; line-height: 1.7; }
+      .era-card .solid-btn {
+        border-radius: 30px; padding: 12px 44px;
+        font-size: 16px; background: #b14a3a; color: #fff;
+        border: none; cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        margin-top: 4px; letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(177, 74, 58, 0.25);
+        position: relative; z-index: 4;
+      }
+      .era-card .solid-btn:hover {
+        background: #96382a; transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(177, 74, 58, 0.35);
+      }
+
+      /* ========== 顶部主 tab ========== */
+      .tabs:not(.sub) {
+        display: flex; justify-content: space-around;
+        align-items: center;
+        border-bottom: 1px solid #e7dccb;
+        padding-bottom: 2px; margin-bottom: 22px; gap: 0;
+      }
+      .tabs:not(.sub) .tab-btn {
+        flex: 1; text-align: center;
+        background: transparent; border: none;
+        padding: 12px 0; font-size: 20px;
+        color: #8a765f; cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit; position: relative;
+      }
+      .tabs:not(.sub) .tab-btn:hover { color: #5a4632; }
+      .tabs:not(.sub) .tab-btn.active { color: #3b2e21; font-weight: 700; }
+      .tabs:not(.sub) .tab-btn.active::after {
+        content: ""; position: absolute;
+        left: 50%; bottom: -3px;
+        transform: translateX(-50%);
+        width: 60%; height: 4px;
+        background: #b14a3a; border-radius: 2px;
+      }
+      .tabs.sub { border-bottom: none; gap: 10px; margin-bottom: 20px; }
+      .tabs.sub .tab-btn {
+        border-radius: 999px; padding: 8px 24px;
+        font-size: 15px;
+        border: 1px solid #e7dccb;
+        background: #fffdf8; color: #5a4632;
+        cursor: pointer; transition: all 0.2s ease;
+        font-family: inherit;
+      }
+      .tabs.sub .tab-btn:hover:not(.active) { background: #f5efe3; border-color: #b08d60; }
+      .tabs.sub .tab-btn.active { background: #1a1a1a; color: #fffdf8; border-color: #1a1a1a; }
+
+      /* ========== 回忆卡片 ========== */
+      .remember-box {
+        position: relative; overflow: hidden;
+        background: #fffdf8; border-radius: 14px;
+        border: 2px solid #b14a3a;
+        box-shadow: 0 6px 20px rgba(177, 74, 58, 0.12);
+        transition: border-color 0.35s ease, box-shadow 0.35s ease;
+      }
+      .remember-box.on {
+        border-color: #8f2f23;
+        box-shadow: 0 10px 28px rgba(177, 74, 58, 0.28);
+      }
+      .remember-box-bg {
+        position: absolute; inset: 0;
+        background-size: cover; background-position: center;
+        opacity: 0; transition: opacity 0.9s ease;
+        pointer-events: none;
+        filter: sepia(0.25) brightness(1.05) contrast(0.9) saturate(0.85);
+        -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.35) 75%, transparent 100%);
+        mask-image: linear-gradient(to left, #000 0%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.35) 75%, transparent 100%);
+        z-index: 0; border-radius: 14px;
+      }
+      .remember-box-bg.on { opacity: 1; }
+      .remember-box-content { position: relative; z-index: 1; }
+      #player h2, #player .lyrics, #player .player-note {
+        text-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 0 12px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.6);
+      }
+      .remember-box h2, .remember-box p, .remember-box .memoir-btn {
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 12px rgba(255, 255, 255, 0.9), 0 0 24px rgba(255, 255, 255, 0.7);
+      }
+      .remember-box h2 {
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 1), 0 0 14px rgba(255, 255, 255, 0.95), 0 0 28px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+      }
+
+      /* ============================================================
+         ★★★ 相册书（真实复古老相册版） ★★★
+         ============================================================ */
+      .album-stage {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        perspective: 2600px;
+        margin: 30px 0 12px;
+        min-height: 520px;
+        padding: 20px;
+        background: #2b1f14;
+        border-radius: 16px;
+      }
+      .album-book {
+        position: relative;
+        width: 780px;
+        max-width: 100%;
+        height: 480px;
+        transform-style: preserve-3d;
+        transition: transform 0.8s ease;
+      }
+      .album-shell {
+        position: absolute;
+        inset: -14px -20px -14px -20px;
+        background: linear-gradient(135deg, #3a2418 0%, #1f1208 100%);
+        border-radius: 8px;
+        box-shadow:
+          0 30px 60px rgba(0, 0, 0, 0.8),
+          0 0 0 2px #4a3020 inset,
+          0 0 0 8px rgba(0,0,0,0.4) inset;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .album-shell::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(180, 140, 90, 0.25);
+        box-shadow: 0 0 20px rgba(180, 140, 90, 0.08) inset;
+      }
+      .album-book .page-stack {
+        position: absolute;
+        right: -2px; top: 4px; bottom: 4px;
+        width: 8px;
+        border-radius: 0 4px 4px 0;
+        background: linear-gradient(to right, #e8d5b0, #c9b48a);
+        z-index: 1;
+        pointer-events: none;
+        box-shadow: 1px 0 2px rgba(0,0,0,0.2);
+      }
+      .album-book .page-stack:nth-child(1) { transform: translateX(0); }
+      .album-book .page-stack:nth-child(2) { transform: translateX(3px); opacity: 0.8; }
+      .album-book .page-stack:nth-child(3) { transform: translateX(6px); opacity: 0.6; }
+
+      .album-cover {
+        position: absolute;
+        inset: 0;
+        border-radius: 4px 8px 8px 4px;
+        background: linear-gradient(135deg, #4a2c1a 0%, #2b1a0e 100%);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.6),
+          0 0 0 2px rgba(180, 140, 90, 0.15) inset;
+        cursor: pointer;
+        transform-origin: left center;
+        transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.15, 1), box-shadow 0.9s ease;
+        transform-style: preserve-3d;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 30;
+        backface-visibility: hidden;
+      }
+      .album-cover::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 24px;
+        border-radius: 4px 0 0 4px;
+        background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.1) 60%, rgba(255,255,255,0.04));
+        z-index: 2;
+        pointer-events: none;
+      }
+      .album-cover::after {
+        content: "";
+        position: absolute;
+        inset: 20px 20px 20px 36px;
+        border: 1px solid rgba(200, 160, 110, 0.35);
+        border-radius: 2px 6px 6px 2px;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .album-cover-title {
+        font-family: "SimSun", "宋体", "Songti SC", "STSong", serif;
+        font-size: 42px; font-weight: 900;
+        color: #d4b88a;
+        letter-spacing: 12px;
+        text-shadow: 0 3px 12px rgba(0,0,0,0.8);
+        margin-bottom: 14px;
+        z-index: 4;
+      }
+      .album-cover-sub {
+        font-size: 14px;
+        color: rgba(212, 184, 138, 0.6);
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        z-index: 4;
+      }
+      .album-cover-hint {
+        position: absolute;
+        bottom: 30px;
+        font-size: 15px;
+        color: rgba(212, 184, 138, 0.8);
+        letter-spacing: 4px;
+        animation: coverHint 2.4s ease-in-out infinite;
+        font-family: "Kaiti", "楷体", "STKaiti", serif;
+        z-index: 4;
+      }
+      @keyframes coverHint {
+        0%, 100% { opacity: 0.4; transform: translateY(0); }
+        50% { opacity: 1; transform: translateY(-5px); }
+      }
+
+      .album-clasp {
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px;
+        height: 68px;
+        z-index: 35;
+        cursor: pointer;
+        transition: transform 0.5s cubic-bezier(0.45, 0.05, 0.15, 1), opacity 0.5s ease;
+        filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+      }
+      .album-clasp .clasp-body {
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #c9a25e 0%, #8a6a25 40%, #5a4215 100%);
+        border-radius: 6px 14px 14px 6px;
+        position: relative;
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 235, 180, 0.4),
+          inset -3px 0 8px rgba(0,0,0,0.4);
+      }
+      .album-clasp .clasp-body::before {
+        content: "";
+        position: absolute;
+        left: 6px; top: 50%;
+        transform: translateY(-50%);
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ffefc0 0%, #8a6a25 70%);
+        box-shadow: 0 0 6px rgba(255, 220, 130, 0.6);
+      }
+      .album-clasp.unclasped {
+        transform: translateY(-50%) translateX(30px) rotate(22deg);
+        opacity: 0;
+      }
+
+      .album-book.opened .album-cover {
+        transform: rotateY(-180deg);
+        box-shadow: -10px 24px 48px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+      }
+
+      .album-pages {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        border-radius: 4px 8px 8px 4px;
+        overflow: hidden;
+        background: #e8d5b0;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.4s ease 0.3s;
+        z-index: 10;
+      }
+      .album-book.opened .album-pages { opacity: 1; }
+
+      .album-flip-layer {
+        position: absolute;
+        top: 0; right: 0;
+        width: 50%;
+        height: 100%;
+        transform-origin: left center;
+        transform-style: preserve-3d;
+        transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.15, 1);
+        z-index: 20;
+        pointer-events: none;
+        opacity: 0;
+      }
+      .album-flip-layer.flipping {
+        opacity: 1;
+        transform: rotateY(-180deg);
+      }
+      .album-flip-layer .flip-face {
+        position: absolute;
+        inset: 0;
+        background: #e8d5b0;
+        box-shadow: inset 0 0 40px rgba(92, 58, 26, 0.2);
+        backface-visibility: hidden;
+      }
+      .album-flip-layer .flip-face.front {
+        background: linear-gradient(to left, #dcc9a4, #e8d5b0);
+        border-left: 1px solid rgba(92, 58, 26, 0.1);
+        box-shadow: inset -20px 0 30px -10px rgba(92, 58, 26, 0.3);
+      }
+      .album-flip-layer .flip-face.back {
+        transform: rotateY(180deg);
+        background: linear-gradient(to right, #dcc9a4, #e8d5b0);
+        box-shadow: inset 20px 0 30px -10px rgba(92, 58, 26, 0.3);
+      }
+
+      .album-page-left {
+        flex: 1; background: #e8d5b0;
+        padding: 30px 28px;
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+        border-right: 1px solid rgba(92, 58, 26, 0.15);
+        background-image:
+          radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(92, 58, 26, 0.08) 0%, transparent 50%);
+      }
+      .album-photo-frame {
+        position: relative;
+        max-width: 100%; max-height: 100%;
+        transform: rotate(-1.5deg);
+        transition: transform 0.4s ease;
+        box-shadow: 0 6px 18px rgba(92, 58, 26, 0.35);
+      }
+      .album-photo-frame:hover { transform: rotate(0deg) scale(1.02); }
+      .album-photo-frame img {
+        display: block; width: 100%;
+        max-height: 340px; object-fit: cover;
+        filter: sepia(0.3) contrast(0.95) brightness(0.95);
+      }
+      .album-photo-frame .photo-corner {
+        position: absolute;
+        width: 22px; height: 22px;
+        background: rgba(92, 58, 26, 0.4);
+        z-index: 2;
+      }
+      .album-photo-frame .photo-corner.tl { top: -4px; left: -4px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+      .album-photo-frame .photo-corner.tr { top: -4px; right: -4px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+      .album-photo-frame .photo-corner.bl { bottom: -4px; left: -4px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+      .album-photo-frame .photo-corner.br { bottom: -4px; right: -4px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+
+      .album-photo-caption {
+        position: absolute;
+        bottom: -26px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Kaiti", "楷体", "STKaiti", serif;
+        font-size: 15px; color: #8a6a4a;
+        letter-spacing: 1px;
+      }
+
+      .album-page-right {
+        flex: 1; background: #e8d5b0;
+        padding: 6px 30px 50px 30px;
+        position: relative; overflow: hidden;
+        background-image:
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 33px,
+            rgba(138, 106, 74, 0.18) 34px
+          );
+      }
+      .album-page-right::before {
+        content: "";
+        position: absolute;
+        left: 16px; top: 20px; bottom: 20px;
+        width: 1px;
+        background: rgba(138, 106, 74, 0.25);
+      }
+      .album-handwrite {
+        font-family: "Kaiti", "楷体", "STKaiti", "KaiTi", serif;
+        font-size: 21px; line-height: 34px;
+        color: #4a2c1a;
+        letter-spacing: 1px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin-top: 0;
+      }
+      .album-handwrite .album-page-title {
+        font-size: 25px; font-weight: 700;
+        color: #8a3a2a;
+        display: block;
+        margin-bottom: 6px;
+        letter-spacing: 3px;
+      }
+      .album-handwrite .album-page-date {
+        display: block; font-size: 15px;
+        color: #a8866a;
+        margin-bottom: 16px;
+        letter-spacing: 1px;
+      }
+      .album-cursor {
+        display: inline-block;
+        width: 2px; height: 24px;
+        background: #8a3a2a;
+        vertical-align: middle;
+        margin-left: 2px;
+        animation: cursorBlink 1s step-end infinite;
+      }
+      @keyframes cursorBlink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+
+      /* ========== 空白页样式 ========== */
+      .album-photo-frame.empty {
+        border: 2px dashed #b8a07a;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 60px 40px;
+        text-align: center;
+        cursor: pointer;
+        transform: rotate(0deg);
+        box-shadow: none;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .album-photo-frame.empty:hover {
+        background: rgba(255, 255, 255, 0.4);
+        border-color: #8a6a4a;
+      }
+      .album-photo-frame.empty .empty-icon {
+        font-size: 48px;
+        opacity: 0.5;
+        margin-bottom: 12px;
+      }
+      .album-photo-frame.empty .empty-text {
+        font-family: "Kaiti", "楷体", "STKaiti", serif;
+        font-size: 18px;
+        color: #8a6a4a;
+        letter-spacing: 2px;
+      }
+
+      .album-handwrite.empty-handwrite {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #a8866a;
+        font-family: "Kaiti", "楷体", "STKaiti", serif;
+        text-align: center;
+        gap: 16px;
+      }
+      .empty-dots {
+        font-size: 38px;
+        letter-spacing: 8px;
+        opacity: 0.4;
+        animation: dotsPulse 2s ease-in-out infinite;
+      }
+      @keyframes dotsPulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.7; }
+      }
+      .empty-pencil {
+        font-size: 44px;
+        opacity: 0.5;
+        transform: rotate(-15deg);
+        animation: pencilFloat 3s ease-in-out infinite;
+      }
+      @keyframes pencilFloat {
+        0%, 100% { transform: rotate(-15deg) translateY(0); }
+        50% { transform: rotate(-10deg) translateY(-6px); }
+      }
+
+      /* ========== 继续...您的故事 按钮 ========== */
+      .continue-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #b14a3a;
+        color: #fffdf8;
+        padding: 14px 36px;
+        border-radius: 30px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 16px rgba(177, 74, 58, 0.3);
+        letter-spacing: 2px;
+        font-family: "Kaiti", "楷体", "STKaiti", serif;
+      }
+      .continue-btn:hover {
+        background: #96382a;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(177, 74, 58, 0.4);
+      }
+
+      .album-controls {
+        display: flex; justify-content: center; align-items: center;
+        gap: 18px; margin-top: 16px;
+      }
+      .album-nav-btn {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        border: 1px solid #d9cfbf;
+        background: #fffdf8;
+        color: #8a765f; font-size: 22px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+      }
+      .album-nav-btn:hover:not(:disabled) {
+        background: #b14a3a; color: #fff; border-color: #b14a3a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(177, 74, 58, 0.3);
+      }
+      .album-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+      .album-page-indicator {
+        font-family: "SimSun", "宋体", serif;
+        font-size: 17px; color: #8a765f;
+        letter-spacing: 2px;
+        min-width: 70px; text-align: center;
+      }
+
+      .album-upload-row {
+        display: flex; justify-content: center; align-items: center;
+        gap: 14px; margin-top: 14px; flex-wrap: wrap;
+      }
+      .empty-note { font-size: 15px; color: #a89279; }
+
+      .remember-box { margin-top: 26px; }
+
+      @media (max-width: 720px) {
+        .album-book { height: 620px; }
+        .album-pages { flex-direction: column; }
+        .album-page-left { border-right: none; border-bottom: 1px solid rgba(92,58,26,0.15); flex: 0 0 55%; }
+        .album-page-right { flex: 1; padding: 24px 22px; }
+        .album-photo-frame img { max-height: 220px; }
+        .album-handwrite { font-size: 18px; line-height: 30px; }
+        .greeting h1 { font-size: 30px; }
+        .title-radio { right: 20px; }
+        .title-radio .radio-icon { font-size: 64px; }
+        .album-flip-layer { width: 100%; }
+        .album-clasp { right: -14px; width: 28px; height: 54px; }
+      }
+
+            /* ========== 底部对话框：字号调节（放到 talk-bar 内部，跟输入框同一行） ========== */
+      .dock-font-sizer {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 8px;
+        flex-shrink: 0;
+      }
+      .dock-font-sizer .sizer-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .dock-font-sizer .sizer-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .dock-font-sizer .font-size-label {
+        color: #8a3a2b;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+      .dock-font-sizer .font-size-hint {
+        font-size: 12px;
+        color: #8a3a2b;
+        opacity: 0.8;
+        margin-top: 4px;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .dock-font-sizer input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 90px;
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(to right, #e8dccb, #b14a3a);
+        outline: none;
+        cursor: pointer;
+      }
+      .dock-font-sizer input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: #fffdf8;
+        border: 3px solid #b14a3a;
+        box-shadow: 0 2px 6px rgba(177, 74, 58, 0.3);
+        cursor: pointer;
+      }
+      .dock-font-sizer input[type="range"]::-moz-range-thumb {
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: #fffdf8;
+        border: 3px solid #b14a3a;
+        box-shadow: 0 2px 6px rgba(177, 74, 58, 0.3);
+        cursor: pointer;
+      }
+      /* 平滑过渡 */
+      #spoken, #remember-title {
+        transition: font-size 0.2s ease, line-height 0.2s ease;
+      }
+      .time-projects { margin-top: 24px; }
+      .time-project-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 16px; }
+      .time-project { border: 1px solid rgba(135,94,55,.2); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,.62); text-align: left; cursor: pointer; }
+      .time-project img { width: 100%; height: 145px; object-fit: cover; display: block; }
+      .time-project span { display: block; padding: 12px 14px; color: #4d3a2b; }
+      .memory-player { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; background: rgba(28,18,11,.82); padding: 28px; }
+      .memory-player[hidden] { display: none; }
+      .memory-stage { position: relative; width: min(920px,94vw); height: min(620px,82vh); overflow: hidden; border-radius: 28px; background: #1e1712; box-shadow: 0 24px 80px rgba(0,0,0,.4); }
+      .memory-stage img, .memory-stage video { width: 100%; height: 100%; object-fit: cover; }
+      .memory-stage img { animation: memory-pan 18s ease-in-out infinite alternate; }
+      .memory-caption { position: absolute; inset: auto 0 0; padding: 70px 46px 36px; color: white; font-size: 21px; line-height: 1.8; background: linear-gradient(transparent,rgba(20,11,5,.86)); }
+      .memory-actions { position: absolute; z-index: 2; right: 20px; top: 18px; display:flex; gap:10px; }
+      .memory-actions button { border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+      @keyframes memory-pan { from { transform: scale(1.02) translateX(-1%); } to { transform: scale(1.13) translateX(2%); } }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <section class="greeting greeting-compact">
+          <div class="greeting-deco"></div>
+          <p class="eyebrow">点一首 · 说一句 · 写成书</p>
+          <h1>怀旧时光</h1>
+          <div class="title-radio">
+            <span class="radio-icon">📻</span>
+            <span class="radio-note note-1">♪</span>
+            <span class="radio-note note-2">♫</span>
+            <span class="radio-note note-3">♪</span>
+          </div>
+          <p class="greeting-desc">点唱厅、年代时光机、老照片，都还是暖伴在跟您说话。听完告诉我您想起了谁。</p>
+        </section>
+
+        <div class="tabs">
+          <button type="button" class="tab-btn active" data-tab="songs">🎵&nbsp;&nbsp;点唱厅</button>
+          <button type="button" class="tab-btn" data-tab="era">🕰️&nbsp;&nbsp;年代时光机</button>
+          <button type="button" class="tab-btn" data-tab="photos">📷&nbsp;&nbsp;老照片</button>
+        </div>
+
+        <div id="pane-songs">
+          <div class="tabs sub" id="decades"></div>
+          <div class="song-grid" id="songs"></div>
+          <div class="player" id="player" hidden></div>
+        </div>
+
+        <div id="pane-era" hidden>
+          <div class="timeline-wrap">
+            <div class="era-list" id="events"></div>
+          </div>
+        </div>
+
+        <!-- ★★★ 老照片板块：真实复古老相册 ★★★ -->
+        <div id="pane-photos" hidden>
+          <div class="album-stage">
+            <div class="album-book" id="album-book">
+              <div class="album-shell"></div>
+              <div class="page-stack"></div>
+              <div class="page-stack"></div>
+              <div class="page-stack"></div>
+
+              <div class="album-cover" id="album-cover">
+                <div class="album-cover-title">我的回忆录</div>
+                <div class="album-cover-sub">MEMORY ALBUM</div>
+                <div class="album-cover-hint">轻轻一点，翻开我的故事…</div>
+              </div>
+
+              <div class="album-clasp" id="album-clasp" title="解开封扣">
+                <div class="clasp-body"></div>
+              </div>
+
+              <div class="album-pages">
+                <div class="album-flip-layer" id="album-flip-layer">
+                  <div class="flip-face front"></div>
+                  <div class="flip-face back"></div>
+                </div>
+                <div class="album-page-left" id="album-page-left">
+                  <div class="album-photo-frame">
+                    <span class="photo-corner tl"></span>
+                    <span class="photo-corner tr"></span>
+                    <span class="photo-corner bl"></span>
+                    <span class="photo-corner br"></span>
+                    <img id="album-img" src="" alt="回忆照片" />
+                    <div class="album-photo-caption" id="album-caption"></div>
+                  </div>
+                </div>
+                <div class="album-page-right" id="album-page-right">
+                  <div class="album-handwrite" id="album-handwrite">
+                    <span class="album-page-title" id="album-title">最初的时光</span>
+                    <span class="album-page-date" id="album-date">—— 童年 ——</span>
+                    <span id="album-text">故事从这里开始。那时候世界很小，但快乐很简单。</span>
+                    <span class="album-cursor"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="album-controls">
+            <button type="button" class="album-nav-btn" id="album-prev" title="上一页">‹</button>
+            <div class="album-page-indicator" id="album-indicator">1 / 6</div>
+            <button type="button" class="album-nav-btn" id="album-next" title="下一页">›</button>
+          </div>
+
+          <div class="album-upload-row">
+            <button type="button" class="continue-btn" id="continue-btn">
+              ✍️ 继续...您的故事
+            </button>
+            <input type="file" accept="image/*" hidden id="photo-file" />
+            <span class="empty-note" id="photo-notice"></span>
+          </div>
+        </div>
+        <!-- ★★★ 老照片板块结束 ★★★ -->
+
+        <section class="panel remember-box" id="remember-box">
+          <div class="remember-box-bg" id="remember-bg"></div>
+          <div class="remember-box-content">
+            <h2 id="remember-title">暖伴在听这段回忆</h2>
+            <p id="spoken">王阿姨，我给您放《在希望的田野上》。改革开放以后常唱。有人想起分田到户，有人想起第一次听录音机。这首歌让您想起谁，或者想起哪一年？</p>
+            <div id="dock" class="remember-dock"></div>
+            <div class="memoir-btn-row">
+              <a href="memoir.html" class="memoir-btn">📖 去翻回忆录</a>
+            </div>
+          </div>
+        </section>
+        <section class="panel time-projects" id="time-projects" hidden>
+          <h2>我的时光作品</h2>
+          <p class="empty-note">点开作品，会用老照片、本人录音和当时选择的音乐重访这段记忆。</p>
+          <div class="time-project-grid" id="time-project-grid"></div>
+        </section>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+    <div class="memory-player" id="memory-player" hidden>
+      <div class="memory-stage">
+        <div class="memory-actions"><button type="button" id="memory-export">导出 WebM</button><button type="button" id="memory-close">关闭</button></div>
+        <img id="memory-player-image" alt="记忆照片" />
+        <video id="memory-player-video" controls playsinline hidden></video>
+        <div class="memory-caption"><strong id="memory-player-title"></strong><div id="memory-player-text"></div><div id="memory-player-subtitle"></div></div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/melody.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+   <script>
+  // ============================================================
+  // ★★★ 相册书核心数据（照片路径 img/book/） ★★★
+  // ============================================================
+  var albumPages = [
+    { id: 'p1', title: '最初的时光', date: '—— 童年 ——', caption: '全家福 · 老家院子', text: '翻开这本相册，第一张就是我们的全家福。那时候我还小，坐在最前面。家里人多，日子虽然过得清苦，但只要一家人在一起，心里就踏实。这是我人生的起点。', img: 'img/book/1.jpg' },
+    { id: 'p2', title: '恰同学少年', date: '—— 青春 ——', caption: '和姐妹们在城楼下', text: '后来，我长成了大姑娘。和几个好姐妹约着去公园，那时候我们留着长辫子，穿着碎花裙，笑得没心没肺。青春就像那天的阳光，干净又明亮，真好。', img: 'img/book/2.jpg' },
+    { id: 'p3', title: '结发为夫妻', date: '—— 成家 ——', caption: '我们的结婚登记照', text: '在最好的年纪，遇到了要相伴一生的人。没有华丽的仪式，只有两张年轻的脸和一颗真诚的心。从那天起，我们成了家，这一牵手，就是一辈子。', img: 'img/book/3.jpg' },
+    { id: 'p4', title: '柴米油盐的甜', date: '—— 中年 ——', caption: '带小家伙去公园', text: '家里添了新成员，日子突然变得忙碌起来。每天围着孩子转，虽然辛苦，但看着他一天天长大，所有的疲惫都烟消云散了。这就是为人父母的甜。', img: 'img/book/4.jpg' },
+    { id: 'p5', title: '最美不过夕阳红', date: '—— 晚年 ——', caption: '公园里的老伙计们', text: '孩子们飞远了，日子终于慢了下来。约上三五老友，在公园里拉拉琴、唱唱歌。头发白了没关系，只要心里还装着热爱，晚年依然可以过得热气腾腾。', img: 'img/book/5.jpg' },
+    { id: 'p6', title: '团圆即是福', date: '—— 当下 ——', caption: '全家团圆饭', text: '翻到最后一页，看着满堂的儿孙，心里只有知足。这一生，吃过苦，也尝过甜，最终都化作了此刻围坐在一起的笑脸。这一辈子，值了。', img: 'img/book/6.jpg' }
+  ];
+
+  var albumIndex = 0;
+  var albumOpened = false;
+  var albumTypingTimer = null;
+  var albumFlipping = false;
+
+  var PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">' +
+    '<rect width="400" height="300" fill="#e8d5b0"/>' +
+    '<text x="200" y="150" font-size="20" fill="#8a6a4a" text-anchor="middle" font-family="serif">照片位置</text>' +
+    '<text x="200" y="180" font-size="14" fill="#a8866a" text-anchor="middle" font-family="serif">上传后显示</text>' +
+    '</svg>'
+  );
+
+  // ============================================================
+  // ★★★ 写字沙沙声 ★★★
+  // ============================================================
+  function playWriteSound(duration) {
+    try {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      var ctx = new AudioCtx();
+      var dur = duration || 0.08;
+      var bufferSize = Math.floor(ctx.sampleRate * dur);
+      var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) {
+        var t = i / bufferSize;
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2) * 0.6;
+      }
+      var source = ctx.createBufferSource();
+      source.buffer = buffer;
+      var filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 3800 + Math.random() * 1200;
+      filter.Q.value = 0.9;
+      var gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      source.start();
+      setTimeout(function () { ctx.close(); }, dur * 1000 + 100);
+    } catch (e) { /* 忽略 */ }
+  }
+
+  // ============================================================
+  // ★★★ 纸张翻过去的“唰”声 ★★★
+  // ============================================================
+  function playFlipSound() {
+    try {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      var ctx = new AudioCtx();
+      var dur = 0.55;
+      var bufferSize = Math.floor(ctx.sampleRate * dur);
+      var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) {
+        var t = i / bufferSize;
+        var env;
+        if (t < 0.3) env = Math.pow(t / 0.3, 0.6);
+        else if (t < 0.75) env = 1 - Math.pow((t - 0.3) / 0.45, 1.6);
+        else env = Math.pow(1 - (t - 0.75) / 0.25, 3);
+        var noise = (Math.random() * 2 - 1);
+        var lowFreq = Math.sin(i * 0.05) * 0.15;
+        data[i] = (noise * 0.85 + lowFreq) * env;
+      }
+      var source = ctx.createBufferSource();
+      source.buffer = buffer;
+      var filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(2600, ctx.currentTime);
+      filter.frequency.linearRampToValueAtTime(1800, ctx.currentTime + dur);
+      filter.Q.value = 0.7;
+      var gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      source.start();
+      setTimeout(function () { ctx.close(); }, dur * 1000 + 100);
+    } catch (e) { /* 忽略 */ }
+  }
+
+  // ============================================================
+  // 相册书渲染与交互
+  // ============================================================
+  function renderAlbumPage(index, animateTyping) {
+    var page = albumPages[index];
+    if (!page) return;
+
+    var indicatorEl = document.getElementById('album-indicator');
+    var prevBtn = document.getElementById('album-prev');
+    var nextBtn = document.getElementById('album-next');
+
+    var isBlank = page.isBlank === true;
+    var leftFrame = document.querySelector('.album-photo-frame');
+    var rightHand = document.querySelector('.album-handwrite');
+
+    if (isBlank) {
+      leftFrame.classList.add('empty');
+      leftFrame.innerHTML = `
+        <div class="empty-icon">📷</div>
+        <div class="empty-text">点击这里，放一张照片</div>
+      `;
+      leftFrame.onclick = function() {
+        document.getElementById('photo-file').click();
+      };
+    } else {
+      leftFrame.classList.remove('empty');
+      leftFrame.onclick = null;
+      leftFrame.innerHTML = `
+        <span class="photo-corner tl"></span>
+        <span class="photo-corner tr"></span>
+        <span class="photo-corner bl"></span>
+        <span class="photo-corner br"></span>
+        <img id="album-img" src="${page.img}" alt="回忆照片" onerror="this.src='${PLACEHOLDER_IMG}'" />
+        <div class="album-photo-caption">${page.caption || ''}</div>
+      `;
+    }
+
+    if (isBlank) {
+      rightHand.classList.add('empty-handwrite');
+      rightHand.innerHTML = `
+        <div class="empty-dots">...</div>
+        <div class="empty-pencil">✏️</div>
+      `;
+    } else {
+      rightHand.classList.remove('empty-handwrite');
+      rightHand.innerHTML = `
+        <span class="album-page-title" id="album-title">${page.title}</span>
+        <span class="album-page-date" id="album-date">${page.date}</span>
+        <span id="album-text">${page.text}</span>
+        <span class="album-cursor"></span>
+      `;
+    }
+
+    if (albumTypingTimer) { clearInterval(albumTypingTimer); albumTypingTimer = null; }
+    if (!isBlank && animateTyping) {
+      var textEl = document.getElementById('album-text');
+      if (textEl) {
+        textEl.textContent = '';
+        var fullText = page.text;
+        var i = 0;
+        albumTypingTimer = setInterval(function () {
+          if (i >= fullText.length) {
+            clearInterval(albumTypingTimer);
+            albumTypingTimer = null;
+            return;
+          }
+          textEl.textContent += fullText.charAt(i);
+          i++;
+          if (i % 3 === 0) playWriteSound(0.06);
+        }, 42);
+      }
+    }
+
+    indicatorEl.textContent = (index + 1) + ' / ' + albumPages.length;
+    prevBtn.disabled = index <= 0;
+    nextBtn.disabled = index >= albumPages.length - 1;
+
+    var rememberTitle = document.getElementById('remember-title');
+    var spokenEl = document.getElementById('spoken');
+    if (rememberTitle && spokenEl) {
+      if (isBlank) {
+        rememberTitle.textContent = '暖伴在等您写下新的故事';
+        spokenEl.textContent = '这里还空着。您可以放一张新照片，然后在右边写下那时候的事。想好了，慢慢来。';
+      } else {
+        rememberTitle.textContent = '暖伴正在陪您一起讲照片中的故事';
+        var warmStories = {
+          'p1': '您看这张全家福，那时候家里人真多呀。您说您坐在最前面，那时候日子虽然过得清苦，但只要一家人聚在一起，心里就特别踏实，对吧？',
+          'p2': '这张照片里的姑娘们真精神！您说那时候和好姐妹去公园，留着长辫子、穿着碎花裙，笑得没心没肺的。青春就像那天的阳光，真让人怀念呀。',
+          'p3': '这是您和爱人当年的结婚照吧？没有华丽的仪式，就两张年轻的脸，但那一牵手就是一辈子。真是一段让人羡慕的姻缘。',
+          'p4': '家里添了小家伙之后，日子就变得忙碌起来了。虽然辛苦，但看着孩子一天天长大，那种甜是藏不住的。这就是为人父母的心意呀。',
+          'p5': '孩子们飞远了，日子终于慢下来了。您和老伙计们在公园里拉琴唱歌，头发白了也没关系，只要心里还装着热爱，晚年照样过得热气腾腾。',
+          'p6': '翻到最后一页，满堂儿孙，团团圆圆。您这一生吃过苦也尝过甜，最后都变成了此刻围坐在一起的笑脸。这一辈子，真值了。'
+        };
+        var warmText = warmStories[page.id] || ('暖伴陪您看着这张照片。' + page.text);
+        spokenEl.textContent = warmText;
+
+        if (typeof NBSpeech !== 'undefined' && NBSpeech.speak) {
+          NBSpeech.speak(warmText, rate);
+        } else if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          var utter = new SpeechSynthesisUtterance(warmText);
+          utter.lang = 'zh-CN';
+          utter.rate = 0.82;
+          window.speechSynthesis.speak(utter);
+        }
+      }
+    }
+  }
+
+  function runFlipAnimation(callback) {
+    if (albumFlipping) return;
+    albumFlipping = true;
+    var flipLayer = document.getElementById('album-flip-layer');
+    playFlipSound();
+    flipLayer.classList.remove('flipping');
+    void flipLayer.offsetWidth;
+    flipLayer.classList.add('flipping');
+    setTimeout(function () {
+      if (callback) callback();
+      flipLayer.classList.remove('flipping');
+      albumFlipping = false;
+    }, 900);
+  }
+
+  function openAlbum() {
+    if (albumOpened) return;
+    albumOpened = true;
+    var clasp = document.getElementById('album-clasp');
+    var book = document.getElementById('album-book');
+
+    playFlipSound();
+    clasp.classList.add('unclasped');
+
+    setTimeout(function () {
+      book.classList.add('opened');
+      playFlipSound();
+      setTimeout(function () {
+        renderAlbumPage(albumIndex, true);
+      }, 500);
+    }, 350);
+  }
+
+  function albumNext() {
+    if (albumIndex >= albumPages.length - 1) return;
+    if (albumFlipping) return;
+    runFlipAnimation(function () {
+      albumIndex++;
+      renderAlbumPage(albumIndex, true);
+    });
+  }
+
+  function albumPrev() {
+    if (albumIndex <= 0) return;
+    if (albumFlipping) return;
+    runFlipAnimation(function () {
+      albumIndex--;
+      renderAlbumPage(albumIndex, true);
+    });
+  }
+
+  // ============================================================
+  // 歌曲数据
+  // ============================================================
+  var songs = [
+    { id: "molihua", title: "茉莉花", artist: "江苏民歌", year: 1950, decade: "50后", bg:"song-moli.jpg", audio:"audio/molihua.mp3", lyrics: "好一朵美丽的茉莉花，好一朵美丽的茉莉花，芬芳美丽满枝桠，又香又白人人夸。", story: "这是一首江苏民歌，后来唱遍全国。", chapter: "youth", notes: [392, 440, 523, 523, 440, 392, 349, 392, 440, 392] },
+    { id: "nanniwan", title: "南泥湾", artist: "马可 / 郭兰英", year: 1943, decade: "50后", bg:"song-nanniwan.jpg", audio:"audio/nanniwan.mp3", lyrics: "花篮的花儿香，听我来唱一唱。", story: "歌颂大生产运动的经典歌曲。", chapter: "youth", notes: [392, 440, 523, 523, 440, 392, 349, 392, 440, 392] },
+    { id: "wodezuguo", title: "我的祖国", artist: "刘炽 / 郭兰英", year: 1956, decade: "50后", bg:"song-zuguo.jpg", audio:"audio/wodezuguo.mp3", lyrics: "一条大河波浪宽，风吹稻花香两岸。", story: "电影《上甘岭》里的插曲。", chapter: "youth", notes: [330, 349, 392, 523, 440, 392, 349, 330, 294, 330] },
+    { id: "dongfanghong", title: "东方红", artist: "陕北民歌改编", year: 1964, decade: "60后", bg:"song-dongfanghong.jpg", audio:"audio/dongfanghong.mp3", lyrics: "东方红，太阳升，中国出了个毛泽东。", story: "广为传唱的陕北经典。", chapter: "youth", notes: [392, 392, 440, 392, 349, 330, 294, 330, 349, 392] },
+    { id: "honghu", title: "洪湖水浪打浪", artist: "王玉珍", year: 1961, decade: "60后", bg:"song-honghushui.jpg", audio:"audio/honghu.mp3", lyrics: "洪湖水呀浪呀嘛浪打浪啊，洪湖岸边是呀嘛是家乡啊。", story: "歌剧洪湖赤卫队选段。", chapter: "youth", notes: [392, 440, 523, 523, 440, 392, 349, 392, 440, 392] },
+    { id: "tianye", title: "在希望的田野上", artist: "施光南 / 彭丽媛", year: 1981, decade: "80后", bg:"song-xiwang.jpg", audio:"audio/tianye.mp3", lyrics: "我们的家乡，在希望的田野上。", story: "改革开放后家喻户晓的歌曲。", chapter: "work", notes: [330, 349, 392, 523, 440, 392, 349, 330, 294, 330] },
+    { id: "shuangjiang", title: "让我们荡起双桨", artist: "刘炽 / 乔羽", year: 1955, decade: "50后", bg:"song-shuangjiang.jpg", audio:"audio/shuangjiang.mp3", lyrics: "让我们荡起双桨，小船儿推开波浪。", story: "几代人的童年记忆。", chapter: "youth", notes: [392, 440, 523, 523, 440, 392, 349, 392, 440, 392] },
+    { id: "liuyanghe", title: "浏阳河", artist: "湖南民歌", year: 1951, decade: "50后", bg:"song-liuyanghe.jpg", audio:"audio/liuyanghe.mp3", lyrics: "浏阳河，弯过了几道弯。", story: "湖南流传很广的民歌。", chapter: "youth", notes: [330, 349, 392, 523, 440, 392, 349, 330, 294, 330] }
+  ];
+  var events = [
+    { year: 1956, title: "对私有制的社会主义改造基本完成", desc: "城里的铺子、厂子陆续公私合营。许多人的青春，是从学徒变成工人开始的。", chapter: "youth", photo: "img/era/era-1956.jpg" },
+    { year: 1964, title: "第一颗原子弹爆炸成功", desc: "广播里反复播报。有人在车间里听，有人在田埂上听，都记得那天的喇叭声。", chapter: "youth", photo: "img/era/era-1964.jpg" },
+    { year: 1971, title: "恢复联合国合法席位", desc: "报纸头条、单位学习。世界忽然变大了，收音机里的国际新闻多了起来。", chapter: "work", photo: "img/era/era-1971.jpg" },
+    { year: 1978, title: "十一届三中全会", desc: "后来叫做改革开放。有人回城，有人考大学，有人第一次知道“搞活”。", chapter: "work", photo: "img/era/era-1978.jpg" },
+    { year: 1984, title: "国庆三十五周年阅兵", desc: "电视开始走进更多家庭。一家人围着小屏幕，看天安门前过车。", chapter: "work", photo: "img/era/era-1984.jpg" },
+    { year: 1990, title: "第十一届亚运会在北京举行", desc: "盼盼、开幕式、单位组织观看。那是许多人口中“国家真的不一样了”的一年。", chapter: "work", photo: "img/era/era-1990.jpg" }
+  ];
+
+  var photos = [];
+  var tab = "songs";
+  var decade = "全部";
+  var current = null;
+  var playing = false;
+  var spoken = "";
+  var prompt = "听完以后，告诉我这首歌让您想起谁。";
+  var chapter = "youth";
+  var photoId = 0;
+  var rate = 0.82;
+  var busy = false;
+  var selectedEraYear = null;
+  var projects = [];
+  var projectVoice = null;
+  var projectMusic = null;
+  var projectVoiceUrl = "";
+  var currentProject = null;
+  var projectVideo = null;
+
+  function subtitleAt(project, milliseconds) {
+    return ((project && project.subtitles) || []).find(function (cue) {
+      return milliseconds >= cue.start_ms && milliseconds < cue.end_ms;
+    });
+  }
+
+  function stopMemoryPlayer() {
+    if (projectVoice) { projectVoice.pause(); projectVoice = null; }
+    if (projectMusic) { projectMusic.pause(); projectMusic = null; }
+    if (projectVoiceUrl) { URL.revokeObjectURL(projectVoiceUrl); projectVoiceUrl = ""; }
+    if (projectVideo) { projectVideo.pause(); projectVideo.removeAttribute("src"); projectVideo = null; }
+    NBSpeech.stopSpeaking();
+    document.getElementById("memory-player").hidden = true;
+  }
+
+  function playMemoryProject(project) {
+    stopAudio();
+    stopMemoryPlayer();
+    currentProject = project;
+    document.getElementById("memory-player").hidden = false;
+    var imageElement = document.getElementById("memory-player-image");
+    var videoElement = document.getElementById("memory-player-video");
+    imageElement.src = NB.asset(project.photo_url || "");
+    imageElement.hidden = !!project.video_url;
+    videoElement.hidden = !project.video_url;
+    if (project.video_url) {
+      projectVideo = videoElement;
+      videoElement.src = NB.asset(project.video_url);
+      videoElement.play().catch(function () {});
+    }
+    document.getElementById("memory-player-title").textContent = project.title || "我的时光故事";
+    document.getElementById("memory-player-text").textContent = project.voice_session_id ? "" : (project.narration || "");
+    document.getElementById("memory-player-subtitle").textContent = "";
+    if (project.video_url) return;
+    var song = songs.find(function (item) { return item.id === project.song_id; });
+    if (song && song.audio) {
+      projectMusic = new Audio(song.audio);
+      projectMusic.loop = true;
+      projectMusic.volume = 0.16;
+      projectMusic.play().catch(function () {});
+    }
+    if (project.voice_session_id) {
+      NB.fetchVoiceBlob(project.voice_session_id).then(function (blob) {
+        projectVoiceUrl = URL.createObjectURL(blob);
+        projectVoice = new Audio(projectVoiceUrl);
+        projectVoice.volume = 1;
+        projectVoice.ontimeupdate = function () {
+          var cue = subtitleAt(project, projectVoice.currentTime * 1000);
+          document.getElementById("memory-player-subtitle").textContent = cue ? cue.text : "";
+          if (projectMusic) projectMusic.volume = 0.08;
+        };
+        projectVoice.onended = function () { if (projectMusic) projectMusic.volume = 0.16; };
+        projectVoice.play().catch(function () { NBSpeech.speak(project.narration || "", rate); });
+      }).catch(function () { NBSpeech.speak(project.narration || "", rate); });
+    } else {
+      NBSpeech.speak(project.narration || "", rate);
+    }
+  }
+
+  function renderMemoryProjects() {
+    var section = document.getElementById("time-projects");
+    var grid = document.getElementById("time-project-grid");
+    section.hidden = !projects.length;
+    grid.innerHTML = projects.map(function (item) {
+      var state = item.video_url ? " · AI记忆影像" : (item.video_job_id ? " · 影像生成中" : (item.voice_session_id ? " · 本人口述" : " · 文字讲述"));
+      return '<button type="button" class="time-project" data-project="' + item.id + '"><img src="' + NB.asset(item.photo_url || "") + '" alt="' + NBLayout.esc(item.title || "时光作品") + '"><span><strong>' + NBLayout.esc(item.title || "我的时光故事") + '</strong><small>' + state + '</small></span></button>';
+    }).join("");
+  }
+
+  function loadMemoryProjects() {
+    NB.fetchMemoryProjects().then(function (data) {
+      projects = data.projects || [];
+      renderMemoryProjects();
+    }).catch(function () {});
+  }
+
+  function loadImage(url) {
+    return new Promise(function (resolve, reject) {
+      var image = new Image();
+      image.onload = function () { resolve(image); };
+      image.onerror = reject;
+      image.src = NB.asset(url);
+    });
+  }
+
+  function decodeBlob(context, blob) {
+    return blob.arrayBuffer().then(function (buffer) { return context.decodeAudioData(buffer.slice(0)); });
+  }
+
+  function exportMemoryProject(project) {
+    if (!project || !project.voice_session_id || !window.MediaRecorder) {
+      document.getElementById("photo-notice").textContent = "需要本人录音并使用支持 MediaRecorder 的浏览器才能导出。";
+      return;
+    }
+    var button = document.getElementById("memory-export");
+    button.disabled = true;
+    button.textContent = "正在导出…";
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    var context = new AudioCtx();
+    var song = songs.find(function (item) { return item.id === project.song_id; });
+    Promise.all([
+      loadImage(project.photo_url),
+      NB.fetchVoiceBlob(project.voice_session_id),
+      song && song.audio ? fetch(song.audio).then(function (response) { return response.blob(); }) : Promise.resolve(null),
+    ]).then(function (assets) {
+      return Promise.all([
+        Promise.resolve(assets[0]),
+        decodeBlob(context, assets[1]),
+        assets[2] ? decodeBlob(context, assets[2]) : Promise.resolve(null),
+      ]);
+    }).then(function (assets) {
+      var image = assets[0], voiceBuffer = assets[1], musicBuffer = assets[2];
+      var canvas = document.createElement("canvas");
+      canvas.width = 1280; canvas.height = 720;
+      var ctx = canvas.getContext("2d");
+      var destination = context.createMediaStreamDestination();
+      var voiceSource = context.createBufferSource();
+      voiceSource.buffer = voiceBuffer;
+      voiceSource.connect(destination);
+      var musicSource = null;
+      if (musicBuffer) {
+        musicSource = context.createBufferSource();
+        var musicGain = context.createGain();
+        musicGain.gain.value = 0.1;
+        musicSource.buffer = musicBuffer;
+        musicSource.loop = true;
+        musicSource.connect(musicGain).connect(destination);
+      }
+      var canvasStream = canvas.captureStream(25);
+      var mixed = new MediaStream(canvasStream.getVideoTracks().concat(destination.stream.getAudioTracks()));
+      var mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? "video/webm;codecs=vp9,opus" : "video/webm";
+      var recorder = new MediaRecorder(mixed, { mimeType: mime });
+      var chunks = [];
+      recorder.ondataavailable = function (event) { if (event.data.size) chunks.push(event.data); };
+      recorder.onstop = function () {
+        var url = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = (project.title || "暖伴时光作品") + ".webm";
+        link.click();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        context.close().catch(function () {});
+        button.disabled = false;
+        button.textContent = "导出 WebM";
+      };
+      var started = performance.now();
+      function draw(now) {
+        var elapsed = now - started;
+        var progress = Math.min(1, elapsed / (voiceBuffer.duration * 1000));
+        var scale = 1.04 + progress * 0.1;
+        var imageRatio = image.width / image.height;
+        var canvasRatio = canvas.width / canvas.height;
+        var width = imageRatio > canvasRatio ? canvas.height * imageRatio : canvas.width;
+        var height = imageRatio > canvasRatio ? canvas.height : canvas.width / imageRatio;
+        width *= scale; height *= scale;
+        ctx.fillStyle = "#1b120d"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, (canvas.width - width) / 2 + progress * 18, (canvas.height - height) / 2, width, height);
+        var gradient = ctx.createLinearGradient(0, 430, 0, 720);
+        gradient.addColorStop(0, "rgba(20,10,4,0)"); gradient.addColorStop(1, "rgba(20,10,4,.9)");
+        ctx.fillStyle = gradient; ctx.fillRect(0, 390, 1280, 330);
+        ctx.fillStyle = "white"; ctx.font = "bold 38px sans-serif"; ctx.fillText(project.title || "我的时光故事", 70, 570);
+        var cue = subtitleAt(project, elapsed);
+        ctx.font = "30px sans-serif"; ctx.fillText((cue && cue.text) || "", 70, 635);
+        if (progress < 1) requestAnimationFrame(draw);
+      }
+      recorder.start(500);
+      voiceSource.start();
+      if (musicSource) musicSource.start();
+      requestAnimationFrame(draw);
+      voiceSource.onended = function () {
+        if (musicSource) try { musicSource.stop(); } catch (error) {}
+        setTimeout(function () { if (recorder.state !== "inactive") recorder.stop(); }, 250);
+      };
+    }).catch(function () {
+      context.close().catch(function () {});
+      button.disabled = false;
+      button.textContent = "导出 WebM";
+      document.getElementById("photo-notice").textContent = "这次没有导出成功，请确认录音和音乐可以播放。";
+    });
+  }
+
+  // ★★★ 原唱音频播放器 + 音量 ★★★
+  var audioEl = null;
+  var savedVolume = 0.9;
+  var volumeSaveTimer = null;
+
+  function ensureAudioEl() {
+    if (audioEl) return audioEl;
+    audioEl = new Audio();
+    audioEl.preload = "auto";
+    audioEl.volume = savedVolume;
+    audioEl.addEventListener("ended", function () {
+      playing = false;
+      renderPlayer();
+    });
+    audioEl.addEventListener("error", function () {
+      playing = false;
+      renderPlayer();
+    });
+    audioEl.addEventListener("pause", function () {
+      if (audioEl.ended) return;
+      playing = false;
+      renderPlayer();
+    });
+    audioEl.addEventListener("play", function () {
+      playing = true;
+      renderPlayer();
+    });
+    return audioEl;
+  }
+
+  // ★★★ 播放音频：fromStart=true 从头播；false 从当前位置继续 ★★★
+  function playAudio(song, fromStart) {
+    if (!song || !song.audio) {
+      startMelody(song);
+      return;
+    }
+    var el = ensureAudioEl();
+    try {
+      // 只有切歌（fromStart）时才归零
+      if (fromStart) {
+        el.pause();
+        el.src = song.audio;
+        el.currentTime = 0;
+      } else {
+        // 同一首歌"继续"：如果 src 不对，还是要重设
+        if (!el.src || el.src.indexOf(song.audio) < 0) {
+          el.src = song.audio;
+          el.currentTime = 0;
+        }
+      }
+      el.volume = savedVolume;
+      var p = el.play();
+      if (p && p.catch) {
+        p.catch(function (err) {
+          console.warn("音频播放失败：", err);
+          playing = false;
+          renderPlayer();
+        });
+      }
+    } catch (e) {
+      console.warn("音频播放异常：", e);
+      playing = false;
+      renderPlayer();
+    }
+  }
+
+  function stopAudio() {
+    if (audioEl) {
+      try {
+        audioEl.pause();
+        // ★★★ 不归零，保留进度，方便"继续" ★★★
+      } catch (e) {}
+    }
+    playing = false;
+    renderPlayer();
+  }
+
+  function setTab(next) {
+    tab = next;
+    document.querySelectorAll("[data-tab]").forEach(function (btn) {
+      btn.className = "tab-btn" + (btn.getAttribute("data-tab") === tab ? " active" : "");
+    });
+    document.getElementById("pane-songs").hidden = tab !== "songs";
+    document.getElementById("pane-era").hidden = tab !== "era";
+    document.getElementById("pane-photos").hidden = tab !== "photos";
+
+    if (tab !== "songs") stopAudio();
+
+    if (tab === "songs") {
+      decade = "全部";
+      renderSongs();
+    }
+
+    var bgEl = document.getElementById("remember-bg");
+    if (bgEl) {
+      bgEl.classList.remove("on");
+      bgEl.style.backgroundImage = "";
+    }
+    var boxEl = document.getElementById("remember-box");
+    if (boxEl) {
+      boxEl.classList.remove("on");
+    }
+
+    var titleEl = document.getElementById("remember-title");
+    var spokenEl = document.getElementById("spoken");
+    if (!titleEl || !spokenEl) return;
+
+    if (tab === "songs") {
+      titleEl.textContent = "暖伴在听这段回忆";
+      if (!current) {
+        spokenEl.textContent = "听完以后，告诉我这首歌让您想起谁。";
+      }
+    } else if (tab === "era") {
+      titleEl.textContent = "暖伴在陪您回忆那一年";
+      spokenEl.textContent = "点一个年代，或者按「我经历过」，跟我讲讲那一年您在做什么。";
+    } else if (tab === "photos") {
+      titleEl.textContent = "暖伴在听这张老照片";
+      spokenEl.textContent = "点一张老照片，跟我讲讲照片里的人、发生的事。";
+    }
+  }
+
+  function startMelody(song) {
+    try {
+      NBMelody.playMelody(song.notes || []);
+    } catch (e) {
+      console.warn("playMelody 失败：", e);
+    }
+    playing = true;
+    setTimeout(function () { playing = false; renderPlayer(); }, ((song.notes || []).length * 420) + 200);
+    renderPlayer();
+  }
+
+  function renderSongs() {
+    var decades = ["全部", "50后", "60后", "80后"];
+    document.getElementById("decades").innerHTML = decades.map(function (item) {
+      return '<button type="button" class="tab-btn' + (decade === item ? " active" : "") + '" data-decade="' + item + '">' + item + "</button>";
+    }).join("");
+    var visible = songs.filter(function (item) { return decade === "全部" || item.decade === decade; });
+
+    document.getElementById("songs").innerHTML = visible.map(function (song) {
+      var bgStyle = song.bg ? `background: url('./${song.bg}') center/cover;` : "";
+      return `<button type="button" class="song-card${(current && current.id === song.id ? " on" : "")}" data-song="${song.id}" style="position:relative;overflow:hidden;${bgStyle};text-align:left;padding:18px 16px;border:none;">
+        <div style="position:absolute;inset:0;background:rgba(255,253,248,0.65);z-index:2;"></div>
+        <div style="position:relative;z-index:3;color:#1a1a1a;">
+          <small style="font-size:13px;color:#333;display:block;margin-bottom:6px;">${song.year} · ${NBLayout.esc(song.decade)}</small>
+          <strong style="font-size:21px;font-weight:700;color:#111;display:block;margin-bottom:4px;">${NBLayout.esc(song.title)}</strong>
+          <span style="font-size:14px;color:#2c2c2c;">${NBLayout.esc(song.artist)}</span>
+        </div>
+      </button>`;
+    }).join("");
+    renderPlayer();
+  }
+
+  // ★★★ 播放器：加了音量滑块 ★★★
+  function renderPlayer() {
+    var box = document.getElementById("player");
+    if (!current) { box.hidden = true; return; }
+    box.hidden = false;
+    var playerBg = current && current.bg ? `background: url('./${current.bg}') center/cover;` : "";
+    var volPercent = Math.round(savedVolume * 100);
+    box.innerHTML = `
+      <div style="position:absolute;inset:0;${playerBg}background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+      <div style="position:absolute;inset:0;background:rgba(255,253,248,0.25);z-index:1;"></div>
+      <div style="position:absolute;inset:0;backdrop-filter:blur(0.5px);-webkit-backdrop-filter:blur(0.5px);z-index:2;"></div>
+      <div style="position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:3;box-shadow:inset 0 0 30px 6px rgba(255,253,248,0.35);"></div>
+      <div style="position:relative;z-index:4;padding:18px 22px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;">
+        <div style="flex:1;min-width:0;">
+          <h2 style="font-size:26px;color:#111;margin:0 0 10px;font-weight:800;font-family:'Microsoft YaHei','PingFang SC',sans-serif;">${playing ? "正在唱" : "已暂停"}《${NBLayout.esc(current.title)}》</h2>
+          <p class="lyrics" style="font-size:21px;color:#1a1a1a;margin:0 0 8px;line-height:1.55;font-weight:900;font-family:'SimSun','宋体','Songti SC','STSong',serif;">${NBLayout.esc(current.lyrics)}</p>
+          <p class="player-note" style="font-size:16px;color:#2a2a2a;margin:0;line-height:1.55;font-weight:700;font-family:'SimSun','宋体','Songti SC','STSong',serif;">原唱唱片，听完可以说您想起了谁。</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;min-width:200px;">
+          <button type="button" id="toggle-play" style="font-size:17px;min-width:130px;padding:12px 16px;border-radius:12px;border:1px solid #d9cfbf;background:#fffdf8;color:#111;font-weight:700;font-family:'Noto Serif SC',serif;">${playing ? "暂停" : "继续"}</button>
+          <button type="button" id="hear-lyrics" style="font-size:17px;min-width:130px;padding:12px 16px;border-radius:12px;border:1px solid #d9cfbf;background:#fffdf8;color:#111;font-weight:700;font-family:'Noto Serif SC',serif;">听歌词</button>
+          <div style="display:flex;align-items:center;gap:8px;background:#fffdf8;border:1px solid #d9cfbf;border-radius:12px;padding:8px 12px;">
+            <span style="font-size:16px;" id="vol-icon">🔊</span>
+            <input type="range" id="volume-slider" min="0" max="100" step="1" value="${volPercent}"
+              style="flex:1;height:5px;border-radius:3px;background:linear-gradient(to right,#e8dccb,#b14a3a);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;" />
+            <span style="font-size:13px;color:#5a4632;min-width:34px;text-align:right;" id="vol-label">${volPercent}%</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderEvents() {
+    document.getElementById("events").innerHTML = events.map(function (event) {
+      var photoSrc = event.photo ? event.photo : "";
+      var onClass = (selectedEraYear === event.year) ? " on" : "";
+      return `
+        <div class="era-card-wrap">
+          <div class="era-marker">
+            <div class="era-tick"></div>
+            <div class="era-arrow"></div>
+          </div>
+          <article class="era-card${onClass}" data-year="${event.year}">
+            ${photoSrc ? `<div class="era-photo" style="background-image: url('${photoSrc}');"></div>` : ""}
+            <div class="era-year">${event.year}</div>
+            <div class="era-content">
+              <h3>${NBLayout.esc(event.title)}</h3>
+              <p>${NBLayout.esc(event.desc)}</p>
+              <button type="button" class="solid-btn" data-year="${event.year}">我经历过</button>
+            </div>
+          </article>
+        </div>`;
+    }).join("");
+  }
+
+  function renderPhotos() {
+    var container = document.getElementById("photos");
+    if (!container) return;
+    container.innerHTML = photos.map(function (photo) {
+      var src = NB.asset(photo.url || "/api/uploads/" + photo.filename);
+      return '<button type="button" class="photo-card' + (photoId === photo.id ? " on" : "") + '" data-photo="' + photo.id + '"><img src="' + src +
+        '" alt="' + NBLayout.esc(photo.caption || "") + '" /><span>' + NBLayout.esc(photo.caption || photo.story || "点这张，跟我讲讲") + '</span></button>';
+    }).join("");
+  }
+
+  function startSong(song) {
+    if (!song) return;
+    current = song;
+    chapter = song.chapter || "youth";
+    photoId = 0;
+    prompt = "《" + song.title + "》让您想起谁，或者想起哪一年？";
+    renderSongs();
+    renderPlayer();
+
+    try { NBSpeech.stopSpeaking(); } catch (e) {}
+
+    // ★★★ 点卡片：从头播放 ★★★
+    playAudio(song, true);
+
+    busy = true;
+    try {
+      NB.playSong(song.id).then(function (result) {
+        spoken = result.speak;
+        document.getElementById("spoken").textContent = spoken;
+      }).catch(function () {
+        spoken = song.story + "这首歌让您想起谁，或者想起哪一年？";
+        document.getElementById("spoken").textContent = spoken;
+      }).finally(function () {
+        busy = false;
+        renderSongs();
+      });
+    } catch (e) {
+      spoken = song.story + "这首歌让您想起谁，或者想起哪一年？";
+      document.getElementById("spoken").textContent = spoken;
+      busy = false;
+      renderSongs();
+    }
+  }
+
+  function saveStory(text, panel) {
+    busy = true;
+    NB.rememberStory({ text: text, chapter_key: chapter, photo_id: photoId > 0 ? photoId : undefined }).then(function (result) {
+      spoken = result.speak;
+      document.getElementById("spoken").textContent = spoken;
+      document.getElementById("photo-notice").textContent = "这一段已经写进回忆录。";
+      if (panel && panel.reply) panel.reply(result.speak, { speak: true });
+      else NBSpeech.speak(result.speak, rate);
+      if (photoId > 0) {
+        var selectedPhoto = photos.find(function (item) { return item.id === photoId; }) || {};
+        NB.createMemoryProject({
+          photo_id: photoId,
+          song_id: current ? current.id : "",
+          narration: text,
+          title: selectedPhoto.caption || "我的时光故事",
+        }).then(function () {
+          document.getElementById("photo-notice").textContent = "照片、口述和配乐已组成时光故事板，也写进了回忆录。";
+          loadMemoryProjects();
+        }).catch(function () {});
+      }
+    }).catch(function () {
+      spoken = "我记下了。您可以去翻回忆录，看这一段写在哪一章。";
+      document.getElementById("spoken").textContent = spoken;
+      document.getElementById("photo-notice").textContent = "回忆暂时没有保存成功，请稍后再试。";
+      if (panel && panel.reply) panel.reply(spoken, { speak: true });
+      else NBSpeech.speak(spoken, rate);
+    }).finally(function () { busy = false; });
+  }
+
+  NBLayout.requireRole("elder").then(function (user) {
+    if (!user) return;
+
+    NB.fetchPreferences().then(function (preferences) {
+      var value = Number(preferences.audio_volume);
+      if (!isNaN(value) && value >= 0 && value <= 1) {
+        savedVolume = value;
+        if (audioEl) audioEl.volume = value;
+        renderPlayer();
+      }
+    }).catch(function () {});
+
+    NBTalk.renderDock(document.getElementById("dock"), function (text, panel, cmd) {
+      var action = (cmd && cmd.action) || "";
+      var args = (cmd && cmd.args) || {};
+      var line = (cmd && cmd.reply) || "";
+      if (action === "play_song") {
+        var hit = songs.filter(function (item) {
+          return item.id === args.song_id || item.title === args.title || text.indexOf(item.title) >= 0;
+        })[0] || songs[0];
+        startSong(hit);
+        panel.reply(line || ("给您放《" + hit.title + "》。听完告诉我您想起了谁。"), { speak: false });
+        return;
+      }
+      if (action === "set_tab") {
+        setTab(args.tab || "songs");
+        panel.reply(line || "好，这一页给您打开了。", { speak: true });
+        return;
+      }
+      if (action === "remember" || action === "") {
+        saveStory(text, panel);
+        return;
+      }
+      return false;
+    }, {
+      page: "nostalgia",
+      busy: function () { return busy; },
+      placeholder: "说想起谁，或放茉莉花",
+    });
+
+    document.querySelector(".tabs").onclick = function (event) {
+      var btn = event.target.closest("[data-tab]");
+      if (btn) setTab(btn.getAttribute("data-tab"));
+    };
+    document.getElementById("memory-close").onclick = stopMemoryPlayer;
+    document.getElementById("memory-export").onclick = function () { exportMemoryProject(currentProject); };
+    document.getElementById("memory-player").onclick = function (event) {
+      if (event.target === this) stopMemoryPlayer();
+    };
+    document.getElementById("time-project-grid").onclick = function (event) {
+      var button = event.target.closest("[data-project]");
+      if (!button) return;
+      var project = projects.find(function (item) { return item.id === Number(button.getAttribute("data-project")); });
+      if (project) playMemoryProject(project);
+    };
+    document.getElementById("decades").onclick = function (event) {
+      var btn = event.target.closest("[data-decade]");
+      if (!btn) return;
+      decade = btn.getAttribute("data-decade");
+      renderSongs();
+    };
+    document.getElementById("songs").onclick = function (event) {
+      var btn = event.target.closest("[data-song]");
+      if (!btn) return;
+      var song = songs.find(function (item) { return item.id === btn.getAttribute("data-song"); });
+      if (song) startSong(song);
+    };
+
+    // ★★★ 播放器点击：暂停 / 继续 / 音量 ★★★
+    document.getElementById("player").onclick = function (event) {
+      if (event.target.id === "toggle-play" && current) {
+        if (playing) {
+          stopAudio();          // 暂停（保留进度）
+        } else {
+          playAudio(current, false);  // 继续（不归零）
+        }
+        return;
+      }
+      if (event.target.id === "hear-lyrics" && current) {
+        NBSpeech.speak(current.story + current.lyrics, rate);
+      }
+    };
+
+    // ★★★ 音量滑块（input 事件，实时生效） ★★★
+    document.getElementById("player").addEventListener("input", function (event) {
+      if (event.target.id === "volume-slider") {
+        var v = Number(event.target.value) / 100;
+        savedVolume = v;
+        clearTimeout(volumeSaveTimer);
+        volumeSaveTimer = setTimeout(function () {
+          NB.savePreference("audio_volume", v).catch(function () {});
+        }, 350);
+        if (audioEl) audioEl.volume = v;
+        var label = document.getElementById("vol-label");
+        if (label) label.textContent = Math.round(v * 100) + "%";
+        var icon = document.getElementById("vol-icon");
+        if (icon) {
+          icon.textContent = v === 0 ? "🔇" : (v < 0.4 ? "🔉" : "🔊");
+        }
+      }
+    });
+
+    document.getElementById("events").onclick = function (event) {
+      var card = event.target.closest(".era-card");
+      if (!card) return;
+      var year = Number(card.getAttribute("data-year"));
+      var eventItem = events.find(function (item) { return item.year === year; });
+      if (!eventItem) return;
+
+      selectedEraYear = year;
+      renderEvents();
+
+      var bgEl = document.getElementById("remember-bg");
+      if (bgEl) {
+        bgEl.classList.remove("on");
+        bgEl.style.backgroundImage = "";
+      }
+      var boxEl = document.getElementById("remember-box");
+      if (boxEl) {
+        boxEl.classList.remove("on");
+      }
+
+      stopAudio();
+      current = null;
+      chapter = eventItem.chapter;
+      photoId = 0;
+      prompt = eventItem.year + "年您在做什么？说一句，我写进回忆录。";
+      busy = true;
+      NB.tellEra(eventItem.year).then(function (result) {
+        spoken = result.speak;
+        document.getElementById("spoken").textContent = spoken;
+        NBSpeech.speak(result.speak, rate);
+      }).catch(function () {
+        spoken = eventItem.year + "年，" + eventItem.desc + "那一年您在做什么？";
+        document.getElementById("spoken").textContent = spoken;
+        NBSpeech.speak(spoken, rate);
+      }).finally(function () { busy = false; renderPlayer(); });
+    };
+
+    var coverEl = document.getElementById('album-cover');
+    var claspEl = document.getElementById('album-clasp');
+    var prevBtn = document.getElementById('album-prev');
+    var nextBtn = document.getElementById('album-next');
+
+    coverEl.addEventListener('click', openAlbum);
+    claspEl.addEventListener('click', openAlbum);
+    prevBtn.addEventListener('click', albumPrev);
+    nextBtn.addEventListener('click', albumNext);
+
+    document.addEventListener('keydown', function (e) {
+      if (tab !== 'photos') return;
+      if (!albumOpened) return;
+      if (e.key === 'ArrowRight') albumNext();
+      if (e.key === 'ArrowLeft') albumPrev();
+    });
+
+    document.getElementById('continue-btn').onclick = function() {
+      var lastPage = albumPages[albumPages.length - 1];
+      if (lastPage && lastPage.isBlank) {
+        albumIndex = albumPages.length - 1;
+        renderAlbumPage(albumIndex, false);
+        return;
+      }
+
+      var blankPage = {
+        id: 'blank-' + Date.now(),
+        isBlank: true,
+        title: '',
+        date: '',
+        caption: '',
+        text: '',
+        img: ''
+      };
+      albumPages.push(blankPage);
+
+      if (!albumOpened) openAlbum();
+      albumIndex = albumPages.length - 1;
+
+      if (albumIndex > 0) {
+        runFlipAnimation(function() {
+          renderAlbumPage(albumIndex, false);
+        });
+      } else {
+        renderAlbumPage(albumIndex, false);
+      }
+    };
+
+    document.getElementById("photo-file").onchange = function (event) {
+      var file = event.target.files && event.target.files[0];
+      event.target.value = "";
+      if (!file) return;
+
+      var localUrl = URL.createObjectURL(file);
+
+      var lastPage = albumPages[albumPages.length - 1];
+      if (lastPage && lastPage.isBlank) {
+        lastPage.img = localUrl;
+        lastPage.caption = file.name;
+        lastPage.text = '在这里写下这张照片的故事...';
+        lastPage.title = '新的回忆';
+        lastPage.date = '—— ' + new Date().getFullYear() + ' ——';
+        lastPage.isBlank = false;
+
+        if (NB.uploadPhoto) {
+          NB.uploadPhoto(file).then(function(photo) {
+            lastPage.img = NB.asset(photo.url || "/api/uploads/" + photo.filename);
+            if (photo.caption) lastPage.caption = photo.caption;
+          }).catch(function(){});
+        }
+
+        document.getElementById("photo-notice").textContent = "照片放好了，右边可以写故事啦。";
+        renderAlbumPage(albumIndex, false);
+      }
+    };
+
+    renderSongs();
+    renderEvents();
+    renderPhotos();
+    setTab("songs");
+    loadMemoryProjects();
+
+    if (NB.fetchSession) {
+      NB.fetchSession().then(function (data) {
+        if (data.songs && data.songs.length) {
+          var localSongsMap = {};
+          songs.forEach(function (s) { localSongsMap[s.id] = s; });
+          songs = data.songs.map(function (item) {
+            return Object.assign({}, item, localSongsMap[item.id] || {});
+          });
+        }
+        if (data.events && data.events.length) {
+          var localEventMap = {};
+          events.forEach(function (e) { localEventMap[e.year] = e; });
+          events = data.events.map(function (e) {
+            return Object.assign({}, localEventMap[e.year] || {}, e);
+          });
+        }
+        var remote = (data.photos || []).map(function (item) {
+          return Object.assign({}, item, { url: item.url || "/api/uploads/" + item.filename });
+        });
+        if (remote.length) photos = remote;
+        rate = (data.profile && data.profile.speech_rate) || 0.82;
+        renderSongs();
+        renderEvents();
+        renderPhotos();
+      }).catch(function () {});
+    }
+  });
+</script>
+  </body>
+</html>

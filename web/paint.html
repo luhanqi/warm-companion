@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作画 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* ===== 作画页专属样式 ===== */
+      :root {
+        --art-pink: #F6A9B8;
+        --art-pink-deep: #E87E95;
+        --art-peach: #FFCE8D;
+        --art-lavender: #C7B0F2;
+        --art-mint: #A8D8B9;
+        --art-cream: #FBF6EC;
+        --art-paper: #FEFCF7;
+        --art-ink: #3A4A3F;
+        --art-brown: #8B7355;
+        --art-line: rgba(180, 150, 120, 0.18);
+      }
+
+      .paint-page {
+        position: relative;
+        padding: 28px 0 16px;
+      }
+
+      /* ===== 背景漂浮装饰 ===== */
+      .paint-bg-deco {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+      .deco-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(1px);
+        opacity: 0.65;
+      }
+      .deco-blob.b1 {
+        top: 40px; left: 2%;
+        width: 80px; height: 80px;
+        background: radial-gradient(circle at 35% 35%, rgba(246, 169, 184, 0.5), rgba(246, 169, 184, 0) 70%);
+        animation: floatBlob 9s ease-in-out infinite;
+      }
+      .deco-blob.b2 {
+        top: 180px; right: 1%;
+        width: 100px; height: 100px;
+        background: radial-gradient(circle at 60% 40%, rgba(199, 176, 242, 0.5), rgba(199, 176, 242, 0) 70%);
+        animation: floatBlob 11s ease-in-out infinite 0.5s;
+      }
+      .deco-blob.b3 {
+        top: 360px; left: 4%;
+        width: 60px; height: 60px;
+        background: radial-gradient(circle at 40% 60%, rgba(255, 206, 141, 0.55), rgba(255, 206, 141, 0) 70%);
+        animation: floatBlob 8s ease-in-out infinite 1s;
+      }
+      .deco-blob.b4 {
+        top: 560px; right: 3%;
+        width: 70px; height: 70px;
+        background: radial-gradient(circle at 50% 50%, rgba(168, 216, 185, 0.5), rgba(168, 216, 185, 0) 70%);
+        animation: floatBlob 10s ease-in-out infinite 1.5s;
+      }
+      @keyframes floatBlob {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(14px, -20px) scale(1.08); }
+        66% { transform: translate(-10px, 12px) scale(0.96); }
+      }
+
+      /* ===== 海报标题区 ===== */
+      .paint-hero {
+        position: relative;
+        text-align: center;
+        padding: 32px 24px 36px;
+        margin-bottom: 26px;
+        background:
+          radial-gradient(ellipse at 15% 25%, rgba(246, 169, 184, 0.13), transparent 55%),
+          radial-gradient(ellipse at 85% 75%, rgba(199, 176, 242, 0.12), transparent 55%),
+          radial-gradient(ellipse at 50% 100%, rgba(255, 206, 141, 0.15), transparent 60%),
+          linear-gradient(135deg, #FEFAF0 0%, #FBF1E2 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(230, 200, 160, 0.3);
+        box-shadow:
+          0 10px 30px rgba(160, 120, 80, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        overflow: hidden;
+        z-index: 1;
+      }
+      .paint-hero::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px dashed rgba(200, 160, 110, 0.22);
+        border-radius: 18px;
+        pointer-events: none;
+      }
+      .paint-hero .eyebrow {
+        color: var(--art-pink-deep);
+        letter-spacing: 0.35em;
+      }
+      .paint-hero h1 {
+        font-family: "Noto Serif SC", serif;
+        font-size: 2.4rem;
+        color: var(--art-ink);
+        letter-spacing: 0.08em;
+        margin: 4px 0 14px;
+        position: relative;
+        display: inline-block;
+      }
+      .paint-hero h1::after {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 20%;
+        right: 20%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--art-pink), var(--art-peach), transparent);
+        border-radius: 2px;
+        opacity: 0.7;
+      }
+      .paint-hero > p:last-child {
+        color: #7A6B5A;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        max-width: 46ch;
+        margin: 0 auto;
+      }
+      /* 右上角画笔装饰 */
+      .paint-hero::after {
+        content: "🖌️";
+        position: absolute;
+        top: 14px; right: 26px;
+        font-size: 22px;
+        opacity: 0.4;
+        transform: rotate(15deg);
+        animation: brushBob 4s ease-in-out infinite;
+      }
+      @keyframes brushBob {
+        0%, 100% { transform: rotate(15deg) translateY(0); }
+        50% { transform: rotate(22deg) translateY(-4px); }
+      }
+
+      /* ===== 两栏画室：左右顶部对齐、高度一致 ===== */
+      .paint-studio {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+        align-items: stretch;
+        position: relative;
+        z-index: 1;
+      }
+
+      .panel.paint-desk,
+      .panel.paint-stage {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: linear-gradient(135deg, #FFFEFB 0%, #FDF8EE 100%);
+        border: 1.5px solid rgba(230, 200, 160, 0.35);
+        border-radius: 22px;
+        padding: 24px 26px;
+        box-shadow:
+          0 14px 36px rgba(140, 100, 60, 0.07),
+          0 2px 6px rgba(140, 100, 60, 0.04),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+      }
+      .panel.paint-desk:hover,
+      .panel.paint-stage:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 44px rgba(140, 100, 60, 0.10),
+          0 4px 10px rgba(140, 100, 60, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      /* 纸张纹理 */
+      .panel.paint-desk::before,
+      .panel.paint-stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(circle at 22% 30%, rgba(200, 170, 130, 0.05) 1px, transparent 1.5px),
+          radial-gradient(circle at 68% 60%, rgba(200, 170, 130, 0.05) 1px, transparent 1.5px),
+          radial-gradient(circle at 45% 85%, rgba(200, 170, 130, 0.04) 1px, transparent 1.5px);
+        background-size: 30px 30px, 42px 42px, 36px 36px;
+        border-radius: 22px;
+      }
+
+      /* 画框角装饰 */
+      .panel.paint-desk::after {
+        content: "";
+        position: absolute;
+        top: 10px; left: 10px;
+        width: 26px; height: 26px;
+        border-top: 2px solid rgba(246, 169, 184, 0.55);
+        border-left: 2px solid rgba(246, 169, 184, 0.55);
+        border-top-left-radius: 10px;
+        pointer-events: none;
+      }
+      .panel.paint-stage::after {
+        content: "";
+        position: absolute;
+        top: 10px; right: 10px;
+        width: 26px; height: 26px;
+        border-top: 2px solid rgba(199, 176, 242, 0.6);
+        border-right: 2px solid rgba(199, 176, 242, 0.6);
+        border-top-right-radius: 10px;
+        pointer-events: none;
+      }
+
+      /* 卡片头部 */
+      .paint-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 44px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--art-line);
+        position: relative;
+        z-index: 1;
+      }
+      .paint-head.next {
+        margin-top: 22px;
+      }
+      .paint-head small {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; height: 32px;
+        flex: none;
+        border-radius: 50%;
+        font-family: "Noto Serif SC", serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(232, 126, 149, 0.25);
+        position: relative;
+      }
+      .paint-desk .paint-head small {
+        background: linear-gradient(135deg, #F6A9B8 0%, #E87E95 100%);
+      }
+      .paint-desk .paint-head.next small {
+        background: linear-gradient(135deg, #FFCE8D 0%, #F5A95F 100%);
+        box-shadow: 0 6px 14px rgba(245, 169, 95, 0.3);
+      }
+      .paint-stage .paint-head small {
+        background: linear-gradient(135deg, #C7B0F2 0%, #A98BE6 100%);
+        box-shadow: 0 6px 14px rgba(169, 139, 230, 0.3);
+      }
+      .paint-head h2 {
+        font-family: "Noto Serif SC", serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--art-ink);
+        letter-spacing: 0.08em;
+        margin: 0;
+      }
+      .paint-seal {
+        margin-left: auto;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-family: "Noto Serif SC", serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #fff;
+        background: linear-gradient(135deg, #C7B0F2 0%, #A98BE6 100%);
+        box-shadow: 0 4px 12px rgba(169, 139, 230, 0.3);
+        position: relative;
+      }
+      .paint-seal::before {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: 22px;
+        border: 1px dashed rgba(169, 139, 230, 0.5);
+        opacity: 0.6;
+      }
+
+      /* 表单区域 */
+      .field {
+        display: block;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+        font-size: 0.88rem;
+        color: #7A6B5A;
+        letter-spacing: 0.05em;
+      }
+      .field textarea {
+        margin-top: 8px;
+        width: 100%;
+        background: linear-gradient(180deg, #FFFCF5 0%, #FDF7EA 100%);
+        border: 1.5px solid rgba(230, 200, 160, 0.4);
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-family: "Noto Sans SC", sans-serif;
+        font-size: 1rem;
+        color: var(--art-ink);
+        line-height: 1.75;
+        resize: vertical;
+        min-height: 96px;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        box-shadow: inset 0 1px 3px rgba(180, 140, 90, 0.06);
+      }
+      .field textarea:focus {
+        outline: none;
+        border-color: var(--art-pink);
+        background: #FFFEFA;
+        box-shadow:
+          inset 0 1px 3px rgba(180, 140, 90, 0.06),
+          0 0 0 4px rgba(246, 169, 184, 0.15);
+      }
+
+      .paint-label {
+        font-size: 0.82rem;
+        color: #9A8B75;
+        letter-spacing: 0.1em;
+        margin: 10px 0 8px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 现成句子 chips */
+      .prompt-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 6px;
+        position: relative;
+        z-index: 1;
+      }
+      .prompt-chip {
+        padding: 8px 16px;
+        border-radius: 40px;
+        border: 1.5px solid rgba(230, 180, 140, 0.4);
+        background: linear-gradient(135deg, #FFF9F0, #FDF3E2);
+        color: #6B5A48;
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        letter-spacing: 0.04em;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .prompt-chip::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        transition: left 0.5s ease;
+      }
+      .prompt-chip:hover {
+        transform: translateY(-2px);
+        border-color: var(--art-pink);
+        background: linear-gradient(135deg, #FFF0F3, #FFE4EA);
+        color: var(--art-pink-deep);
+        box-shadow: 0 8px 18px rgba(232, 126, 149, 0.15);
+      }
+      .prompt-chip:hover::before {
+        left: 100%;
+      }
+
+      /* 画法选择 */
+      .paint-styles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        position: relative;
+        z-index: 1;
+      }
+      .paint-style {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1.5px solid rgba(230, 200, 160, 0.35);
+        background: linear-gradient(135deg, #FFFDF8, #FDF7EB);
+        cursor: pointer;
+        font-family: inherit;
+        text-align: left;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .paint-style em {
+        position: absolute;
+        top: 8px; right: 10px;
+        font-style: normal;
+        font-family: "Noto Serif SC", serif;
+        font-size: 0.78rem;
+        color: rgba(180, 140, 90, 0.45);
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+      .paint-style strong {
+        font-family: "Noto Serif SC", serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--art-ink);
+        letter-spacing: 0.08em;
+      }
+      .paint-style span {
+        font-size: 0.78rem;
+        color: #9A8B75;
+        letter-spacing: 0.03em;
+      }
+      .paint-style:hover {
+        transform: translateY(-2px);
+        border-color: rgba(199, 176, 242, 0.6);
+        box-shadow: 0 10px 22px rgba(169, 139, 230, 0.12);
+      }
+      .paint-style.on {
+        background: linear-gradient(135deg, #F8F2FF, #F0E6FF);
+        border-color: var(--art-lavender);
+        box-shadow:
+          0 10px 22px rgba(169, 139, 230, 0.18),
+          inset 0 0 0 1px rgba(199, 176, 242, 0.4);
+      }
+      .paint-style.on em {
+        color: var(--art-lavender);
+      }
+      .paint-style.on strong {
+        color: #6B4FB8;
+      }
+
+      /* 操作按钮 */
+      .paint-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: auto;
+        padding-top: 18px;
+        position: relative;
+        z-index: 1;
+      }
+      .paint-actions .solid-btn,
+      .paint-actions .ghost-btn {
+        flex: 1;
+        padding: 13px 20px;
+        border-radius: 40px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      }
+      .paint-actions .solid-btn {
+        background: linear-gradient(135deg, #E87E95 0%, #C95D77 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 8px 20px rgba(201, 93, 119, 0.28);
+      }
+      .paint-actions .solid-btn::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.6s ease;
+      }
+      .paint-actions .solid-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(201, 93, 119, 0.36);
+      }
+      .paint-actions .solid-btn:hover:not(:disabled)::before {
+        left: 100%;
+      }
+      .paint-actions .solid-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: 0 4px 10px rgba(201, 93, 119, 0.15);
+      }
+      .paint-actions .ghost-btn {
+        background: #FFFDF7;
+        color: #6B5A48;
+        border: 1.5px solid rgba(230, 200, 160, 0.5);
+        box-shadow: 0 4px 10px rgba(140, 100, 60, 0.05);
+      }
+      .paint-actions .ghost-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        border-color: var(--art-pink);
+        color: var(--art-pink-deep);
+        background: #FFF8F9;
+        box-shadow: 0 10px 22px rgba(232, 126, 149, 0.12);
+      }
+      .paint-actions .ghost-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* 画框区域 */
+      .paint-mount {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px;
+        margin-bottom: 14px;
+        background:
+          radial-gradient(ellipse at 30% 20%, rgba(255, 240, 220, 0.6), transparent 60%),
+          radial-gradient(ellipse at 70% 80%, rgba(240, 230, 255, 0.4), transparent 60%),
+          linear-gradient(135deg, #FBF5E8 0%, #F5EDDD 100%);
+        border-radius: 18px;
+        border: 1px solid rgba(200, 170, 130, 0.25);
+        box-shadow: inset 0 2px 8px rgba(160, 120, 80, 0.06);
+        position: relative;
+        overflow: hidden;
+        min-height: 320px;
+      }
+      .paint-mount::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border: 1px dashed rgba(200, 160, 110, 0.35);
+        border-radius: 12px;
+        pointer-events: none;
+      }
+
+      .paint-frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: background 0.4s ease;
+        min-height: 260px;
+      }
+      .paint-frame.has-art {
+        background: #FFF;
+        box-shadow:
+          0 12px 30px rgba(120, 90, 60, 0.12),
+          0 0 0 6px #FBF6EC,
+          0 0 0 7px rgba(200, 170, 130, 0.4);
+      }
+      .paint-frame.has-art img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+        border-radius: 4px;
+      }
+
+      .paint-empty {
+        text-align: center;
+        color: #9A8B75;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+      }
+      .paint-empty span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 38% 32%, #FFFCF3 0%, #F7EBD0 60%, #EFDDB8 100%);
+        color: #B8945D;
+        font-family: "Noto Serif SC", serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        box-shadow:
+          0 10px 24px rgba(180, 140, 90, 0.18),
+          inset 0 -4px 10px rgba(180, 140, 90, 0.12),
+          inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        margin-bottom: 18px;
+        position: relative;
+        transition: transform 0.5s cubic-bezier(.34, 1.56, .64, 1);
+      }
+      .paint-empty span::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1.5px dashed rgba(200, 160, 110, 0.4);
+        animation: slowSpin 24s linear infinite;
+      }
+      .paint-empty span::before {
+        content: "";
+        position: absolute;
+        inset: -16px;
+        border-radius: 50%;
+        border: 1px solid rgba(200, 160, 110, 0.2);
+        animation: slowSpin 36s linear infinite reverse;
+      }
+      @keyframes slowSpin {
+        to { transform: rotate(360deg); }
+      }
+      .paint-empty:hover span {
+        transform: scale(1.05) rotate(-4deg);
+      }
+      .paint-empty p {
+        color: #8A7A66;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        max-width: 240px;
+        margin: 0 auto;
+        letter-spacing: 0.03em;
+      }
+
+      /* 正在作画遮罩 */
+      .paint-veil {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: rgba(254, 250, 240, 0.85);
+        backdrop-filter: blur(3px);
+        z-index: 5;
+      }
+      .paint-veil i {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 3px solid rgba(232, 126, 149, 0.2);
+        border-top-color: var(--art-pink-deep);
+        animation: spinLoad 0.9s linear infinite;
+      }
+      .paint-veil b {
+        font-family: "Noto Serif SC", serif;
+        font-size: 0.9rem;
+        color: var(--art-pink-deep);
+        letter-spacing: 0.15em;
+        font-weight: 600;
+      }
+      @keyframes spinLoad {
+        to { transform: rotate(360deg); }
+      }
+
+      .paint-caption {
+        font-family: "Noto Serif SC", serif;
+        font-size: 0.9rem;
+        color: #7A6B5A;
+        letter-spacing: 0.06em;
+        text-align: center;
+        min-height: 24px;
+        padding: 4px 8px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 画集 */
+      .panel.paint-album {
+        margin-top: 24px;
+        position: relative;
+        z-index: 1;
+        background: linear-gradient(135deg, #FFFEFB 0%, #FDF8EE 100%);
+        border: 1.5px solid rgba(230, 200, 160, 0.35);
+        border-radius: 22px;
+        padding: 24px 26px;
+        box-shadow:
+          0 14px 36px rgba(140, 100, 60, 0.07),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+      .paint-count {
+        margin-left: auto;
+        font-size: 0.85rem;
+        color: #9A8B75;
+        letter-spacing: 0.08em;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: rgba(246, 169, 184, 0.12);
+        border: 1px solid rgba(246, 169, 184, 0.25);
+      }
+      .paint-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 14px;
+        margin-top: 8px;
+      }
+      .paint-tile {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        background: #FFFCF5;
+        border: 1.5px solid rgba(230, 200, 160, 0.35);
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: inherit;
+        text-align: left;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .paint-tile:hover {
+        transform: translateY(-3px);
+        border-color: var(--art-pink);
+        box-shadow: 0 12px 26px rgba(232, 126, 149, 0.15);
+      }
+      .paint-tile.on {
+        border-color: var(--art-pink-deep);
+        box-shadow:
+          0 12px 26px rgba(232, 126, 149, 0.2),
+          0 0 0 3px rgba(246, 169, 184, 0.25);
+      }
+      .paint-tile img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #F5EDDD;
+      }
+      .paint-tile span {
+        font-size: 0.85rem;
+        color: var(--art-ink);
+        font-weight: 500;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .paint-tile small {
+        font-size: 0.72rem;
+        color: #9A8B75;
+        letter-spacing: 0.05em;
+      }
+
+      .empty-note {
+        font-size: 0.9rem;
+        color: #9A8B75;
+        letter-spacing: 0.04em;
+        padding: 24px 10px;
+        text-align: center;
+        font-family: "Noto Serif SC", serif;
+      }
+
+      /* 状态横幅美化 */
+      .status-banner {
+        background: linear-gradient(135deg, #FFF6E2, #FFEFD0);
+        border: 1px solid rgba(240, 200, 130, 0.5);
+        color: #8A6D1A;
+        border-radius: 16px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 16px rgba(200, 150, 80, 0.08);
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 响应式 */
+      @media (max-width: 820px) {
+        .paint-studio {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        .paint-hero h1 {
+          font-size: 1.9rem;
+        }
+        .paint-hero {
+          padding: 26px 18px 30px;
+        }
+      }
+      @media (max-width: 520px) {
+        .paint-hero h1 {
+          font-size: 1.6rem;
+        }
+        .paint-hero > p:last-child {
+          font-size: 0.88rem;
+        }
+        .panel.paint-desk,
+        .panel.paint-stage,
+        .panel.paint-album {
+          padding: 18px 18px;
+          border-radius: 18px;
+        }
+        .paint-styles {
+          grid-template-columns: 1fr;
+        }
+        .paint-actions {
+          flex-direction: column;
+        }
+        .paint-gallery {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <div class="paint-page">
+          <!-- 背景漂浮装饰 -->
+          <div class="paint-bg-deco" aria-hidden="true">
+            <span class="deco-blob b1"></span>
+            <span class="deco-blob b2"></span>
+            <span class="deco-blob b3"></span>
+            <span class="deco-blob b4"></span>
+          </div>
+
+          <section class="greeting greeting-compact paint-hero">
+            <p class="eyebrow">疗愈 · 画室</p>
+            <h1>您说，暖伴来画</h1>
+            <p>先选画法，再说画面。点下面一句就会去画一张新的，不是现成照片。</p>
+          </section>
+          <div class="status-banner" id="error" hidden></div>
+          <div class="paint-studio">
+            <section class="panel paint-desk">
+              <header class="paint-head"><small>壹</small><h2>落稿</h2></header>
+              <label class="field">用一句话说画面
+                <textarea id="prompt" rows="4" placeholder="例如：村子口那棵大槐树，夏天有人在下面乘凉。"></textarea>
+              </label>
+              <p class="paint-label">现成句子，点了就画</p>
+              <div class="prompt-row" id="quick"></div>
+              <header class="paint-head next"><small>贰</small><h2>画法</h2></header>
+              <div class="paint-styles" id="styles"></div>
+              <div class="paint-actions">
+                <button type="button" class="solid-btn" id="paint-btn">开始作画</button>
+              </div>
+            </section>
+            <section class="panel paint-stage">
+              <header class="paint-head"><small>叁</small><h2>裱画</h2><span class="paint-seal" id="seal">水彩</span></header>
+              <div class="paint-mount">
+                <div class="paint-frame" id="frame">
+                  <div class="paint-empty" id="empty"><span>画</span><p>还没有新画。左边写完，或点一句现成句子。</p></div>
+                </div>
+              </div>
+              <p class="paint-caption" id="caption">画好以后，题目会写在这里。</p>
+              <div class="paint-actions">
+                <button type="button" class="ghost-btn" id="download-btn" disabled>收下这张</button>
+                <button type="button" class="solid-btn" id="again-btn">再画一张</button>
+              </div>
+            </section>
+          </div>
+          <section class="panel paint-album">
+            <header class="paint-head"><small>册</small><h2>我的画集</h2><span class="paint-count" id="count">还是空白</span></header>
+            <div id="gallery"><p class="empty-note">第一张会留在这里。点开小图，可以再看、再收下。</p></div>
+          </section>
+        </div>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+    <div id="dock"></div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var QUICK = ["画我老家的院子", "画一片金色麦田", "画老北京胡同", "画小时候的学校"];
+      var MARK = { ink: "墨", water: "彩", oil: "油", story: "话" };
+      var styles = [
+        { id: "ink", label: "国画", hint: "宣纸水墨，留白" },
+        { id: "water", label: "水彩", hint: "米色纸，柔边" },
+        { id: "oil", label: "油画", hint: "厚涂暖色" },
+        { id: "story", label: "故事画", hint: "温和绘本" },
+      ];
+      var style = "water";
+      var current = null;
+      var gallery = [];
+      var busy = false;
+
+      function shortDay(raw) {
+        if (!raw) return "";
+        var part = raw.slice(5, 10).replace("-", "月");
+        return part ? part + "日" : "";
+      }
+
+      function chosen() {
+        return styles.find(function (item) { return item.id === style; });
+      }
+
+      function showError(text) {
+        var el = document.getElementById("error");
+        if (!text) { el.hidden = true; return; }
+        el.hidden = false;
+        el.textContent = text;
+      }
+
+      function renderStyles() {
+        document.getElementById("styles").innerHTML = styles
+          .map(function (item) {
+            return (
+              '<button type="button" data-style="' + item.id + '" class="paint-style' + (style === item.id ? " on" : "") + '">' +
+              "<em>" + (MARK[item.id] || "画") + "</em><strong>" + NBLayout.esc(item.label) + "</strong><span>" +
+              NBLayout.esc(item.hint) + "</span></button>"
+            );
+          })
+          .join("");
+        document.getElementById("seal").textContent = (chosen() && chosen().label) || "水彩";
+      }
+
+      function renderFrame() {
+        var frame = document.getElementById("frame");
+        frame.className = "paint-frame" + (busy ? " busy" : "") + (current ? " has-art" : "");
+        var inner = current
+          ? '<img src="' + NB.asset(current.url) + '" alt="' + NBLayout.esc(current.prompt) + '" />'
+          : '<div class="paint-empty"><span>画</span><p>' + (busy ? "宣纸上正在落墨，请稍等一会儿。" : "还没有新画。左边写完，或点一句现成句子。") + "</p></div>";
+        if (busy) inner += '<div class="paint-veil"><i></i><b>宣纸上正在落墨</b></div>';
+        frame.innerHTML = inner;
+        document.getElementById("caption").textContent = current
+          ? (current.style_label || "画") + " · " + current.prompt
+          : "画好以后，题目会写在这里。";
+        document.getElementById("download-btn").disabled = !current;
+        document.getElementById("paint-btn").disabled = busy || !document.getElementById("prompt").value.trim();
+        document.getElementById("again-btn").disabled = busy || !document.getElementById("prompt").value.trim();
+        document.getElementById("paint-btn").textContent = busy ? "正在落墨……" : "开始作画";
+      }
+
+      function renderGallery() {
+        document.getElementById("count").textContent = gallery.length ? "已有 " + gallery.length + " 张" : "还是空白";
+        var box = document.getElementById("gallery");
+        if (!gallery.length) {
+          box.innerHTML = '<p class="empty-note">第一张会留在这里。点开小图，可以再看、再收下。</p>';
+          return;
+        }
+        box.innerHTML = '<div class="paint-gallery">' + gallery.map(function (item) {
+          return (
+            '<button type="button" class="paint-tile' + (current && current.id === item.id ? " on" : "") + '" data-id="' + item.id + '">' +
+            '<img src="' + NB.asset(item.url) + '" alt="' + NBLayout.esc(item.prompt) + '" />' +
+            "<span>" + NBLayout.esc(item.prompt) + "</span><small>" +
+            NBLayout.esc(item.style_label || "画") + (shortDay(item.created_at) ? " · " + shortDay(item.created_at) : "") +
+            "</small></button>"
+          );
+        }).join("") + "</div>";
+      }
+
+      function paint(text) {
+        var value = (text || document.getElementById("prompt").value).trim();
+        if (!value || busy) return;
+        document.getElementById("prompt").value = value;
+        busy = true;
+        showError("");
+        renderFrame();
+        NB.paintScene(value, style)
+          .then(function (made) {
+            current = made;
+            gallery = [made].concat(gallery.filter(function (item) { return item.id !== made.id; }));
+            NBSpeech.speak("画好了。您看看像不像心里那幅。");
+          })
+          .catch(function (err) {
+            showError(err.message || "这一张还没有画出来");
+          })
+          .finally(function () {
+            busy = false;
+            renderFrame();
+            renderGallery();
+          });
+      }
+
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        QUICK.forEach(function (item) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "prompt-chip";
+          btn.textContent = item;
+          btn.onclick = function () { paint(item); };
+          document.getElementById("quick").appendChild(btn);
+        });
+        renderStyles();
+        document.getElementById("styles").onclick = function (event) {
+          var btn = event.target.closest("[data-style]");
+          if (!btn) return;
+          style = btn.getAttribute("data-style");
+          renderStyles();
+        };
+        document.getElementById("prompt").oninput = renderFrame;
+        document.getElementById("paint-btn").onclick = function () { paint(); };
+        document.getElementById("again-btn").onclick = function () { paint(); };
+        document.getElementById("download-btn").onclick = function () {
+          if (!current || !current.url) return;
+          var link = document.createElement("a");
+          link.href = NB.asset(current.url);
+          link.download = current.filename || "nuanban-painting.jpg";
+          link.click();
+        };
+        document.getElementById("gallery").onclick = function (event) {
+          var tile = event.target.closest("[data-id]");
+          if (!tile) return;
+          var id = Number(tile.getAttribute("data-id"));
+          current = gallery.find(function (item) { return item.id === id; }) || current;
+          renderFrame();
+          renderGallery();
+        };
+        NBTalk.renderDock(document.getElementById("dock"), function (text) {
+          document.getElementById("prompt").value = text;
+          renderFrame();
+          NBSpeech.speak("好，我记下了。您看要不要改几个字，再点开始作画。");
+        }, {
+          busy: function () { return busy; },
+          placeholder: "说画面，我写进左边",
+        });
+        Promise.all([NB.fetchPaintings(), NB.fetchPaintStyles()])
+          .then(function (pack) {
+            gallery = pack[0].paintings || [];
+            if (pack[1].styles && pack[1].styles.length) styles = pack[1].styles;
+            renderStyles();
+            renderGallery();
+            renderFrame();
+          })
+          .catch(function () {
+            showError("作画页还没有连上服务。");
+          });
+      });
+    </script>
+  </body>
+</html>

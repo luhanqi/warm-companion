@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>注册 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://miaoda.feishu.cn" crossorigin />
+    <link
+      href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .top-links {
+        display: none;
+      }
+      /* 页面不滚动：卡片在剩余空间里垂直水平居中；注册与登录卡片等高 */
+      .login-shell {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 620px;
+        height: auto;
+        background: #fffbf0;
+        border: 1px solid #f0dfc4;
+        border-radius: 26px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(190, 118, 62, 0.2);
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+      }
+      .login-illustration {
+        background: linear-gradient(150deg, #fff3de 0%, #ffe7c4 48%, #ffd5a0 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .login-illustration .warm-scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 42%;
+        display: block;
+      }
+      .login-form-side {
+        padding: 22px 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+      }
+      .login-form-side .brand-title {
+        font-family: "Noto Serif SC", "Songti SC", serif;
+        font-size: 26px;
+        color: #8a4b2b;
+        margin: 0 0 2px;
+      }
+      .login-form-side .brand-subtitle {
+        color: #a97b58;
+        margin: 0 0 12px;
+        font-size: 14px;
+      }
+      .door-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .door-card {
+        border: 1px solid #edd9bc;
+        background: #fdf5e7;
+        border-radius: 14px;
+        padding: 9px 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-height: 0;
+      }
+      .door-card:hover {
+        border-color: #e7be92;
+        background: #faebd2;
+      }
+      .door-card.on {
+        border-color: #e8a05e;
+        background: #fbecd7;
+        box-shadow: 0 6px 16px rgba(232, 160, 94, 0.28);
+      }
+      .door-no {
+        display: block;
+        color: #b08a68;
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      .door-card strong {
+        color: #7a5438;
+        font-size: 15px;
+      }
+      .field {
+        margin-bottom: 8px;
+      }
+      .field label {
+        display: block;
+        color: #8a6447;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+      .field input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #ecd9bc;
+        border-radius: 11px;
+        background: #fdf5e7;
+        padding: 9px 14px;
+        font-size: 16px;
+        color: #6b4a32;
+        outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        min-height: 0;
+      }
+      .field input:focus {
+        border-color: #e89355;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(232, 147, 85, 0.18);
+      }
+      .solid-btn {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        padding: 11px;
+        background: linear-gradient(135deg, #f7a55e 0%, #e6784b 100%);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(230, 120, 75, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+      }
+      .solid-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(230, 120, 75, 0.45);
+      }
+      .solid-btn:disabled {
+        background: #e4c9a9;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .status-banner {
+        margin-top: 8px;
+        color: #c4523a;
+        background: #fbe4dc;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      .text-link-wrap {
+        text-align: center;
+        margin-top: 8px;
+      }
+      .text-link {
+        color: #d0673c;
+        font-size: 14px;
+      }
+      .login-form.panel {
+        margin-top: 0;
+        padding: 16px 20px;
+        display: block;
+        border-radius: 14px;
+      }
+      @media (max-width: 760px) {
+        .login-card {
+          grid-template-columns: 1fr;
+          max-width: 480px;
+          height: auto;
+        }
+        .login-illustration {
+          min-height: 180px;
+        }
+        .login-form-side {
+          padding: 18px 26px;
+        }
+        .login-form-side .brand-title {
+          font-size: 23px;
+        }
+        .door-grid {
+          margin-bottom: 10px;
+        }
+        .door-card {
+          padding: 8px 10px;
+        }
+        .field {
+          margin-bottom: 7px;
+        }
+        .field input {
+          padding: 8px 12px;
+        }
+        .solid-btn {
+          padding: 10px;
+          font-size: 15px;
+        }
+      }
+      @media (max-width: 760px) and (max-height: 720px) {
+        .login-illustration {
+          min-height: 120px;
+        }
+        .login-form-side {
+          padding: 12px 20px;
+        }
+        .login-form-side .brand-subtitle {
+          margin-bottom: 8px;
+        }
+        .door-card {
+          padding: 6px 8px;
+        }
+        .door-card strong {
+          font-size: 14px;
+        }
+        .field {
+          margin-bottom: 6px;
+        }
+        .field input {
+          padding: 6px 12px;
+        }
+        .solid-btn {
+          padding: 8px;
+        }
+      }
+      @media (max-height: 700px) and (min-width: 761px) {
+        .login-shell {
+          padding: 8px 12px;
+        }
+        .login-card {
+          min-height: 0;
+        }
+        .login-form-side {
+          padding: 10px 30px;
+        }
+        .login-form-side .brand-title {
+          font-size: 23px;
+        }
+        .login-form-side .brand-subtitle {
+          margin-bottom: 7px;
+        }
+        .door-grid {
+          margin-bottom: 7px;
+        }
+        .door-card {
+          padding: 6px 9px;
+        }
+        .login-form.panel {
+          padding: 10px 16px;
+        }
+        .field {
+          margin-bottom: 5px;
+        }
+        .field input {
+          padding: 6px 12px;
+        }
+        .solid-btn {
+          min-height: 0;
+          padding: 8px;
+        }
+        .text-link-wrap {
+          margin-top: 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell public-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <div class="login-shell">
+          <div class="login-card">
+            <div class="login-illustration" aria-hidden="true">
+              <img class="warm-scene" src="images/warm-scene.png" alt="" />
+            </div>
+            <div class="login-form-side">
+              <h1 class="brand-title">暖伴</h1>
+              <p class="brand-subtitle">注册新账号，加入暖伴</p>
+              <div class="door-grid login-roles">
+                <button type="button" class="door-card on" id="pick-elder">
+                  <span class="door-no">老人</span>
+                  <strong>我是老人</strong>
+                </button>
+                <button type="button" class="door-card" id="pick-family">
+                  <span class="door-no">家人</span>
+                  <strong>我是家人</strong>
+                </button>
+              </div>
+              <form class="panel login-form" id="register-form">
+                <label class="field">
+                  账号
+                  <input id="username" autocomplete="username" />
+                </label>
+                <label class="field">
+                  口令
+                  <input id="password" type="password" autocomplete="new-password" />
+                </label>
+                <label class="field">
+                  再输一遍口令
+                  <input id="password2" type="password" autocomplete="new-password" />
+                </label>
+                <label class="field" id="elder-account-field" hidden>
+                  对应的老人账号
+                  <input id="elder-username" autocomplete="username" placeholder="请先让老人完成注册" />
+                </label>
+                <label class="field" id="link-code-field" hidden>
+                  老人提供的六位关联码
+                  <input id="link-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="例如 123456" />
+                </label>
+                <button class="solid-btn landing-btn" type="submit" id="submit-btn">完成注册</button>
+                <div class="status-banner" id="error" hidden></div>
+              </form>
+              <div class="text-link-wrap">
+                <a class="text-link" href="login.html" id="to-login">已有账号？返回登录</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="site-colophon">暖伴</footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      NBLayout.publicTopbar("注册一个新账号");
+      var role = new URLSearchParams(location.search).get("role") === "family" ? "family" : "elder";
+      function friendlyError(error) {
+        var msg = (error && error.message) || "";
+        if (msg.indexOf("Failed to fetch") !== -1 || msg.indexOf("NetworkError") !== -1 || msg.indexOf("load failed") !== -1) {
+          return "连不上暖伴服务，请确认后端已启动（127.0.0.1:8002）";
+        }
+        return msg || "没有注册上";
+      }
+      function paint() {
+        document.getElementById("pick-elder").className = "door-card" + (role === "elder" ? " on" : "");
+        document.getElementById("pick-family").className = "door-card" + (role === "family" ? " on" : "");
+        document.getElementById("to-login").href = "login.html?role=" + role;
+        document.getElementById("elder-account-field").hidden = role !== "family";
+        document.getElementById("link-code-field").hidden = role !== "family";
+      }
+      document.getElementById("pick-elder").onclick = function () {
+        role = "elder";
+        paint();
+      };
+      document.getElementById("pick-family").onclick = function () {
+        role = "family";
+        paint();
+      };
+      paint();
+      document.getElementById("register-form").onsubmit = function (event) {
+        event.preventDefault();
+        var btn = document.getElementById("submit-btn");
+        var err = document.getElementById("error");
+        var username = document.getElementById("username").value.trim();
+        var password = document.getElementById("password").value;
+        var password2 = document.getElementById("password2").value;
+        var elderUsername = document.getElementById("elder-username").value.trim();
+        var linkCode = document.getElementById("link-code").value.trim();
+        if (!username) {
+          err.hidden = false;
+          err.textContent = "请先填写账号";
+          return;
+        }
+        if (password.length < 8) {
+          err.hidden = false;
+          err.textContent = "口令至少 8 位";
+          return;
+        }
+        if (password !== password2) {
+          err.hidden = false;
+          err.textContent = "两次口令不一致";
+          return;
+        }
+        if (role === "family" && !elderUsername) {
+          err.hidden = false;
+          err.textContent = "请填写需要关联的老人账号";
+          return;
+        }
+        if (role === "family" && !/^\d{6}$/.test(linkCode)) {
+          err.hidden = false;
+          err.textContent = "请输入老人资料页显示的六位关联码";
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "正在注册…";
+        err.hidden = true;
+        NB.register(username, password, role, elderUsername, linkCode)
+          .then(function () {
+            NB.writeAuth(null);
+            location.replace("login.html?role=" + role + "&registered=1");
+          })
+          .catch(function (error) {
+            err.hidden = false;
+            err.textContent = friendlyError(error);
+            btn.disabled = false;
+            btn.textContent = "完成注册";
+          });
+      };
+    </script>
+  </body>
+</html>

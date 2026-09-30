@@ -1,0 +1,14 @@
+{
+  "name": "warm-companion",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "server": "powershell -ExecutionPolicy Bypass -File start-backend.ps1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.19"
+  }
+}

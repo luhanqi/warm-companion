@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>健脑小游戏 · 暖伴</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" id="topbar"></header>
+      <main class="page">
+        <section class="greeting greeting-compact">
+          <p class="eyebrow">老物件，不是符号</p>
+          <h1>健脑小游戏</h1>
+          <p>做完一局，暖伴会用说话鼓励您。成绩只留给您自己看。</p>
+        </section>
+        <div id="game-root"></div>
+        <div id="dock"></div>
+      </main>
+      <footer class="site-colophon">暖伴 · 第四阶段 · 查询与提醒</footer>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/holdtalk.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+      var RELICS = [
+        { pair: "radio", label: "收音机", mark: "📻" },
+        { pair: "ticket", label: "粮票", mark: "🎫" },
+        { pair: "bike", label: "自行车", mark: "🚲" },
+        { pair: "train", label: "绿皮火车", mark: "🚂" },
+        { pair: "pot", label: "暖壶", mark: "🫖" },
+        { pair: "pen", label: "钢笔", mark: "✒️" },
+        { pair: "coal", label: "蜂窝煤", mark: "⚫" },
+        { pair: "sew", label: "缝纫机", mark: "🧵" },
+      ];
+      var root = document.getElementById("game-root");
+      var mode = "pick";
+
+      function shuffle(list) {
+        var next = list.slice();
+        for (var i = next.length - 1; i > 0; i -= 1) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = next[i];
+          next[i] = next[j];
+          next[j] = temp;
+        }
+        return next;
+      }
+
+      function pickView() {
+        root.innerHTML =
+          '<div class="door-grid">' +
+          '<button type="button" class="door-card" data-mode="flip"><span class="door-no">壹 · 翻牌</span><strong>记忆翻牌</strong><span>收音机、粮票、绿皮火车，翻出一对</span></button>' +
+          '<button type="button" class="door-card" data-mode="schulte"><span class="door-no">贰 · 舒尔特</span><strong>数字舒尔特</strong><span>按顺序点数字，练眼力。可选五格或六格</span></button></div>';
+        root.onclick = function (event) {
+          var btn = event.target.closest("[data-mode]");
+          if (!btn) return;
+          mode = btn.getAttribute("data-mode");
+          if (mode === "flip") flipView();
+          else schulteView(5);
+        };
+      }
+
+      function makeTiles() {
+        var raw = [];
+        RELICS.forEach(function (item, index) {
+          raw.push({ id: index * 2, pair: item.pair, label: item.label, mark: item.mark, open: false, done: false });
+          raw.push({ id: index * 2 + 1, pair: item.pair, label: item.label, mark: item.mark, open: false, done: false });
+        });
+        return shuffle(raw);
+      }
+
+      function flipView() {
+        var tiles = makeTiles();
+        var picked = [];
+        var locked = false;
+        var start = Date.now();
+        var moves = 0;
+        var seconds = 0;
+        var done = "";
+        var timer = setInterval(function () {
+          if (done) return;
+          seconds = Math.round((Date.now() - start) / 1000);
+          paint();
+        }, 500);
+
+        function paint() {
+          root.innerHTML =
+            '<div class="game-hud"><button type="button" class="ghost-btn" data-back>返回</button><span>' +
+            seconds + " 秒 · " + moves + ' 次</span><button type="button" class="ghost-btn" data-restart>重来一局</button></div>' +
+            '<div class="flip-grid">' + tiles.map(function (tile) {
+              var face = tile.open || tile.done
+                ? '<span class="flip-face">' + tile.mark + " " + NBLayout.esc(tile.label) + "</span>"
+                : "翻开";
+              return '<button type="button" class="flip-tile' + (tile.open || tile.done ? " open" : "") + (tile.done ? " done" : "") +
+                '" data-id="' + tile.id + '">' + face + "</button>";
+            }).join("") + "</div>" + (done ? '<p class="status-banner">' + NBLayout.esc(done) + "</p>" : "");
+        }
+
+        function praise(score) {
+          NB.finishGame("flip", score).then(function (result) {
+            done = result.speak;
+            NBSpeech.speak(result.speak);
+            paint();
+          }).catch(function () {
+            done = "配好了。这一局 " + score + "。眼睛还很亮。";
+            NBSpeech.speak(done);
+            paint();
+          });
+        }
+
+        root.onclick = function (event) {
+          if (event.target.closest("[data-back]")) { clearInterval(timer); pickView(); return; }
+          if (event.target.closest("[data-restart]")) {
+            tiles = makeTiles(); picked = []; locked = false; start = Date.now(); moves = 0; seconds = 0; done = ""; paint(); return;
+          }
+          var btn = event.target.closest("[data-id]");
+          if (!btn || locked || done) return;
+          var id = Number(btn.getAttribute("data-id"));
+          var tile = tiles.find(function (item) { return item.id === id; });
+          if (!tile || tile.open || tile.done) return;
+          tile.open = true;
+          picked.push(id);
+          paint();
+          if (picked.length < 2) return;
+          moves += 1;
+          locked = true;
+          var a = tiles.find(function (item) { return item.id === picked[0]; });
+          var b = tiles.find(function (item) { return item.id === picked[1]; });
+          setTimeout(function () {
+            if (a.pair === b.pair) {
+              tiles.forEach(function (item) { if (item.pair === a.pair) { item.done = true; item.open = true; } });
+              if (tiles.every(function (item) { return item.done; })) praise(Math.round((Date.now() - start) / 1000) + " 秒，翻了 " + moves + " 次");
+            } else {
+              tiles.forEach(function (item) { if (picked.indexOf(item.id) >= 0) item.open = false; });
+            }
+            picked = [];
+            locked = false;
+            paint();
+          }, 700);
+        };
+        paint();
+      }
+
+      function schulteView(size) {
+        var numbers = shuffle(Array.from({ length: size * size }, function (_, i) { return i + 1; }));
+        var expect = 1;
+        var start = Date.now();
+        var seconds = 0;
+        var done = "";
+        var timer = setInterval(function () {
+          if (done) return;
+          seconds = Math.round((Date.now() - start) / 1000);
+          paint();
+        }, 500);
+
+        function paint() {
+          root.innerHTML =
+            '<div class="game-hud"><button type="button" class="ghost-btn" data-back>返回</button><span>请点 ' +
+            Math.min(expect, size * size) + " · " + seconds + ' 秒</span><div class="pill-row">' +
+            '<button type="button" class="pill' + (size === 5 ? " on" : "") + '" data-size="5">五格</button>' +
+            '<button type="button" class="pill' + (size === 6 ? " on" : "") + '" data-size="6">六格</button>' +
+            '<button type="button" class="ghost-btn" data-restart>重来</button></div></div>' +
+            '<div class="schulte-grid' + (size === 6 ? " size-6" : "") + '">' + numbers.map(function (value) {
+              return '<button type="button" class="schulte-cell' + (value < expect ? " done" : "") + '" data-num="' + value + '">' + value + "</button>";
+            }).join("") + "</div>" + (done ? '<p class="status-banner">' + NBLayout.esc(done) + "</p>" : "");
+        }
+
+        root.onclick = function (event) {
+          if (event.target.closest("[data-back]")) { clearInterval(timer); pickView(); return; }
+          var sizeBtn = event.target.closest("[data-size]");
+          if (sizeBtn || event.target.closest("[data-restart]")) {
+            clearInterval(timer);
+            schulteView(sizeBtn ? Number(sizeBtn.getAttribute("data-size")) : size);
+            return;
+          }
+          var cell = event.target.closest("[data-num]");
+          if (!cell || done) return;
+          var value = Number(cell.getAttribute("data-num"));
+          if (value !== expect) return;
+          if (value === size * size) {
+            var used = Math.round((Date.now() - start) / 1000);
+            NB.finishGame("schulte", used + " 秒 · " + size + "×" + size).then(function (result) {
+              done = result.speak;
+              NBSpeech.speak(result.speak);
+              paint();
+            }).catch(function () {
+              done = "点完了。用了 " + used + " 秒。眼力还在。";
+              NBSpeech.speak(done);
+              paint();
+            });
+          }
+          expect = value + 1;
+          paint();
+        };
+        paint();
+      }
+
+      NBLayout.requireRole("elder").then(function (user) {
+        if (!user) return;
+        pickView();
+        NBTalk.renderDock(document.getElementById("dock"), function (text, panel, cmd) {
+          var action = (cmd && cmd.action) || "";
+          var line = (cmd && cmd.reply) || "";
+          if (action === "start_flip") {
+            flipView();
+            panel.reply(line || "开始翻牌了。翻出一对收音机、粮票这些老物件。", { speak: true });
+            return;
+          }
+          if (action === "start_schulte") {
+            schulteView(5);
+            panel.reply(line || "从 1 开始点。点完我会夸您。", { speak: true });
+            return;
+          }
+          if (action === "go_menu") {
+            pickView();
+            panel.reply(line || "回到选游戏了。", { speak: true });
+            return;
+          }
+          return false;
+        }, {
+          page: "games",
+          placeholder: "说开始翻牌，或开始找数字",
+        });
+      });
+    </script>
+  </body>
+</html>

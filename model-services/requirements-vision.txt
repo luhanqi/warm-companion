@@ -1,0 +1,8 @@
+# Compatible with the shared Windows CPU model runtime (torch 2.14).
+torchvision==0.29.0
+torch
+transformers>=4.45,<5
+accelerate>=0.33,<2
+Pillow>=10,<12
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
